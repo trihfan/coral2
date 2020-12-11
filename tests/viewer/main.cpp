@@ -1,10 +1,10 @@
-#include "Object.h"
+#include "Engine.h"
+
+using namespace coral;
 
 int main()
 {
-	auto object = std::make_shared<coral::Object>();
-	object->setName("test");
-	object = nullptr;
-	//auto ttt = coral::ObjectInstance::objects;
-	int t = 0;
+    Engine::create();
+
+    Engine::destroy();
 }

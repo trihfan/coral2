@@ -1,24 +1,21 @@
 #include "Object.h"
+#include "utils/Logs.h"
 
 using namespace coral;
 
+//*********************************************************************************
+// Object
 
-Object::Object()
+Object::Object() : state(ObjectState::not_initialized)
 {
-	coral::ObjectInstance::registerObject(std::shared_ptr<Object>(this));
 }
 
 Object::~Object()
 {
-	if (!destroyed)
-	{
-
+    if (state == ObjectState::initialized)
+    {
+        Logs(warning) << "object " << getName() << " has not been destroyed";
 	}
-}
-
-void Object::destroy()
-{
-	coral::ObjectInstance::unregisterObject(std::shared_ptr<Object>(this));
 }
 
 void Object::setName(const std::string& name) 
@@ -32,18 +29,46 @@ const std::string& Object::getName() const
 }
 
 //*********************************************************************************
+// ObjectFactory
 
-std::vector<std::shared_ptr<Object>> ObjectInstance::objects;
-std::vector<std::shared_ptr<Object>> ObjectInstance::initialize_list;
-std::vector<std::shared_ptr<Object>> ObjectInstance::release_list;
+std::unique_ptr<ObjectManager> ObjectManager::instance;
 
-void ObjectInstance::registerObject(std::shared_ptr<Object> object)
+void ObjectManager::release()
+{
+    for (auto object : objects)
+    {
+        if (object->state == Object::ObjectState::initialized)
+        {
+            release_list.push_back(object);
+        }
+    }
+    for (auto object : release_list)
+    {
+        object->release();
+    }
+
+    objects.clear();
+    initialize_list.clear();
+    release_list.clear();
+}
+
+void ObjectManager::destroy(std::shared_ptr<Object> object)
+{
+    instance->unregisterObject(object);
+}
+
+ObjectManager::ObjectManager(std::pmr::memory_resource* memory_resource) :
+      memory_resource(memory_resource)
+{
+}
+
+void ObjectManager::registerObject(std::shared_ptr<Object> object)
 {
 	objects.push_back(object);
 	initialize_list.push_back(object);
 }
 
-void ObjectInstance::unregisterObject(std::shared_ptr<Object> object)
+void ObjectManager::unregisterObject(std::shared_ptr<Object> object)
 {
 	objects.erase(std::find(objects.begin(), objects.end(), object));
 	release_list.push_back(object);

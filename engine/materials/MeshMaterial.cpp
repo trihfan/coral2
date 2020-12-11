@@ -1,6 +1,6 @@
 #include "MeshMaterial.h"
 #include "scene/Camera.h"
-#include "utils/Shader.h"
+#include "Shader.h"
 #include <unordered_map>
 
 using namespace coral;
@@ -12,7 +12,7 @@ const unsigned int SCR_HEIGHT = 600;
 static std::unordered_map<std::string, GLuint> sLoadedTextures;
 
 MeshMaterial::MeshMaterial(const std::vector<Texture>& textures) :
-    textures(textures)
+      Material(""), textures(textures)
 {
     texture_ids.resize(textures.size(), 0);
     //shader = std::make_shared<Shader>("resources/shaders/1.model_loading.vs", "resources/shaders/1.model_loading.fs");

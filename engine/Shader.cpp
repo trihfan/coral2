@@ -3,6 +3,9 @@
 
 using namespace coral;
 
+//*********************************************************************************
+// Shader
+
 void Shader::addShaderData(ShaderType type, const std::string& data)
 {
     shader_data[static_cast<size_t>(type)] = data;
@@ -22,13 +25,13 @@ void Shader::init()
 
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
     checkCompileErrors(vertex, "VERTEX");
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
     checkCompileErrors(fragment, "FRAGMENT");
 
@@ -37,7 +40,7 @@ void Shader::init()
     if (has_geometry)
     {
         geometry = glCreateShader(GL_GEOMETRY_SHADER);
-        glShaderSource(geometry, 1, &gShaderCode, NULL);
+        glShaderSource(geometry, 1, &gShaderCode, nullptr);
         glCompileShader(geometry);
         checkCompileErrors(geometry, "GEOMETRY");
     }
@@ -82,7 +85,7 @@ GLuint Shader::getId() const
 
 void Shader::setBool(const std::string& name, bool value) const
 {
-    glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+    glUniform1i(glGetUniformLocation(id, name.c_str()), value ? 1 : 0);
 }
 
 void Shader::setInt(const std::string& name, int value) const
@@ -149,7 +152,7 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
             Logs(error) << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
@@ -158,8 +161,30 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success)
         {
-            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
             Logs(error) << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
+}
+
+//*********************************************************************************
+// ShaderManager
+
+DEFINE_SINGLETON(ShaderManager)
+
+std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
+{
+    auto it = instance->shaders.find(name);
+    if (it != instance->shaders.end())
+    {
+        return it->second;
+    }
+
+    Logs(error) << "unknown shader " << name;
+    return nullptr;
+}
+
+ShaderManager::ShaderManager(std::pmr::memory_resource* memory_resource)
+{
+    // load shaders
 }

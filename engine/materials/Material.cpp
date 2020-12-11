@@ -3,24 +3,14 @@
 
 using namespace coral;
 
-void Material::init()
+Material::Material(const std::string& shader_name)
 {
-    shader->init();
-}
-
-void Material::release()
-{
-    shader->release();
+    shader = ShaderManager::getShader(shader_name);
 }
 
 void Material::use()
 {
     shader->use();
-}
-
-void Material::addShaderData(ShaderType type, const std::string& data)
-{
-    shader->addShaderData(type, data);
 }
 
 std::shared_ptr<Shader> Material::getShader()

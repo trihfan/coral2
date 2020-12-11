@@ -1,11 +1,20 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#ifdef __APPLE__
+    #include <experimental/memory_resource>
+    namespace std { namespace pmr = experimental::pmr; }
+#else
+    #include <memory_resource>
+#endif
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <array>
+#include <unordered_map>
 #include "Object.h"
+#include "utils/Singleton.h"
 
 namespace coral
 {
@@ -49,6 +58,20 @@ namespace coral
         // utility function for checking shader compilation/linking errors.
         // ------------------------------------------------------------------------
         void checkCompileErrors(GLuint shader, std::string type);
+    };
+
+    // The shader manager
+    class ShaderManager
+    {
+        MAKE_ENGINE_SINGLETON(ShaderManager)
+    public:
+        static std::shared_ptr<Shader> getShader(const std::string& name);
+
+    private:
+        ShaderManager(std::pmr::memory_resource* memory_resource);
+
+    private:
+        std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
     };
 }
 #endif
