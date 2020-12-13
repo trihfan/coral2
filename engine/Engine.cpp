@@ -33,8 +33,18 @@ Engine::Engine()
 {
     std::pmr::memory_resource* resource = memory_resource ? memory_resource.get() : std::pmr::new_delete_resource();
 
+    // load backend
+    if (!gladLoadGL())
+    {
+        Logs(error) << "Failed to initialize GLAD";
+    }
+
     // create instances
     ObjectManager::createInstance(resource);
     ShaderManager::createInstance(resource);
 }
 
+void Engine::frame()
+{
+
+}

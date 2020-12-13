@@ -1,11 +1,5 @@
 project (viewer)
 
-# include directories
-include_directories("${engine_path}")
-include_directories("${external_path}/glad/include")
-include_directories("${external_path}/glfw/include")
-include_directories("${external_path}/glm")
-
 # link directories
 link_directories(viewer ${lib_output_directory})
 
@@ -13,8 +7,11 @@ link_directories(viewer ${lib_output_directory})
 file(GLOB_RECURSE sources *.h *.cpp *.inl)
 set_folder_structure("${sources}" ${viewer_path})
 add_executable(viewer ${sources})
-add_dependencies(viewer engine)
 
+# includes
+target_include_directories(viewer PUBLIC "${external_path}/glfw/include")
+
+# dependencies
 target_link_libraries(viewer engine)
 target_link_libraries(viewer glfw)
 

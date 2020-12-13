@@ -23,6 +23,9 @@ namespace coral
         // configuration
         static void setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource);
 
+        // run
+        static void frame();
+
     private:
         // Constructor
         Engine();

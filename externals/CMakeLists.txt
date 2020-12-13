@@ -1,14 +1,21 @@
 project (external)
 
+# add submodules
 add_subdirectory(assimp)
 add_subdirectory(glfw)
 add_subdirectory(glm)
+add_subdirectory(rang)
 
+# set project structure
 set_target_properties(glfw PROPERTIES FOLDER "externals/glfw")
 set_target_properties(assimp PROPERTIES FOLDER "externals/assimp")
 set_target_properties(assimp_cmd PROPERTIES FOLDER "externals/assimp")
+set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "externals/glm")
+set_target_properties(uninstall PROPERTIES FOLDER "externals/assimp")
 set_target_properties(glm_shared PROPERTIES FOLDER "externals/glm")
+set_target_properties(zlibstatic PROPERTIES FOLDER "externals/zlib")
 
+# set output directories
 set_target_properties(assimp PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(assimp PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(assimp PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${bin_output_directory})

@@ -1,20 +1,22 @@
 project (engine)
 
-# include directories
-include_directories("${external_path}/assimp/include")
-include_directories("${assimp_config_path}")
-include_directories("${external_path}/glm")
-include_directories("${external_path}/stb")
-include_directories("${engine_path}")
-
 # link directories
 link_directories(engine ${lib_output_directory})
 
 # make lib
 file(GLOB_RECURSE sources *.h *.cpp *.inl *.c)
 set_folder_structure("${sources}" ${engine_path})
-add_library(engine STATIC ${sources} "${external_path}/stb/stb_vorbis.c" "${external_path}/stb/deprecated/stb_image.c")
-add_dependencies(engine assimp)
+add_library(engine STATIC ${sources})
+
+# includes
+target_include_directories(engine PUBLIC "${external_path}/assimp/include")
+target_include_directories(engine PUBLIC "${assimp_config_path}")
+target_include_directories(engine PUBLIC "${external_path}/glm")
+target_include_directories(engine PUBLIC "${external_path}/stb")
+target_include_directories(engine PUBLIC "${external_path}/rang/include")
+target_include_directories(engine PUBLIC "${engine_path}")
+
+# dependencies
 target_link_libraries(engine assimp)
 
 # set output directories

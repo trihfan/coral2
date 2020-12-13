@@ -33,3 +33,8 @@ add_custom_command(TARGET copy_resources PRE_BUILD
                    COMMAND python copy.py "${PROJECT_SOURCE_DIR}/resources" "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources"
 				   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 add_dependencies(engine copy_resources)
+
+# setup coral project directory
+set_target_properties(copy_resources PROPERTIES FOLDER "coral/utils")
+set_target_properties(engine PROPERTIES FOLDER "coral")
+set_target_properties(viewer PROPERTIES FOLDER "coral/tests")

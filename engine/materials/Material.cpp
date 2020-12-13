@@ -19,11 +19,11 @@ std::shared_ptr<Shader> Material::getShader()
 }
 
 #include "utils/Logs.h"
-#include <stb_image.h>
+//#include <stb_image.h>
 unsigned int Material::textureFromFile(const std::string& path, bool gamma)
 {
     unsigned int textureID;
-    glGenTextures(1, &textureID);
+    /*glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
@@ -52,7 +52,7 @@ unsigned int Material::textureFromFile(const std::string& path, bool gamma)
     {
         Logs(error) << "Texture failed to load at path: " << path;
         stbi_image_free(data);
-    }
+    }*/
 
     return textureID;
 }

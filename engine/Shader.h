@@ -78,7 +78,7 @@ namespace coral
         int getShaderType(const std::filesystem::path& extension) const;
 
     private:
-        std::vector<std::filesystem::path> paths;
+        static std::vector<std::filesystem::path> paths;
         std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
     };
 }

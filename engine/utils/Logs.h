@@ -21,17 +21,9 @@ namespace coral
     class Logs
     {
     public:
-        Logs(LogType type) : type(type)
-        {
-            setColor(type);
-            static constexpr std::array<std::string_view, 6> headers { "error", "warning", "info", "success", "fail", "debug" };
-            write(std::string("[") + std::string(headers[static_cast<size_t>(type)]) + "] ");
-        }
-
-        ~Logs()
-        {
-            *this << "\033[0m" << std::endl;
-        }
+        // construction
+        Logs(LogType type);
+        ~Logs();
 
         // stream operator
         template<typename type>
@@ -45,28 +37,16 @@ namespace coral
         typedef std::basic_ostream<char, std::char_traits<char>> coutType;
         typedef coutType& (*coutManipulator)(coutType&);
 
-        inline Logs& operator<<(coutManipulator manip)
-        {
-            manip(std::cout);
-            return *this;
-        }
+        Logs& operator<<(coutManipulator manip);
 
     private:
         const std::array<int, 5> verbosity { -1, 0, 4, 4, 5 };
         LogType type;
 
-        void setColor(LogType type)
-        {
-#if defined(__linux__) || defined(__APPLE__)
-            static const std::array<std::string, 6> colors { "\033[31m", "\033[33m", "\033[36m", "\033[32;1m", "\033[31;1m", "\033[35m" };
-            write(colors[static_cast<size_t>(type)]);
-#else
-            // todo
-            static const std::array<std::string, 6> colors{ "\033[31m", "\033[33m", "\033[36m", "\033[32;1m", "\033[31;1m", "\033[35m" };
-            write(colors[static_cast<size_t>(type)]);
-#endif
-        }
+        // set the output color
+        void setColor(LogType type);
 
+        // write to the standard output
         template<typename type>
         void write(const type& value)
         {

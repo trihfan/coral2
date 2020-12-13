@@ -46,7 +46,7 @@ def rcopy(input_folder, output_folder):
         
         # check if file don't exists or if modification date is different
         if entry.is_file():
-            if not os.path.exists(current_path) or os.path.getmtime(current_path) > os.path.getmtime(entry.path):
+            if not os.path.exists(current_path) or os.path.getmtime(entry.path) > os.path.getmtime(current_path):
                 print('copy ' + entry.path + ' -> ' + current_path)
                 shutil.copy(entry.path, output_folder)
 

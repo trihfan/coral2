@@ -172,10 +172,11 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 // ShaderManager
 
 DEFINE_SINGLETON(ShaderManager)
+std::vector<std::filesystem::path> ShaderManager::paths;
 
 void ShaderManager::addShaderPath(const std::filesystem::path& path)
 {
-    instance->paths.push_back(path);
+    paths.push_back(path);
 }
 
 std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
@@ -201,8 +202,6 @@ ShaderManager::ShaderManager(std::pmr::memory_resource* memory_resource)
 
 void ShaderManager::iterateFolder(const std::filesystem::path& path)
 {
-    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
-
     // list shaders in folder
     for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(path))
     {
@@ -213,7 +212,7 @@ void ShaderManager::iterateFolder(const std::filesystem::path& path)
         else if (std::filesystem::is_regular_file(entry))
         {
             int shader_type = getShaderType(entry.path().extension());
-            if (shader_type != -1)
+            if (shader_type == -1)
             {
                 Logs(warning) << "unknown shader type " << entry.path();
             }
@@ -224,6 +223,7 @@ void ShaderManager::iterateFolder(const std::filesystem::path& path)
                 if (!shader)
                 {
                     shader = ObjectManager::create<Shader>();
+                    shaders[name] = shader;
                 }
                 shader->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
             }
@@ -234,19 +234,19 @@ void ShaderManager::iterateFolder(const std::filesystem::path& path)
 int ShaderManager::getShaderType(const std::filesystem::path& extension) const
 {
     // vertex
-    if (extension == "vert" || extension == "vs" || extension == "vs.glsl")
+    if (extension == ".vert" || extension == ".vs" || extension == ".vs.glsl")
     {
         return Shader::vertex;
     }
 
     // fragment
-    if (extension == "frag" || extension == "fs" || extension == "fs.glsl")
+    if (extension == ".frag" || extension == ".fs" || extension == ".fs.glsl")
     {
         return Shader::fragment;
     }
    
     // geometry
-    if (extension == "geom" || extension == "gs" || extension == "gs.glsl")
+    if (extension == ".geom" || extension == ".gs" || extension == ".gs.glsl")
     {
         return Shader::geometry;
     }
