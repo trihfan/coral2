@@ -50,7 +50,7 @@
     public:
         // Create an object of the given object type
         template <typename ObjectType, class... Args>
-        static std::shared_ptr<ObjectType> create(Args... args);
+        static std::shared_ptr<ObjectType> create(Args&&... args);
 
         // Destroy the object, this should be called to released acquired data
         static void destroy(std::shared_ptr<Object> object);
@@ -71,12 +71,12 @@
     };
 
     template <typename ObjectType, class... Args>
-    std::shared_ptr<ObjectType> ObjectManager::create(Args... args)
+    std::shared_ptr<ObjectType> ObjectManager::create(Args&&... args)
     {
         static_assert (std::is_base_of<Object, ObjectType>::value, "Only object derivated from Object can be instanciated");
 
         // allocate object in the memory resource
-        std::shared_ptr<ObjectType> object = std::allocate_shared(std::pmr::polymorphic_allocator<ObjectType>(instance->memory_resource), std::forward(args...));
+        std::shared_ptr<ObjectType> object = std::allocate_shared<ObjectType>(std::pmr::polymorphic_allocator<ObjectType>(instance->memory_resource), std::forward<Args>(args)...);
 
         // register object
         instance->registerObject(object);

@@ -11,10 +11,10 @@ private: \
     X& operator=(X&&) = delete; \
     static std::unique_ptr<X> instance; \
     void release(); \
-    template <class... Args> static void createInstance(Args... args) \
+    template <class... Args> static void createInstance(Args&&... args) \
     { \
         if (instance) { Logs(warning) << #X << " already created, recreating"; } \
-        instance = std::make_unique<X>(std::forward<Args...>(args...)); \
+        instance = std::unique_ptr<X>(new X(std::forward<Args>(args)...)); \
         Logs(success) << #X << " created"; \
     } \
     static void destroyInstance() { instance->release(); instance = nullptr; Logs(success) << #X << " destroyed"; }

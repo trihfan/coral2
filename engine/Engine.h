@@ -21,13 +21,15 @@ namespace coral
         static void destroy();
 
         // configuration
-        void setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource);
+        static void setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource);
 
     private:
-        static std::unique_ptr<std::pmr::memory_resource> memory_resource;
-
-    private:
+        // Constructor
         Engine();
+
+    private:
+        // Engine memory resource
+        static std::unique_ptr<std::pmr::memory_resource> memory_resource;
     };
 }
 #endif

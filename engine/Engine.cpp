@@ -10,19 +10,12 @@ DEFINE_SINGLETON(Engine)
 
 void Engine::create()
 {
-    // create default memory resource if none provided
-    if (!memory_resource)
-    {
-        memory_resource = std::unique_ptr<std::pmr::memory_resource>(std::pmr::new_delete_resource());
-    }
-
-    // create the engine
     createInstance();
 }
 
 void Engine::destroy()
 {
-    // destroy instance
+    // destroy instances
     ShaderManager::destroyInstance();
     ObjectManager::destroyInstance();
     memory_resource = nullptr;
@@ -31,10 +24,17 @@ void Engine::destroy()
     destroyInstance();
 }
 
+void Engine::setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource)
+{
+    Engine::memory_resource = std::move(memory_resource);
+}
+
 Engine::Engine()
 {
+    std::pmr::memory_resource* resource = memory_resource ? memory_resource.get() : std::pmr::new_delete_resource();
+
     // create instances
-    ObjectManager::createInstance(memory_resource.get());
-    ShaderManager::createInstance(memory_resource.get());
+    ObjectManager::createInstance(resource);
+    ShaderManager::createInstance(resource);
 }
 

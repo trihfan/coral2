@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include "utils/Logs.h"
+#include "utils/FileUtils.h"
 
 using namespace coral;
 
@@ -14,11 +15,11 @@ void Shader::addShaderData(ShaderType type, const std::string& data)
 void Shader::init()
 {
     // 1. check shader data
-    bool has_geometry = !shader_data[static_cast<size_t>(ShaderType::geometry)].empty();
+    bool has_geometry = !shader_data[geometry].empty();
 
-    const char* vShaderCode = shader_data[static_cast<size_t>(ShaderType::vertex)].c_str();
-    const char* fShaderCode = shader_data[static_cast<size_t>(ShaderType::fragment)].c_str();
-    const char* gShaderCode = shader_data[static_cast<size_t>(ShaderType::geometry)].c_str();
+    const char* vShaderCode = shader_data[vertex].c_str();
+    const char* fShaderCode = shader_data[fragment].c_str();
+    const char* gShaderCode = shader_data[geometry].c_str();
 
     // 2. compile shaders
     unsigned int vertex, fragment;
@@ -172,6 +173,11 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 
 DEFINE_SINGLETON(ShaderManager)
 
+void ShaderManager::addShaderPath(const std::filesystem::path& path)
+{
+    instance->paths.push_back(path);
+}
+
 std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
 {
     auto it = instance->shaders.find(name);
@@ -187,4 +193,63 @@ std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
 ShaderManager::ShaderManager(std::pmr::memory_resource* memory_resource)
 {
     // load shaders
+    for (const std::filesystem::path& path : paths)
+    {
+        iterateFolder(path.is_relative() ? FileUtils::getAbsolutePath(path) : path);
+    }
+}
+
+void ShaderManager::iterateFolder(const std::filesystem::path& path)
+{
+    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
+
+    // list shaders in folder
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(path))
+    {
+        if (std::filesystem::is_directory(entry))
+        {
+            iterateFolder(entry.path());
+        }
+        else if (std::filesystem::is_regular_file(entry))
+        {
+            int shader_type = getShaderType(entry.path().extension());
+            if (shader_type != -1)
+            {
+                Logs(warning) << "unknown shader type " << entry.path();
+            }
+            else
+            {
+                std::string name = entry.path().stem().string();
+                std::shared_ptr<Shader> shader = shaders[name];
+                if (!shader)
+                {
+                    shader = ObjectManager::create<Shader>();
+                }
+                shader->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
+            }
+        }
+    }
+}
+
+int ShaderManager::getShaderType(const std::filesystem::path& extension) const
+{
+    // vertex
+    if (extension == "vert" || extension == "vs" || extension == "vs.glsl")
+    {
+        return Shader::vertex;
+    }
+
+    // fragment
+    if (extension == "frag" || extension == "fs" || extension == "fs.glsl")
+    {
+        return Shader::fragment;
+    }
+   
+    // geometry
+    if (extension == "geom" || extension == "gs" || extension == "gs.glsl")
+    {
+        return Shader::geometry;
+    }
+
+    return -1;
 }

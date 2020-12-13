@@ -8,22 +8,23 @@
     #include <memory_resource>
 #endif
 
-#include <glad/glad.h>
-#include <glm/glm.hpp>
+#include <filesystem>
 #include <string>
 #include <array>
 #include <unordered_map>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
 #include "Object.h"
 #include "utils/Singleton.h"
 
 namespace coral
 {
-    // supported shader types
-    enum class ShaderType : int { vertex, geometry, fragment, count };
-
     class Shader : public Object
     {
     public:
+        // supported shader types
+        enum ShaderType : int { vertex, fragment, geometry };
+
         // add a shader data
         void addShaderData(ShaderType type, const std::string& data);
 
@@ -52,7 +53,7 @@ namespace coral
         void setMat4(const std::string& name, const glm::mat4& mat) const;
 
     private:
-        std::array<std::string, static_cast<size_t>(ShaderType::count)> shader_data;
+        std::array<std::string, 3> shader_data;
         GLuint id = 0;
 
         // utility function for checking shader compilation/linking errors.
@@ -65,12 +66,19 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(ShaderManager)
     public:
+        // add a path to looks for loading shaders
+        static void addShaderPath(const std::filesystem::path& path);
+
+        // get the shader of the given name
         static std::shared_ptr<Shader> getShader(const std::string& name);
 
     private:
         ShaderManager(std::pmr::memory_resource* memory_resource);
+        void iterateFolder(const std::filesystem::path& path);
+        int getShaderType(const std::filesystem::path& extension) const;
 
     private:
+        std::vector<std::filesystem::path> paths;
         std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
     };
 }
