@@ -31,7 +31,5 @@ namespace coral
         // the material shader
         std::shared_ptr<Shader> shader;
     };
-
-
 }
 #endif

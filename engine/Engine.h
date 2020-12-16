@@ -12,6 +12,8 @@
 
 namespace coral
 {
+    class Scene;
+
     class Engine
     {
         MAKE_ENGINE_SINGLETON(Engine)
@@ -24,6 +26,7 @@ namespace coral
         static void setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource);
 
         // run
+        static void setCurrentScene(std::shared_ptr<Scene> scene);
         static void frame();
 
     private:

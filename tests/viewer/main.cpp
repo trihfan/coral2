@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Shader.h"
+#include "Object.h"
 #include <GLFW/glfw3.h>
 
 using namespace coral;
@@ -20,7 +21,7 @@ void processInput(GLFWwindow* window);
 int main()
 {
     // glfw: initialize and configure
-    // ------------------------------
+    // ------------------------------0
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -50,12 +51,21 @@ int main()
     ShaderManager::addShaderPath("resources/shaders");
     Engine::create();
 
+    // material
+
+    // vertices
+
+    // mesh
+    //auto mesh = ObjectManager::create<Mesh>();
+
+    // camera
+
     // main loop
     // ------------------------------
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
+        
         Engine::frame();
 
         glfwSwapBuffers(window);
@@ -71,14 +81,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    /*if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        camera.ProcessKeyboard(RIGHT, deltaTime);*/
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -103,10 +113,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    //camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera.ProcessMouseScroll(yoffset);
+    //camera.ProcessMouseScroll(yoffset);
 }

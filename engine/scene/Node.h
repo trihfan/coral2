@@ -3,14 +3,19 @@
 
 #include <vector>
 #include <memory>
+#include "Object.h"
 
 namespace coral
 {
 	class Camera;
 
-	class Node
+	// A node represent an item in the scene
+	class Node : public Object
 	{
+		DECLARE_TYPE(Node)
 	public:
+
+		// construction
 		Node(std::shared_ptr<Node> parent = nullptr);
 		
 		// Parent
@@ -24,18 +29,31 @@ namespace coral
 		size_t getChildrenCount() const;
 		const std::vector<std::shared_ptr<Node>>& getChildren() const;
 
-		// Draw
-		virtual void draw(std::shared_ptr<coral::Camera> camera) 
-		{
-			for (auto child : children)
-			{
-				child->draw(camera);
-			}
-		}
+		// uptate
+		virtual void update() {}
+
+		// draw
+		virtual void draw() {}
+		void setRenderQueue(unsigned int render_queue);
+		unsigned int getRenderQueue() const;
 
 	private:
 		std::shared_ptr<Node> parent;
 		std::vector<std::shared_ptr<Node>> children;
+		unsigned int render_queue = 1000;
 	};
+
+	// Function: bool(std::shared_ptr<Node>, Args&&...) -> return true to continue traversal, false to stop
+	template <typename Function, typename... Args>
+	static void traverse(std::shared_ptr<Node> node, Function function, Args&&... args)
+	{
+		if (function(node, std::forward<Args>(args)...))
+		{
+			for (std::shared_ptr<Node> child : node->getChildren())
+			{
+				traverse(child, std::forward<decltype(function)>(function), std::forward<Args>(args)...);
+			}
+		}
+	}
 }
 #endif

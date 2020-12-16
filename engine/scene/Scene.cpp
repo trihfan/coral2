@@ -1,22 +1,88 @@
+#include <functional>
 #include "Scene.h"
+#include "Node.h"
+#include "Camera.h"
 
 using namespace coral;
 
+//*********************************************************************************
+// Scene
+
 void Scene::add(std::shared_ptr<Node> node)
 {
-	nodes.push_back(node);
+	top_node->addChild(node);
 }
 
 void Scene::remove(std::shared_ptr<Node> node)
 {
-	auto it = std::find(nodes.begin(), nodes.end(), node);
-	if (it != nodes.end())
+	top_node->removeChild(node);
+}
+
+//*********************************************************************************
+// SceneManager
+
+DEFINE_SINGLETON(SceneManager)
+
+static void fillLists(std::shared_ptr<Node> node)
+{
+	for (std::shared_ptr<Node> child : node->getChildren())
 	{
-		nodes.erase(it);
+		fillLists(child);
 	}
 }
 
-const std::vector<std::shared_ptr<Node>>& Scene::allNodes() const
+void SceneManager::update()
 {
-	return nodes;
+	if (!instance->current_scene)
+	{
+		return;
+	}
+
+	// input and list camera for render
+	instance->cameras.clear();
+	traverse(instance->current_scene->top_node, [](std::shared_ptr<Node> node)
+	{
+		// send input
+		// todo
+
+		if (node->isA(Camera::type))
+		{
+			instance->cameras.push_back(node->getHandle<Camera>());
+		}
+		return true;
+	});
+
+	// update
+	traverse(instance->current_scene->top_node, [](std::shared_ptr<Node> node)
+	{ 
+		node->update(); 
+		if (node->isA(Camera::type))
+		{
+			instance->cameras.push_back(node->getHandle<Camera>());
+		}
+		return true; 
+	});
+
+	// cull / fill render queues
+	traverse(instance->current_scene->top_node, [](std::shared_ptr<Node> node)
+	{
+		node->update();
+		if (node->isA(Camera::type))
+		{
+			instance->cameras.push_back(node->getHandle<Camera>());
+		}
+		return true;
+	});
+}
+
+void SceneManager::setCurrentScene(std::shared_ptr<Scene> scene)
+{
+	instance->current_scene = scene;
+	instance->cameras.clear();
+}
+
+SceneManager::SceneManager(std::pmr::memory_resource* memory_resource)
+{
+	// add default queue
+	render_queues.insert(std::make_pair(1000, RenderQueue()));
 }

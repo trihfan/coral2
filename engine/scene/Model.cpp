@@ -145,7 +145,8 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene)
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
-    return std::make_shared<Mesh>(vertices, indices, std::make_shared<MeshMaterial>(textures));
+    return nullptr;
+    //return std::make_shared<Mesh>(vertices, indices, std::make_shared<MeshMaterial>(textures));
 }
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.

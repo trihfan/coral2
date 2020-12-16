@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include "Node.h"
 
 namespace coral
 {
@@ -25,8 +26,9 @@ namespace coral
     constexpr float ZOOM = 45;
 
     // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
-    class Camera
+    class Camera : public Node
     {
+        DECLARE_TYPE(Camera)
     public:
         // constructor with vectors
         Camera(glm::vec3 position = glm::vec3(0, 0, 0), glm::vec3 up = glm::vec3(0, 1, 0), float yaw = YAW, float pitch = PITCH);
@@ -46,7 +48,7 @@ namespace coral
         // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
         void processMouseScroll(float y_offset);
 
-    //private:
+    private:
         // camera Attributes
         glm::vec3 position;
         glm::vec3 front;

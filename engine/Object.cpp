@@ -52,6 +52,7 @@ void ObjectManager::release()
     release_list.clear();
 }
 
+
 void ObjectManager::destroy(std::shared_ptr<Object> object)
 {
     instance->unregisterObject(object);
@@ -72,4 +73,20 @@ void ObjectManager::unregisterObject(std::shared_ptr<Object> object)
 {
 	objects.erase(std::find(objects.begin(), objects.end(), object));
 	release_list.push_back(object);
+}
+
+void ObjectManager::update()
+{
+    for (auto object : initialize_list)
+    {
+        object->release();
+    }
+
+    for (auto object : release_list)
+    {
+        object->release();
+    }
+
+    initialize_list.clear();
+    release_list.clear();
 }

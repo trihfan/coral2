@@ -23,7 +23,7 @@ void Node::addChild(std::shared_ptr<Node> child)
 	{
 		children.push_back(child);
 	}
-	//child->parent = shared_from_this();
+	child->parent = getHandle<Node>();
 }
 
 void Node::removeChild(std::shared_ptr<Node> child)
@@ -49,4 +49,14 @@ size_t Node::getChildrenCount() const
 const std::vector<std::shared_ptr<Node>>& Node::getChildren() const
 {
 	return children;
+}
+
+void Node::setRenderQueue(unsigned int render_queue)
+{
+	this->render_queue = render_queue;
+}
+
+unsigned int Node::getRenderQueue() const
+{
+	return render_queue;
 }

@@ -23,12 +23,13 @@ namespace coral
 
     class Mesh : public Node
     {
+        DECLARE_TYPE(Mesh)
     public:
         // constructor
         Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material);
 
         // render the mesh;
-        virtual void draw(std::shared_ptr<coral::Camera> camera) override;
+        virtual void draw(std::shared_ptr<coral::Camera> camera);
 
         // Shader material
         void setMaterial(std::shared_ptr<Material> material);
