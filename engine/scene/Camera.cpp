@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "Camera.h"
 #include <algorithm>
 
 using namespace coral;
@@ -18,9 +18,9 @@ Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, fl
 {
 }
 
-glm::mat4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewProjectionMatrix()
 {
-    return glm::lookAt(position, position + front, up);
+    return glm::lookAt(position, position + front, up) * glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f);
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)

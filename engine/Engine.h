@@ -13,11 +13,22 @@
 namespace coral
 {
     class Scene;
+    class Camera;
+    class Node;
+
+    struct RenderParameters
+	{
+        std::shared_ptr<Camera> camera;
+        std::vector<std::shared_ptr<Node>> lights;
+	};
 
     class Engine
     {
-        MAKE_ENGINE_SINGLETON(Engine)
+        MAKE_SINGLETON(Engine)
     public:
+        // tmp
+        static RenderParameters current_parameters;
+
         // creation
         static void create();
         static void destroy();

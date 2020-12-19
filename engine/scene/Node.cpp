@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Node.h"
 
 using namespace coral;

@@ -17,7 +17,7 @@ target_include_directories(engine PUBLIC "${external_path}/rang/include")
 target_include_directories(engine PUBLIC "${engine_path}")
 
 # dependencies
-target_link_libraries(engine assimp)
+target_link_libraries(engine PUBLIC OpenGL::GL ${CMAKE_DL_LIBS} assimp)
 
 # set output directories
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

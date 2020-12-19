@@ -8,6 +8,11 @@ using namespace coral;
 //*********************************************************************************
 // Scene
 
+Scene::Scene() :
+	top_node(ObjectManager::create<Node>())
+{
+}
+
 void Scene::add(std::shared_ptr<Node> node)
 {
 	top_node->addChild(node);
@@ -23,16 +28,16 @@ void Scene::remove(std::shared_ptr<Node> node)
 
 DEFINE_SINGLETON(SceneManager)
 
-static void fillLists(std::shared_ptr<Node> node)
-{
-	for (std::shared_ptr<Node> child : node->getChildren())
-	{
-		fillLists(child);
-	}
-}
-
 void SceneManager::update()
 {
+	// clear
+	instance->cameras.clear();
+	for (auto& queue : instance->render_queues)
+	{
+		queue.second.nodes.clear();
+	}
+
+	// check scene
 	if (!instance->current_scene)
 	{
 		return;
@@ -56,22 +61,7 @@ void SceneManager::update()
 	traverse(instance->current_scene->top_node, [](std::shared_ptr<Node> node)
 	{ 
 		node->update(); 
-		if (node->isA(Camera::type))
-		{
-			instance->cameras.push_back(node->getHandle<Camera>());
-		}
 		return true; 
-	});
-
-	// cull / fill render queues
-	traverse(instance->current_scene->top_node, [](std::shared_ptr<Node> node)
-	{
-		node->update();
-		if (node->isA(Camera::type))
-		{
-			instance->cameras.push_back(node->getHandle<Camera>());
-		}
-		return true;
 	});
 }
 

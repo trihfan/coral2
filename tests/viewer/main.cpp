@@ -1,7 +1,11 @@
+#include "glad/glad.h"
+#include <GLFW/glfw3.h>
 #include "Engine.h"
 #include "Shader.h"
 #include "Object.h"
-#include <GLFW/glfw3.h>
+#include "scene/Scene.h"
+#include "scene/Camera.h"
+#include "materials/BasicMaterial.h"
 
 using namespace coral;
 
@@ -11,6 +15,11 @@ const unsigned int SCR_HEIGHT = 600;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
+std::shared_ptr<Camera> camera;
+
+// timing todo timemanager
+float deltaTime = 0.0f; 
+float lastFrame = 0.0f;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -44,30 +53,48 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // setup engine
     // ------------------------------
     ShaderManager::addShaderPath("resources/shaders");
     Engine::create();
 
+    // scene
+    auto scene = ObjectManager::create<Scene>();
+    SceneManager::setCurrentScene(scene);
+
+    // camera
+    camera = ObjectManager::create<Camera>();
+    scene->add(camera);
+
     // material
+    auto material = ObjectManager::create<BasicMaterial>();
 
     // vertices
 
     // mesh
     //auto mesh = ObjectManager::create<Mesh>();
 
-    // camera
-
     // main loop
     // ------------------------------
     while (!glfwWindowShouldClose(window))
     {
+        // per-frame time logic
+        // --------------------
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        // input
+        // -----
         processInput(window);
         
+        // render
+        // ------
         Engine::frame();
 
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -81,14 +108,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    /*if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->processKeyboard(CameraMovement::forward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        camera->processKeyboard(CameraMovement::backward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        camera->processKeyboard(CameraMovement::left, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);*/
+        camera->processKeyboard(CameraMovement::right, deltaTime);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -113,10 +140,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    //camera.ProcessMouseMovement(xoffset, yoffset);
+    camera->processMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    //camera.ProcessMouseScroll(yoffset);
+    camera->processMouseScroll(yoffset);
 }

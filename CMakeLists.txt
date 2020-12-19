@@ -8,8 +8,12 @@ project(coral VERSION ${version} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 # modules
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 include(folder_structure)
+
+# packages
+find_package(Python3 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 # directories
 set(external_path ${PROJECT_SOURCE_DIR}/externals)
@@ -27,10 +31,11 @@ add_subdirectory(engine)
 add_subdirectory(tests)
 
 # resources
+file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")
 add_custom_target(copy_resources ALL 
 				  DEPENDS ${PROJECT_SOURCE_DIR}/last_copy.h)
 add_custom_command(TARGET copy_resources PRE_BUILD
-                   COMMAND python copy.py "${PROJECT_SOURCE_DIR}/resources" "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources"
+                   COMMAND ${Python3_EXECUTABLE} copy.py "${PROJECT_SOURCE_DIR}/resources" "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources"
 				   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 add_dependencies(engine copy_resources)
 

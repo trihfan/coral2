@@ -13,11 +13,6 @@ void Material::use()
     shader->use();
 }
 
-std::shared_ptr<Shader> Material::getShader()
-{
-    return shader;
-}
-
 #include "utils/Logs.h"
 //#include <stb_image.h>
 unsigned int Material::textureFromFile(const std::string& path, bool gamma)

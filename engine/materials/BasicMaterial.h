@@ -8,16 +8,16 @@ namespace coral
 {
     class BasicMaterial : public Material
     {
+        DECLARE_TYPE(BasicMaterial)
     public:
         // construction
-        BasicMaterial() = default;
+        BasicMaterial();
         virtual ~BasicMaterial() = default;
 
         // setup the shader and its parameters
         virtual void use() override;
 
-    private:
-        // basic material parameters
+        // uniforms
         glm::vec3 ambient;
         glm::vec3 diffuse;
         glm::vec3 specular;

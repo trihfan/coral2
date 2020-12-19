@@ -14,7 +14,6 @@ namespace coral
 	{
 		DECLARE_TYPE(Node)
 	public:
-
 		// construction
 		Node(std::shared_ptr<Node> parent = nullptr);
 		

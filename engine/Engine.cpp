@@ -6,6 +6,7 @@
 using namespace coral;
 
 std::unique_ptr<std::pmr::memory_resource> Engine::memory_resource;
+RenderParameters Engine::current_parameters;
 
 DEFINE_SINGLETON(Engine)
 
@@ -59,4 +60,15 @@ void Engine::frame()
     SceneManager::instance->update();
 
     // draw
+    for (auto camera : SceneManager::instance->cameras)
+    {
+        current_parameters.camera = camera;
+
+        // cull / fill render queues
+        traverse(SceneManager::instance->current_scene->top_node, [](std::shared_ptr<Node> node)
+        {
+            SceneManager::instance-instance->render_queues[node->getRenderQueue()].nodes.push_back(node);
+            return true;
+        });
+    }
 }

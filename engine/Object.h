@@ -19,7 +19,8 @@
                         virtual ObjectType getType() const override { return #X; } \
                         virtual bool isA(const ObjectType& type) const override { return type == #X; } \
                         static constexpr ObjectType type = #X; \
-                        private:
+                        private: \
+                        friend class ObjectManager;
 
  namespace coral
 {

@@ -10,9 +10,12 @@
 
 namespace coral
 {
+    class Shader;
+
     // A material is the class containing the shader and the shader parameters
     class Material : public Object
     {
+        DECLARE_TYPE(Material)
     public:
         // setup the shader and its parameters
         virtual void use();
@@ -24,10 +27,7 @@ namespace coral
         // tmp
         unsigned int textureFromFile(const std::string& path, bool gamma = false);
 
-        // Get the shader
-        std::shared_ptr<Shader> getShader();
-
-    private:
+    protected:
         // the material shader
         std::shared_ptr<Shader> shader;
     };
