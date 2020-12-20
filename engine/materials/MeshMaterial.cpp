@@ -34,7 +34,7 @@ MeshMaterial::MeshMaterial(const std::vector<Texture>& textures) :
     }
 }
 
-void MeshMaterial::use()
+void MeshMaterial::use(const RenderParameters& parameters)
 {
     shader->use();
 

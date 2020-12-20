@@ -8,40 +8,19 @@
 
 using namespace coral;
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material) :
-    vertices(vertices), indices(indices), material(material)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) :
+    vertices(vertices), indices(indices)
 {
-    setupMesh();
 }
 
-void Mesh::draw(std::shared_ptr<coral::Camera> camera)
+void Mesh::draw()
 {
-    if (!material)
-    {
-        Logs(error) << "the mesh has no material";
-        return;
-    }
-
-    // Setup material
-    material->use();
-
-    // draw mesh
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
-void Mesh::setMaterial(std::shared_ptr<Material> material)
-{
-    this->material = material;
-}
-
-std::shared_ptr<Material> Mesh::getMaterial() const
-{
-    return material;
-}
-
-void Mesh::setupMesh()
+void Mesh::init()
 {
     // create buffers/arrays
     glGenVertexArrays(1, &VAO);
@@ -83,4 +62,9 @@ void Mesh::setupMesh()
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bit_tangent));
 
     glBindVertexArray(0);
+}
+
+void Mesh::release()
+{
+
 }

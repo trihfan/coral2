@@ -1,5 +1,11 @@
 project (engine)
 
+# externals
+find_package(OpenGL REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb.h")
+
 # link directories
 link_directories(engine ${lib_output_directory})
 
@@ -15,9 +21,10 @@ target_include_directories(engine PUBLIC "${external_path}/glm")
 target_include_directories(engine PUBLIC "${external_path}/stb")
 target_include_directories(engine PUBLIC "${external_path}/rang/include")
 target_include_directories(engine PUBLIC "${engine_path}")
+target_include_directories(engine PUBLIC ${STB_INCLUDE_DIRS})
 
 # dependencies
-target_link_libraries(engine PUBLIC OpenGL::GL ${CMAKE_DL_LIBS} assimp)
+target_link_libraries(engine PUBLIC OpenGL::GL ${CMAKE_DL_LIBS} glm)
 
 # set output directories
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

@@ -44,6 +44,10 @@ namespace coral
         // Constructor
         Engine();
 
+        // todo -> RenderQueueManager?
+        void cull();
+        void draw();
+
     private:
         // Engine memory resource
         static std::unique_ptr<std::pmr::memory_resource> memory_resource;

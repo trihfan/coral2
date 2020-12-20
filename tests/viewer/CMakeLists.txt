@@ -1,5 +1,8 @@
 project (viewer)
 
+# externals
+find_package(glfw3 CONFIG REQUIRED)
+
 # link directories
 link_directories(viewer ${lib_output_directory})
 
@@ -12,8 +15,7 @@ add_executable(viewer ${sources})
 target_include_directories(viewer PUBLIC "${external_path}/glfw/include")
 
 # dependencies
-target_link_libraries(viewer engine)
-target_link_libraries(viewer glfw)
+target_link_libraries(viewer engine glfw)
 
 # set output directories
 set_target_properties(viewer PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

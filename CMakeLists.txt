@@ -13,7 +13,6 @@ include(folder_structure)
 
 # packages
 find_package(Python3 REQUIRED)
-find_package(OpenGL REQUIRED)
 
 # directories
 set(external_path ${PROJECT_SOURCE_DIR}/externals)
@@ -25,8 +24,7 @@ set(assimp_config_path ${PROJECT_BINARY_DIR}/externals/assimp/include)
 set(lib_output_directory ${PROJECT_BINARY_DIR}/lib)
 set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 
-# externals
-add_subdirectory(externals)
+# subdirectories
 add_subdirectory(engine)
 add_subdirectory(tests)
 
@@ -34,6 +32,8 @@ add_subdirectory(tests)
 file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")
 add_custom_target(copy_resources ALL 
 				  DEPENDS ${PROJECT_SOURCE_DIR}/last_copy.h)
+add_custom_command(TARGET copy_resources PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E make_directory "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources")
 add_custom_command(TARGET copy_resources PRE_BUILD
                    COMMAND ${Python3_EXECUTABLE} copy.py "${PROJECT_SOURCE_DIR}/resources" "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources"
 				   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

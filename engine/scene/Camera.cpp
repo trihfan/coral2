@@ -18,6 +18,11 @@ Camera::Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, fl
 {
 }
 
+const glm::vec3& Camera::getPosition() const
+{
+    return position;
+}
+
 glm::mat4 Camera::getViewProjectionMatrix()
 {
     return glm::lookAt(position, position + front, up) * glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f);

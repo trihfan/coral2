@@ -80,7 +80,7 @@ void ObjectManager::update()
 {
     for (auto object : initialize_list)
     {
-        object->release();
+        object->init();
     }
 
     for (auto object : release_list)

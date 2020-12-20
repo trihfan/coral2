@@ -11,14 +11,18 @@
 namespace coral
 {
     class Shader;
+    struct RenderParameters;
 
     // A material is the class containing the shader and the shader parameters
     class Material : public Object
     {
         DECLARE_TYPE(Material)
     public:
+        // return the material shader
+        std::shared_ptr<Shader> getShader() const;
+
         // setup the shader and its parameters
-        virtual void use();
+        virtual void use(const RenderParameters& parameters) {};
 
     protected:
         // constructor

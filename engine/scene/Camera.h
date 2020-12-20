@@ -36,6 +36,8 @@ namespace coral
         // constructor with scalar values
         Camera(float pos_x, float pos_y, float pos_z, float up_x, float up_y, float up_z, float yaw, float pitch);
 
+        const glm::vec3& getPosition() const;
+        
         // returns the view matrix calculated using Euler Angles and the LookAt Matrix
         glm::mat4 getViewProjectionMatrix();
 

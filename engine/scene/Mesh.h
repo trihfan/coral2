@@ -10,8 +10,6 @@
 
 namespace coral
 {
-    class Material;
-
     struct Vertex 
     {
         glm::vec3 position;
@@ -26,14 +24,13 @@ namespace coral
         DECLARE_TYPE(Mesh)
     public:
         // constructor
-        Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::shared_ptr<Material> material);
+        Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+
+        void init() override;
+        void release() override;
 
         // render the mesh;
-        virtual void draw(std::shared_ptr<coral::Camera> camera);
-
-        // Shader material
-        void setMaterial(std::shared_ptr<Material> material);
-        std::shared_ptr<Material> getMaterial() const;
+        virtual void draw() override;
 
     private:
         // mesh Data
@@ -42,7 +39,6 @@ namespace coral
         GLuint VAO;
 
         // render data 
-        std::shared_ptr<Material> material;
         GLuint VBO, EBO;
 
         // initializes all the buffer objects/arrays

@@ -52,6 +52,16 @@ const std::vector<std::shared_ptr<Node>>& Node::getChildren() const
 	return children;
 }
 
+void Node::setMaterial(std::shared_ptr<Material> material)
+{
+    this->material = material;
+}
+
+std::shared_ptr<Material> Node::getMaterial() const
+{
+    return material;
+}
+
 void Node::setRenderQueue(unsigned int render_queue)
 {
 	this->render_queue = render_queue;

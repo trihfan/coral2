@@ -16,12 +16,13 @@ namespace coral
 	//
 	class Scene : public Object
 	{
-		friend class SceneManager;
 		DECLARE_TYPE(Scene)
 	public:
 		Scene();
 		void add(std::shared_ptr<Node> node);
 		void remove(std::shared_ptr<Node> node);
+
+		std::shared_ptr<Node> getTopNode() const;
 
 	private:
 		std::shared_ptr<Node> top_node;
@@ -31,6 +32,8 @@ namespace coral
 	struct RenderQueue
 	{
 		std::vector<std::shared_ptr<Node>> nodes;
+		std::unordered_map<std::string, std::shared_ptr<Material>> shader_map;
+		std::map<Material*, std::vector<std::shared_ptr<Node>>> material_map;
 	};
 
 	// The scene manager

@@ -21,7 +21,7 @@ namespace coral
     {
     public:
         MeshMaterial(const std::vector<Texture>& textures);
-        virtual void use() override;
+        virtual void use(const RenderParameters& parameters) override;
 
     private:
         std::vector<Texture> textures;

@@ -8,9 +8,9 @@ Material::Material(const std::string& shader_name)
     shader = ShaderManager::getShader(shader_name);
 }
 
-void Material::use()
+std::shared_ptr<Shader> Material::getShader() const
 {
-    shader->use();
+    return shader;
 }
 
 #include "utils/Logs.h"

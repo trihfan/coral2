@@ -1,7 +1,10 @@
+#include <glad/glad.h>
 #include "Engine.h"
 #include "Object.h"
 #include "Shader.h"
 #include "scene/Scene.h"
+#include "scene/Node.h"
+#include "materials/Material.h"
 
 using namespace coral;
 
@@ -63,12 +66,40 @@ void Engine::frame()
     for (auto camera : SceneManager::instance->cameras)
     {
         current_parameters.camera = camera;
+        instance->cull();
+        instance->draw();
+    }
+}
 
-        // cull / fill render queues
-        traverse(SceneManager::instance->current_scene->top_node, [](std::shared_ptr<Node> node)
+void Engine::cull()
+{
+    // clear queues
+    SceneManager::instance->render_queues.clear();
+
+    // fill queues with visible nodes
+    traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
+    {
+        SceneManager::instance->render_queues[node->getRenderQueue()].nodes.push_back(node);
+        return true;
+    });
+}
+
+void Engine::draw()
+{
+    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    // for each render pass
+    for (auto& queue : SceneManager::instance->render_queues)
+    {
+        for (auto node : queue.second.nodes)
         {
-            SceneManager::instance-instance->render_queues[node->getRenderQueue()].nodes.push_back(node);
-            return true;
-        });
+            if (node->getMaterial())
+            {
+                node->getMaterial()->getShader()->use();
+                node->getMaterial()->use(current_parameters);
+                node->draw(current_parameters);
+            }
+        }
     }
 }

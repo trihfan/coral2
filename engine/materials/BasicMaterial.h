@@ -15,7 +15,7 @@ namespace coral
         virtual ~BasicMaterial() = default;
 
         // setup the shader and its parameters
-        virtual void use() override;
+        virtual void use(const RenderParameters& parameters) override;
 
         // uniforms
         glm::vec3 ambient;
