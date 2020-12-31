@@ -24,7 +24,7 @@ void Node::addChild(std::shared_ptr<Node> child)
 	{
 		children.push_back(child);
 	}
-	child->parent = getHandle<Node>();
+	child->parent = toHandle<Node>();
 }
 
 void Node::removeChild(std::shared_ptr<Node> child)
@@ -52,22 +52,7 @@ const std::vector<std::shared_ptr<Node>>& Node::getChildren() const
 	return children;
 }
 
-void Node::setMaterial(std::shared_ptr<Material> material)
+bool Node::isDrawable() const
 {
-    this->material = material;
-}
-
-std::shared_ptr<Material> Node::getMaterial() const
-{
-    return material;
-}
-
-void Node::setRenderQueue(unsigned int render_queue)
-{
-	this->render_queue = render_queue;
-}
-
-unsigned int Node::getRenderQueue() const
-{
-	return render_queue;
+	return false;
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Node.h"
+#include "DrawableNode.h"
 
 namespace coral
 {
@@ -19,7 +19,7 @@ namespace coral
         glm::vec3 bit_tangent;
     };
 
-    class Mesh : public Node
+    class Mesh : public DrawableNode
     {
         DECLARE_TYPE(Mesh)
     public:
@@ -30,7 +30,7 @@ namespace coral
         void release() override;
 
         // render the mesh;
-        virtual void draw() override;
+        virtual void draw(const RenderParameters& parameters) override;
 
     private:
         // mesh Data

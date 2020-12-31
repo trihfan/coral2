@@ -62,15 +62,15 @@ int main()
     Engine::create();
 
     // scene
-    auto scene = ObjectManager::create<Scene>();
+    auto scene = ObjectManager::createWithName<Scene>("scene");
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectManager::create<Camera>(glm::vec3(-3, 0, 0));
+    camera = ObjectManager::createWithName<Camera>("camera", glm::vec3(-3, 0, 0));
     scene->add(camera);
 
     // material
-    auto material = ObjectManager::create<BasicMaterial>();
+    auto material = ObjectManager::createWithName<BasicMaterial>("material");
     material->ambient = glm::vec3(0.1, 0.1, 0.1);
     material->diffuse = glm::vec3(0.1, 0.8, 0.3);
     material->specular = glm::vec3(0.8, 0.8, 0.8);
@@ -126,7 +126,7 @@ int main()
     std::iota(indices.begin(), indices.end(), 0);
     
     // mesh
-    auto mesh = ObjectManager::create<Mesh>(vertices, indices);
+    auto mesh = ObjectManager::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
     scene->add(mesh);
 

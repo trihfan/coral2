@@ -4,9 +4,37 @@
 #include "Shader.h"
 #include "scene/Scene.h"
 #include "scene/Node.h"
+#include "scene/DrawableNode.h"
 #include "materials/Material.h"
 
 using namespace coral;
+
+const char * getGLErrorStr(GLenum err)
+{
+    switch (err)
+    {
+    case GL_NO_ERROR:          return "No error";
+    case GL_INVALID_ENUM:      return "Invalid enum";
+    case GL_INVALID_VALUE:     return "Invalid value";
+    case GL_INVALID_OPERATION: return "Invalid operation";
+    case GL_STACK_OVERFLOW:    return "Stack overflow";
+    case GL_STACK_UNDERFLOW:   return "Stack underflow";
+    case GL_OUT_OF_MEMORY:     return "Out of memory";
+    default:                   return "Unknown error";
+    }
+}
+
+void checkGLError()
+{
+    while (true)
+    {
+        const GLenum err = glGetError();
+        if (GL_NO_ERROR == err)
+            break;
+
+        Logs(error) << "gl error: " << getGLErrorStr(err);
+    }
+}
 
 std::unique_ptr<std::pmr::memory_resource> Engine::memory_resource;
 RenderParameters Engine::current_parameters;
@@ -79,9 +107,17 @@ void Engine::cull()
     // fill queues with visible nodes
     traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
     {
-        SceneManager::instance->render_queues[node->getRenderQueue()].nodes.push_back(node);
+        if (node->isDrawable())
+        {
+            auto drawableNode = node->toHandle<DrawableNode>();
+            auto& render_queue =  SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
+            render_queue.nodes.push_back(drawableNode);
+            render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
+            render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);
+        }
         return true;
     });
+    checkGLError();
 }
 
 void Engine::draw()
@@ -92,14 +128,25 @@ void Engine::draw()
     // for each render pass
     for (auto& queue : SceneManager::instance->render_queues)
     {
-        for (auto node : queue.second.nodes)
+        // for each shader
+        for (auto& shader_pair : queue.second.shader_map)
         {
-            if (node->getMaterial())
+            // Set up shader
+            shader_pair.first->use();
+
+            // for each material
+            for (auto material : shader_pair.second)
             {
-                node->getMaterial()->getShader()->use();
-                node->getMaterial()->use(current_parameters);
-                node->draw(current_parameters);
+                // Set up material
+                material->use(current_parameters);
+
+                // draw each node
+                for (auto node : queue.second.material_map[material])
+                {
+                    node->draw(current_parameters);
+                }
             }
         }
     }
+    checkGLError();
 }

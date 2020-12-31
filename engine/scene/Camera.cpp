@@ -6,10 +6,10 @@ using namespace coral;
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch) : 
     front(glm::vec3(0, 0, -1)), movement_speed(SPEED), mouse_sensitivity(SENSITIVITY), zoom(ZOOM)
 {
-    position = position;
-    world_up = up;
-    yaw = yaw;
-    pitch = pitch;
+    this->position = position;
+    this->world_up = up;
+    this->yaw = yaw;
+    this->pitch = pitch;
     updateCameraVectors();
 }
 
@@ -25,7 +25,7 @@ const glm::vec3& Camera::getPosition() const
 
 glm::mat4 Camera::getViewProjectionMatrix()
 {
-    return glm::lookAt(position, position + front, up) * glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f);
+    return glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f) * glm::lookAt(position, position + front, up);
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)

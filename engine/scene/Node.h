@@ -3,13 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
 #include "Object.h"
 
 namespace coral
 {
-	class Camera;
-	class Material;
-
 	// A node represent an item in the scene
 	class Node : public Object
 	{
@@ -29,25 +27,17 @@ namespace coral
 		size_t getChildrenCount() const;
 		const std::vector<std::shared_ptr<Node>>& getChildren() const;
 
+		// meta
+		virtual bool isDrawable() const;
+
 		// transform
 
 		// uptate
 		virtual void update() {}
 
-		// draw -> todo drawableNode
-		virtual void draw(const RenderParameters& parameters) {}
-		void setRenderQueue(unsigned int render_queue);
-		unsigned int getRenderQueue() const;
-
-		// material -> todo drawableNode
-        void setMaterial(std::shared_ptr<Material> material);
-        std::shared_ptr<Material> getMaterial() const;
-
 	private:
 		std::shared_ptr<Node> parent;
 		std::vector<std::shared_ptr<Node>> children;
-		std::shared_ptr<Material> material;
-		unsigned int render_queue = 1000;
 	};
 
 	// Function: bool(std::shared_ptr<Node>, Args&&...) -> return true to continue traversal, false to stop

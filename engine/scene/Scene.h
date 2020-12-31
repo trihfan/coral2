@@ -5,13 +5,17 @@
 #include <memory>
 #include <functional>
 #include <map>
+#include <set>
 #include "Object.h"
 #include "utils/Singleton.h"
 
 namespace coral
 {
 	class Node;
+	class DrawableNode;
 	class Camera;
+	class Material;
+	class Shader;
 
 	//
 	class Scene : public Object
@@ -31,9 +35,9 @@ namespace coral
 	//
 	struct RenderQueue
 	{
-		std::vector<std::shared_ptr<Node>> nodes;
-		std::unordered_map<std::string, std::shared_ptr<Material>> shader_map;
-		std::map<Material*, std::vector<std::shared_ptr<Node>>> material_map;
+		std::vector<std::shared_ptr<DrawableNode>> nodes;
+		std::unordered_map<std::shared_ptr<Shader>, std::set<std::shared_ptr<Material>>> shader_map;
+		std::map<std::shared_ptr<Material>, std::vector<std::shared_ptr<DrawableNode>>> material_map;
 	};
 
 	// The scene manager

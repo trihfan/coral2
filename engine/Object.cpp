@@ -15,7 +15,7 @@ Object::~Object()
 {
     if (state == ObjectState::initialized)
     {
-        Logs(warning) << "object " << getName() << " has not been destroyed";
+        Logs(warning) << "object " << getName() << " has not been released";
 	}
 }
 
@@ -81,11 +81,13 @@ void ObjectManager::update()
     for (auto object : initialize_list)
     {
         object->init();
+        object->state = Object::ObjectState::initialized;
     }
 
     for (auto object : release_list)
     {
         object->release();
+        object->state = Object::ObjectState::released;
     }
 
     initialize_list.clear();

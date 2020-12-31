@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 #include "FileUtils.h"
 #include "utils/Logs.h"
 
@@ -11,12 +12,14 @@ std::filesystem::path FileUtils::getAbsolutePath(const std::filesystem::path& pa
 
 std::string FileUtils::readAll(const std::filesystem::path& path)
 {
-    std::wifstream file(path);
+    std::ifstream file(path);
     if (!file.is_open())
     {
         Logs(warning) << "can't open " << path;
         return "";
     }
 
-    return "";
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
 }

@@ -22,7 +22,7 @@
                         private: \
                         friend class ObjectManager;
 
- namespace coral
+namespace coral
 {
     using ObjectType = std::string_view;
 
@@ -41,10 +41,10 @@
 
         // handle
         template <typename ObjectType>
-        inline std::shared_ptr<ObjectType> getHandle() { return std::dynamic_pointer_cast<ObjectType>(shared_from_this()); }
+        inline std::shared_ptr<ObjectType> toHandle() { return std::dynamic_pointer_cast<ObjectType>(shared_from_this()); }
 
         template <typename ObjectType>
-        inline std::shared_ptr<const ObjectType> getHandle() const { return std::dynamic_pointer_cast<const ObjectType>(shared_from_this()); }
+        inline std::shared_ptr<const ObjectType> toHandle() const { return std::dynamic_pointer_cast<const ObjectType>(shared_from_this()); }
 
     protected:
         // construction
@@ -59,7 +59,7 @@
         virtual void update() {}
 
     private:
-        enum class ObjectState { not_initialized, initialized, destroyed } state;
+        enum class ObjectState { not_initialized, initialized, released } state;
         std::string name;
     };
 
@@ -68,6 +68,10 @@
     {
         MAKE_ENGINE_SINGLETON(ObjectManager)
     public:
+        // Create an object of the given object type
+        template <typename ObjectType, class... Args>
+        static std::shared_ptr<ObjectType> createWithName(const std::string& name, Args&&... args);
+
         // Create an object of the given object type
         template <typename ObjectType, class... Args>
         static std::shared_ptr<ObjectType> create(Args&&... args);
@@ -92,6 +96,14 @@
         std::vector<std::shared_ptr<Object>> initialize_list;
         std::vector<std::shared_ptr<Object>> release_list;
     };
+
+     template <typename ObjectType, class... Args>
+    std::shared_ptr<ObjectType> ObjectManager::createWithName(const std::string& name, Args&&... args)
+    {
+        std::shared_ptr<ObjectType> object = create<ObjectType>(std::forward<Args>(args)...);
+        object->setName(name);
+        return object;
+    }
 
     template <typename ObjectType, class... Args>
     std::shared_ptr<ObjectType> ObjectManager::create(Args&&... args)

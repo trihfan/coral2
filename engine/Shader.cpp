@@ -204,13 +204,11 @@ void ShaderManager::iterateFolder(const std::filesystem::path& path)
             else
             {
                 std::string name = entry.path().stem().string();
-                std::shared_ptr<Shader> shader = shaders[name];
-                if (!shader)
+                if (!shaders[name])
                 {
-                    shader = ObjectManager::create<Shader>();
-                    shaders[name] = shader;
+                    shaders[name] = ObjectManager::createWithName<Shader>(name);
                 }
-                shader->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
+                shaders[name]->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
             }
         }
     }

@@ -50,7 +50,7 @@ void SceneManager::update()
 
 		if (node->isA(Camera::type))
 		{
-			instance->cameras.push_back(node->getHandle<Camera>());
+			instance->cameras.push_back(node->toHandle<Camera>());
 		}
 		return true;
 	});
