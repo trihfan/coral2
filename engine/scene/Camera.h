@@ -39,7 +39,7 @@ namespace coral
         const glm::vec3& getPosition() const;
         
         // returns the view matrix calculated using Euler Angles and the LookAt Matrix
-        glm::mat4 getViewProjectionMatrix();
+        const glm::mat4& getViewProjectionMatrix();
 
         // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
         void processKeyboard(CameraMovement direction, float delta_time);
@@ -66,6 +66,9 @@ namespace coral
         float movement_speed;
         float mouse_sensitivity;
         float zoom;
+
+        // matrix
+        glm::mat4 viewProjectionMatrix;
 
         // calculates the front vector from the Camera's (updated) Euler Angles
         void updateCameraVectors();

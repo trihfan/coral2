@@ -23,9 +23,9 @@ const glm::vec3& Camera::getPosition() const
     return position;
 }
 
-glm::mat4 Camera::getViewProjectionMatrix()
+const glm::mat4& Camera::getViewProjectionMatrix()
 {
-    return glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f) * glm::lookAt(position, position + front, up);
+    return viewProjectionMatrix;
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)
@@ -83,4 +83,7 @@ void Camera::updateCameraVectors()
     // also re-calculate the Right and Up vector
     right = glm::normalize(glm::cross(front, world_up));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     up = glm::normalize(glm::cross(right, front));
+
+    // compute matrix
+    viewProjectionMatrix = glm::perspective(glm::radians(zoom), 800.f / 600.f, 0.1f, 100.f) * glm::lookAt(position, position + front, up);
 }

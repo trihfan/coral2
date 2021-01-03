@@ -66,7 +66,7 @@ int main()
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectManager::createWithName<Camera>("camera", glm::vec3(-3, 0, 0));
+    camera = ObjectManager::createWithName<Camera>("camera", glm::vec3(0, 0, 3));
     scene->add(camera);
 
     // material

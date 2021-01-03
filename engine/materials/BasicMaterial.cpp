@@ -15,9 +15,13 @@ void BasicMaterial::use(const RenderParameters& parameters)
     Material::use(parameters);
 
     // matrix
-    shader->setMat4("model", glm::mat4());
-    shader->setMat4("viewProjection", parameters.camera->getViewProjectionMatrix());
+    
+    shader->setMat4("model", glm::translate(glm::mat4(1), glm::vec3(1, 0, 0)));
+    shader->setMat4("view", parameters.camera->getViewProjectionMatrix());
     shader->setVec3("viewPos", parameters.camera->getPosition());
+
+    auto t = parameters.camera->getViewProjectionMatrix();
+    auto tt = parameters.camera->getPosition();
 
     // lights
     shader->setVec3("light.position", parameters.camera->getPosition());
