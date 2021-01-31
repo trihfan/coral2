@@ -20,7 +20,6 @@ namespace coral
 	//
 	class Scene : public Object
 	{
-		DECLARE_TYPE(Scene)
 	public:
 		Scene();
 		void add(std::shared_ptr<Node> node);

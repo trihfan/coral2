@@ -5,19 +5,20 @@
 #include "Shader.h"
 #include "Object.h"
 #include "scene/Scene.h"
-#include "scene/Camera.h"
+#include "scene/CameraFreeMovement.h"
 #include "scene/Mesh.h"
 #include "materials/BasicMaterial.h"
 
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1200;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
-std::shared_ptr<Camera> camera;
+bool mousePressed = false;
+std::shared_ptr<CameraFreeMovement> camera;
 
 // timing todo timemanager
 float deltaTime = 0.0f; 
@@ -25,6 +26,7 @@ float lastFrame = 0.0f;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_button(GLFWwindow* window, int button, int action, int mods);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
@@ -53,6 +55,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetMouseButtonCallback(window, mouse_button);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
@@ -66,7 +69,7 @@ int main()
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectManager::createWithName<Camera>("camera", glm::vec3(0, 0, 3));
+    camera = ObjectManager::createWithName<CameraFreeMovement>("camera", glm::vec3(0, 0, 3));
     scene->add(camera);
 
     // material
@@ -79,47 +82,12 @@ int main()
     // vertices
     std::vector<Vertex> vertices 
     {
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3( 0.0f,  0.0f, -1.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f) },
-
-        Vertex{ glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3( 0.0f,  0.0f,  1.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f) },
-
-        Vertex{ glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f) },
-
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f,  0.0f,  0.0f) },
-
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f,  0.0f) },
-
-        Vertex{ glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  1.0f,  0.0f) },
-        Vertex{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  1.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  1.0f,  0.0f) },
-        Vertex{ glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  1.0f,  0.0f) } 
+        Vertex{ glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+        Vertex{ glm::vec3(0.5f,-0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+        Vertex{ glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+        Vertex{ glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
     };
 
     std::vector<unsigned int> indices(vertices.size());
@@ -180,8 +148,22 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void mouse_button(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == 0)
+    {
+        mousePressed = action == GLFW_PRESS ? true : false;
+        firstMouse = true;
+    }
+}
+
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+    if (!mousePressed)
+    {
+        return;
+    }
+
     if (firstMouse)
     {
         lastX = xpos;

@@ -22,7 +22,6 @@ namespace coral
 {
     class Shader : public Object
     {
-        DECLARE_TYPE(Shader)
     public:
         // supported shader types
         enum ShaderType : int { vertex, fragment, geometry };

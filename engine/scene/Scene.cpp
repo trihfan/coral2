@@ -48,7 +48,7 @@ void SceneManager::update()
 		// send input
 		// todo
 
-		if (node->isA(Camera::type))
+		if (node->isA<Camera>())
 		{
 			instance->cameras.push_back(node->toHandle<Camera>());
 		}

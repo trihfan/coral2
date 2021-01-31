@@ -8,7 +8,6 @@ namespace coral
 {
     class BasicMaterial : public Material
     {
-        DECLARE_TYPE(BasicMaterial)
     public:
         // construction
         BasicMaterial();

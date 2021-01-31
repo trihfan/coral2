@@ -124,7 +124,7 @@ void Engine::draw()
 {
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     // for each render pass
     for (auto& queue : SceneManager::instance->render_queues)

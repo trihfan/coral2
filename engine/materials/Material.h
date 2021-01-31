@@ -16,7 +16,6 @@ namespace coral
     // A material is the class containing the shader and the shader parameters
     class Material : public Object
     {
-        DECLARE_TYPE(Material)
     public:
         // return the material shader
         std::shared_ptr<Shader> getShader() const;

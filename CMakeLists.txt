@@ -18,6 +18,7 @@ find_package(Python3 REQUIRED)
 set(external_path ${PROJECT_SOURCE_DIR}/externals)
 set(engine_path ${PROJECT_SOURCE_DIR}/engine)
 set(viewer_path ${PROJECT_SOURCE_DIR}/tests/viewer)
+set(signals_path ${PROJECT_SOURCE_DIR}/tests/signals)
 set(assimp_config_path ${PROJECT_BINARY_DIR}/externals/assimp/include)
 
 # define output directories

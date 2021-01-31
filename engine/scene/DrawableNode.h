@@ -13,7 +13,6 @@ namespace coral
 	// A node represent an drawable item in the scene
 	class DrawableNode : public Node
 	{
-		DECLARE_TYPE(DrawableNode)
 	public:
 		// construction
 		DrawableNode(std::shared_ptr<Node> parent = nullptr);

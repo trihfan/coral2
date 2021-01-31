@@ -15,7 +15,6 @@ namespace coral
 
     class Model : public Node
     {
-        DECLARE_TYPE(Model)
     public:
         // constructor, expects a filepath to a 3D model.
         Model(std::string const& path, bool gamma = false);

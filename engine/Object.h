@@ -14,26 +14,16 @@
 #include <type_traits>
 #include "utils/Singleton.h"
 
-// macros for object type
-#define DECLARE_TYPE(X) public: \
-                        virtual ObjectType getType() const override { return #X; } \
-                        virtual bool isA(const ObjectType& type) const override { return type == #X; } \
-                        static constexpr ObjectType type = #X; \
-                        private: \
-                        friend class ObjectManager;
-
 namespace coral
 {
-    using ObjectType = std::string_view;
-
     // The Object class represent an object in coral engine
     class Object : public std::enable_shared_from_this<Object>
     {
         friend class ObjectManager;
     public:
         // type
-        virtual ObjectType getType() const = 0;
-        virtual bool isA(const ObjectType& type) const = 0;
+        template<typename Type>
+        bool isA() const { return dynamic_cast<const Type*>(this) != nullptr; }
 
         // name
         void setName(const std::string& name);

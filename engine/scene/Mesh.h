@@ -21,7 +21,6 @@ namespace coral
 
     class Mesh : public DrawableNode
     {
-        DECLARE_TYPE(Mesh)
     public:
         // constructor
         Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
