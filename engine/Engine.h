@@ -9,6 +9,8 @@
 #endif
 
 #include "utils/Singleton.h"
+#include <vector>
+#include <memory>
 
 namespace coral
 {

@@ -23,6 +23,6 @@ int main()
     signal.emit(12);
 
     c.test2.changed.connect([](const std::vector<int>& test){ std::cout << test[0] << std::endl; });
-    c.test2.set(5, 0);
+    c.test2.push_back(5);
 
 }

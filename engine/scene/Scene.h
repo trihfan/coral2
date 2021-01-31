@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include "Object.h"
 #include "utils/Singleton.h"
 

@@ -36,7 +36,7 @@ namespace coral
 
         void disconnect()
         {
-            signal.disconnect(this*);
+            signal.disconnect(*this);
         }
 
     private:
