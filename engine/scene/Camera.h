@@ -11,32 +11,25 @@ namespace coral
     {
     public:
         // Construction
-        Camera() = default;
+        Camera();
         virtual ~Camera() = default;
+
+        // Properties
+        Property<glm::mat4> projection;
+        Property<glm::mat4> view;
+        
+        // Signals
+        Signal<const glm::mat4&> viewProjectionChanged;
 
         // Get the projection view matrix
         const glm::mat4& getViewProjectionMatrix() const;
 
-    protected:
-        // Front vector
-        void setFront(const glm::vec3& front);
-        const glm::vec3& getFront() const;
-
-        // Up vector
-        void setUp(const glm::vec3& up);
-        const glm::vec3& getUp() const;
-
-        // Projection matrix
-        void setProjectionMatrix(const glm::mat4& projection);
-
     private:
         // View projection matrix
-        glm::mat4 projection;
         glm::mat4 viewProjection;
 
-        // View
-        glm::vec3 front;
-        glm::vec3 up;
+        // Update the view projection matrix
+        void updateMatrix();
     };
 }
 #endif

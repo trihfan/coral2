@@ -26,12 +26,11 @@ namespace coral
         // supported shader types
         enum ShaderType : int { vertex, fragment, geometry };
 
+        // Construction
+        Shader();
+
         // add a shader data
         void addShaderData(ShaderType type, const std::string& data);
-
-        // initialization
-        void init() override;
-        void release() override;
 
         // use the shader
         // ------------------------------------------------------------------------
@@ -57,6 +56,10 @@ namespace coral
         // utility function for checking shader compilation/linking errors.
         // ------------------------------------------------------------------------
         void checkCompileErrors(GLuint shader, std::string type);
+
+        // initialization
+        void init();
+        void release();
     };
 
     // The shader manager

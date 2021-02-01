@@ -11,6 +11,8 @@ using namespace coral;
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) :
     vertices(vertices), indices(indices)
 {
+    connect<&Mesh::init>(Object::init, this);
+    connect<&Mesh::release>(Object::release, this);
 }
 
 void Mesh::draw(const RenderParameters& parameters)

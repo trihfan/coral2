@@ -15,12 +15,12 @@ Scene::Scene() :
 
 void Scene::add(std::shared_ptr<Node> node)
 {
-	top_node->addChild(node);
+	top_node->children.add(node);
 }
 
 void Scene::remove(std::shared_ptr<Node> node)
 {
-	top_node->removeChild(node);
+	top_node->children.remove(node);
 }
 
 std::shared_ptr<Node> Scene::getTopNode() const

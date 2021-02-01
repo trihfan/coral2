@@ -110,7 +110,7 @@ void Engine::cull()
         if (node->isDrawable())
         {
             auto drawableNode = node->toHandle<DrawableNode>();
-            auto& render_queue =  SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
+            auto& render_queue = SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
             render_queue.nodes.push_back(drawableNode);
             render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
             render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);

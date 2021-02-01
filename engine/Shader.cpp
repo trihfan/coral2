@@ -6,6 +6,11 @@ using namespace coral;
 
 //*********************************************************************************
 // Shader
+Shader::Shader()
+{
+    connect<&Shader::init>(Object::init, this);
+    connect<&Shader::release>(Object::release, this);
+}
 
 void Shader::addShaderData(ShaderType type, const std::string& data)
 {

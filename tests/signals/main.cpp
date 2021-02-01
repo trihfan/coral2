@@ -10,7 +10,7 @@ class my_class
 public:
   void on_update(int test) { std::cout << test << std::endl; }
 
-  PropertyArray<std::vector<int>> test2;
+  PropertyArray<int> test2;
 };
 
 int main()
@@ -18,11 +18,9 @@ int main()
     my_class c;
 
     Signal<int> signal;
-    signal.connect([](int test){ std::cout << test << std::endl; });
-    signal.connect<&my_class::on_update>(&c);
-    signal.emit(12);
+    connect<&my_class::on_update>(signal, &c);
+    signal(12);
 
-    c.test2.changed.connect([](const std::vector<int>& test){ std::cout << test[0] << std::endl; });
-    c.test2.push_back(5);
-
+    Property<int> t;
+    t.get();
 }

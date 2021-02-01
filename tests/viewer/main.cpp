@@ -18,7 +18,7 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mousePressed = false;
-std::shared_ptr<CameraFreeMovement> camera;
+std::shared_ptr<Camera> camera;
 
 // timing todo timemanager
 float deltaTime = 0.0f; 
@@ -69,7 +69,10 @@ int main()
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectManager::createWithName<CameraFreeMovement>("camera", glm::vec3(0, 0, 3));
+    camera = ObjectManager::createWithName<Camera>("camera");
+    camera->projection = glm::perspective(45.f, 4.f / 3.f, 0.1f, 100.f);
+    camera->view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    camera->position = glm::vec3(0, 0, 3);
     scene->add(camera);
 
     // material
@@ -131,14 +134,14 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+   /* if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera->processKeyboard(CameraMovement::forward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera->processKeyboard(CameraMovement::backward, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera->processKeyboard(CameraMovement::left, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->processKeyboard(CameraMovement::right, deltaTime);
+        camera->processKeyboard(CameraMovement::right, deltaTime);*/
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -177,10 +180,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    camera->processMouseMovement(xoffset, yoffset);
+    //camera->processMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    camera->processMouseScroll(yoffset);
+    //camera->processMouseScroll(yoffset);
 }

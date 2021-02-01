@@ -10,13 +10,6 @@
 
 namespace coral
 {
-	// A vec3 with local and world value
-	struct TransformVec3
-	{
-		glm::vec3 local = glm::vec3(0, 0, 0);
-		glm::vec3 world = glm::vec3(0, 0, 0);
-	};
-
 	// A node represent an item in the scene
 	class Node : public Object
 	{
@@ -24,53 +17,33 @@ namespace coral
 		// construction
 		Node(std::shared_ptr<Node> parent = nullptr);
 		
-		// Parent
-		Property<std::shared_ptr<Node>> parentt;
-		void setParent(std::shared_ptr<Node> parent);
-		std::shared_ptr<Node> getParent() const;
-
-		// Children
-		void addChild(std::shared_ptr<Node> child);
-		void removeChild(std::shared_ptr<Node> child);
-		bool hasChild(std::shared_ptr<Node> child) const;
-		size_t getChildrenCount() const;
-		const std::vector<std::shared_ptr<Node>>& getChildren() const;
-
-		// Position
-		void setPosition(const glm::vec3& localPosition);
-		const TransformVec3& getPosition() const;
-
-		// Rotation
-		void setRotation(const glm::vec3& localRotation);
-		const TransformVec3& getRotation() const;
-
-		// Scale
-		void setScale(const glm::vec3& localScale);
-		const TransformVec3& getScale() const;
-
-		// Return transform matrix
-		const glm::mat4& getMatrix() const;
-
 		// meta
 		virtual bool isDrawable() const;
 
-		// uptate
-		virtual void update() {}
+		// Properties
+		Property<std::shared_ptr<Node>> parent;
+		PropertyArray<std::shared_ptr<Node>> children;
+		Property<glm::vec3> position;
+		Property<glm::vec3> rotation;
+		Property<glm::vec3> scale;
 
-		Signal<std::shared_ptr<Node>> parentChanged;
+		// Signals
+		Signal<const glm::mat4&> matrixChanged;
+
+		// World transform values
+		const glm::vec3& getWorldPosition() const;
+		const glm::vec3& getWorldRotation() const;
+		const glm::vec3& getWorldScale() const;
 
 	private:
-		// Hierarchy
-		std::shared_ptr<Node> parent;
-		std::vector<std::shared_ptr<Node>> children;
-		
-		// Transform
-		std::shared_ptr<Node> object;
-		TransformVec3 position;
-		TransformVec3 rotation;
-		TransformVec3 scale;
+		glm::vec3 worldPosition;
+		glm::vec3 worldRotation;
+		glm::vec3 worldScale;
 		glm::mat4 matrix;
 
+		void updateWorldPosition(const glm::vec3& position);
+		void updateWorldRotation(const glm::vec3& rotation);
+		void updateWorldScale(const glm::vec3& scale);
 		void udpateMatrix(const glm::vec3& parentPosition, const glm::vec3& parentRotation, const glm::vec3& parentScale);
 	};
 
@@ -80,9 +53,9 @@ namespace coral
 	{
 		if (function(node, std::forward<Args>(args)...))
 		{
-			for (std::shared_ptr<Node> child : node->getChildren())
+			for (size_t i = 0; i < node->children.size(); i++)
 			{
-				traverse(child, std::forward<decltype(function)>(function), std::forward<Args>(args)...);
+				traverse(node->children[i], std::forward<decltype(function)>(function), std::forward<Args>(args)...);
 			}
 		}
 	}

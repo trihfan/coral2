@@ -46,6 +46,7 @@ void ObjectManager::release()
     for (auto object : release_list)
     {
         object->release();
+        object->state = Object::ObjectState::released;
     }
 
     objects.clear();

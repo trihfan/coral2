@@ -25,9 +25,6 @@ namespace coral
         // constructor
         Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
-        void init() override;
-        void release() override;
-
         // render the mesh;
         virtual void draw(const RenderParameters& parameters) override;
 
@@ -42,6 +39,10 @@ namespace coral
 
         // initializes all the buffer objects/arrays
         void setupMesh();
+
+        // slots
+        void init();
+        void release();
     };
 }
 #endif

@@ -13,6 +13,7 @@
 #include <vector>
 #include <type_traits>
 #include "utils/Singleton.h"
+#include "Signal.h"
 
 namespace coral
 {
@@ -36,17 +37,15 @@ namespace coral
         template <typename ObjectType>
         inline std::shared_ptr<const ObjectType> toHandle() const { return std::dynamic_pointer_cast<const ObjectType>(shared_from_this()); }
 
+        // Signals
+        Signal<> init;
+        Signal<> release;
+        Signal<> update;
+
     protected:
         // construction
         Object();
         virtual ~Object();
-
-        // initialization
-        virtual void init() {}
-        virtual void release() {}
-
-        // update, called each frame before drawing
-        virtual void update() {}
 
     private:
         enum class ObjectState { not_initialized, initialized, released } state;
@@ -87,7 +86,7 @@ namespace coral
         std::vector<std::shared_ptr<Object>> release_list;
     };
 
-     template <typename ObjectType, class... Args>
+    template <typename ObjectType, class... Args>
     std::shared_ptr<ObjectType> ObjectManager::createWithName(const std::string& name, Args&&... args)
     {
         std::shared_ptr<ObjectType> object = create<ObjectType>(std::forward<Args>(args)...);

@@ -4,98 +4,127 @@
 #include <memory>
 #include <algorithm>
 #include <list>
+#include <type_traits>
 
 namespace coral
 {
-    struct Function
-    {
-        void* function;
-        void* object = nullptr;
-    };
-
+    // Declaration
     template<typename... Args>
 	struct Signal;
 
     template<typename... Args>
+    struct Connection;
+
+    template<auto Function, typename From, typename... Args>
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, From* object);
+
+    template<typename... Args>
+    void disconnect(const Connection<Args...>& connection);
+
+    // Connection, handle calling the function
+    template<typename... Args>
     struct Connection
     {
-        Connection(const Signal<Args...>& signal, Function&& function) : signal(signal), function(std::move(function)) {}
-        Connection(Connection& other) = delete;
+        // Construction
+        Connection(const Signal<Args...>& signal, void* function, void* object);
 
-        void operator()(Args... args)
-        {
-            if (function.object == nullptr)
-            {
-                reinterpret_cast<void(*)(Args...)>(function.function)(std::forward<Args>(args)...);
-            }
-            else
-            {
-                reinterpret_cast<void(*)(void*, Args...)>(function.function)(&function.object, std::forward<Args>(args)...);
-            }
-        }
+        // Call the encapsulated function
+        void operator()(Args... args) const;
 
-        void disconnect()
-        {
-            signal.disconnect(*this);
-        }
+        // Disconnect the connection
+        void disconnect();
 
     private:
+        // Data
         const Signal<Args...>& signal;
-        Function function;
+        mutable void* function;
+        mutable void* object;
     };
 
     template<typename... Args>
 	struct Signal
 	{
+        static constexpr bool numberOfArgs = sizeof...(Args) > 0;
+        using Connection = Connection<Args...>;
+
         // connect
-        std::shared_ptr<Connection<Args...>> connect(void(*func)(Args...)) const
+        template<typename From, void(From::*Function)(Args...)>
+		std::shared_ptr<Connection> connect(From* object) const
         {
-            Function function;
-            function.function = reinterpret_cast<void*>(func);
-            auto connection = std::make_shared<Connection<Args...>>(*this, std::move(function));
+            auto connection = std::make_shared<Connection>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(args...); }), object);
             connections.push_back(connection);
             return connection;
         }
 
-        template<auto Method, class From>
-		std::shared_ptr<Connection<Args...>> connect(From* object) const
-		{
-            Function function;
-            function.object = object;
-            function.function = reinterpret_cast<void*>(+[](void* obj, Args... args){((*reinterpret_cast<From**>(obj))->*Method)(args...); });
-            auto connection = std::make_shared<Connection<Args...>>(*this, std::move(function));
+        template<typename From, void(From::*Function)()>
+		std::shared_ptr<Connection> connect(typename std::enable_if<numberOfArgs, From*>::type object) const
+        {
+            auto connection = std::make_shared<Connection>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(); }), object);
             connections.push_back(connection);
             return connection;
         }
 
         // disconnect
-        template<typename Type>
-        void disconnect(Type connection) const
-        {
-            auto it = std::find(connections.begin(), connections.end(), connection);
-            if (it != connections.end())
-            {
-                connections.erase(it);
-            }
-        }
+        void disconnect(std::shared_ptr<Connection> connection) const;
+        void disconnect(Connection* connection) const;
 
         // emit signal
-        void emit(Args... args)
-        {
-            for (std::shared_ptr<Connection<Args...>> connnection : connections)
-            {
-                (*connnection)(std::forward<Args>(args)...);
-            }
-        }
+        void operator()(Args... args) const;
 
 	private:
-        mutable std::list<std::shared_ptr<Connection<Args...>>> connections;
+        mutable std::list<std::shared_ptr<Connection>> connections;
 	};
 
     template<typename... Args>
-    void connect()
+    Connection<Args...>::Connection(const Signal<Args...>& signal, void* function, void* object) : signal(signal), function(function), object(object) {}
+
+    template<typename... Args>
+    void Connection<Args...>::operator()(Args... args) const
     {
-        
+        reinterpret_cast<void(*)(void*, Args...)>(function)(&object, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void Connection<Args...>::disconnect()
+    {
+        signal.disconnect(this);
+    }
+
+    template<typename... Args>
+    void Signal<Args...>::disconnect(std::shared_ptr<Connection> connection) const
+    {
+        disconnect(connection.get());
+    }
+
+    template<typename... Args>
+    void Signal<Args...>::disconnect(Connection* connection) const
+    {
+        auto it = std::find_if(connections.begin(), connections.end(), [connection](const std::shared_ptr<Connection>& c){ return c.get() == connection; });
+        if (it != connections.end())
+        {
+            connections.erase(it);
+        }
+    }
+
+    template<typename... Args>
+    void Signal<Args...>::operator()(Args... args) const
+    {
+        for (const auto& connnection : connections)
+        {
+            (*connnection)(std::forward<Args>(args)...);
+        }
+    }
+
+    template<auto Function, typename From, typename... Args>
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, From* object)
+    {
+        return signal.connect<From, Function>(std::forward<From*>(object));
+    }
+
+    template<typename... Args>
+    void disconnect(const Connection<Args...>& connection)
+    {
+        connection.disconnect();
     }
 }
 #endif

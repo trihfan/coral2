@@ -23,9 +23,12 @@ namespace coral
 	{
 	public:
 		Scene();
+
+		// Objects
 		void add(std::shared_ptr<Node> node);
 		void remove(std::shared_ptr<Node> node);
 
+		// Get top node
 		std::shared_ptr<Node> getTopNode() const;
 
 	private:
