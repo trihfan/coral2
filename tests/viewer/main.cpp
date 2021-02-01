@@ -5,7 +5,7 @@
 #include "Shader.h"
 #include "Object.h"
 #include "scene/Scene.h"
-#include "scene/CameraFreeMovement.h"
+#include "scene/Camera.h"
 #include "scene/Mesh.h"
 #include "materials/BasicMaterial.h"
 
@@ -70,8 +70,8 @@ int main()
 
     // camera
     camera = ObjectManager::createWithName<Camera>("camera");
-    camera->projection = glm::perspective(45.f, 4.f / 3.f, 0.1f, 100.f);
-    camera->view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    camera->setPerspective(45.f, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100.f));
+    camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
     scene->add(camera);
 
@@ -133,15 +133,6 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-   /* if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera->processKeyboard(CameraMovement::forward, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera->processKeyboard(CameraMovement::backward, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera->processKeyboard(CameraMovement::left, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera->processKeyboard(CameraMovement::right, deltaTime);*/
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -149,6 +140,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    camera->setPerspective(45.f, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100.f));
 }
 
 void mouse_button(GLFWwindow* window, int button, int action, int mods)
@@ -185,5 +177,5 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    //camera->processMouseScroll(yoffset);
+   
 }
