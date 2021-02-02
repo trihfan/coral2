@@ -1,5 +1,5 @@
 #include "MeshMaterial.h"
-#include "scene/Camera.h"
+#include "scene/camera/Camera.h"
 #include "Shader.h"
 #include <unordered_map>
 #include <glm/gtx/transform.hpp>

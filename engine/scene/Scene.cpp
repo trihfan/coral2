@@ -1,7 +1,8 @@
 #include <functional>
 #include "Scene.h"
 #include "Node.h"
-#include "Camera.h"
+#include "camera/Camera.h"
+#include "light/Light.h"
 
 using namespace coral;
 
@@ -41,16 +42,19 @@ void SceneManager::update()
 		return;
 	}
 
-	// input and list camera for render
+	// list cameras and lights
 	instance->cameras.clear();
+	instance->lights.clear();
+
 	traverse(instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
 	{
-		// send input
-		// todo
-
 		if (node->isA<Camera>())
 		{
 			instance->cameras.push_back(node->toHandle<Camera>());
+		}
+		else if (node->isA<Light>())
+		{
+			instance->lights.push_back(node->toHandle<Light>());
 		}
 		return true;
 	});

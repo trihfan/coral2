@@ -37,6 +37,7 @@ void checkGLError()
 }
 
 std::unique_ptr<std::pmr::memory_resource> Engine::memory_resource;
+std::chrono::steady_clock::time_point Engine::startTime;
 RenderParameters Engine::current_parameters;
 
 DEFINE_SINGLETON(Engine)
@@ -65,6 +66,7 @@ void Engine::setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory
 
 Engine::Engine()
 {
+    startTime = std::chrono::steady_clock::now();
     std::pmr::memory_resource* resource = memory_resource ? memory_resource.get() : std::pmr::new_delete_resource();
 
     // load backend
@@ -86,6 +88,11 @@ void Engine::setCurrentScene(std::shared_ptr<Scene> scene)
 
 void Engine::frame()
 {
+    // update time
+    double lastTime = current_parameters.time;
+    current_parameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count() / 1e6;
+    current_parameters.deltaTime = current_parameters.time - lastTime;
+    
     // update
     ObjectManager::instance->update();
     SceneManager::instance->update();

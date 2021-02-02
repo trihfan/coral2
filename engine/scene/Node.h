@@ -21,6 +21,7 @@ namespace coral
 		virtual bool isDrawable() const;
 
 		// Properties
+		Property<bool> enabled;
 		Property<std::shared_ptr<Node>> parent;
 		PropertyArray<std::shared_ptr<Node>> children;
 		Property<glm::vec3> position;
@@ -51,7 +52,7 @@ namespace coral
 	template <typename Function, typename... Args>
 	static void traverse(std::shared_ptr<Node> node, Function function, Args&&... args)
 	{
-		if (function(node, std::forward<Args>(args)...))
+		if (*node->enabled && function(node, std::forward<Args>(args)...))
 		{
 			for (size_t i = 0; i < node->children.size(); i++)
 			{

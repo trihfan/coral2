@@ -5,8 +5,8 @@
 #include "Shader.h"
 #include "Object.h"
 #include "scene/Scene.h"
-#include "scene/Camera.h"
-#include "scene/Mesh.h"
+#include "scene/camera/Camera.h"
+#include "scene/mesh/Mesh.h"
 #include "materials/BasicMaterial.h"
 
 using namespace coral;
@@ -14,15 +14,15 @@ using namespace coral;
 // variables
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1200;
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
+double lastX = SCR_WIDTH / 2.0f;
+double lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mousePressed = false;
 std::shared_ptr<Camera> camera;
 
 // timing todo timemanager
-float deltaTime = 0.0f; 
-float lastFrame = 0.0f;
+double deltaTime = 0; 
+double lastFrame = 0;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -107,7 +107,7 @@ int main()
     {
         // per-frame time logic
         // --------------------
-        float currentFrame = glfwGetTime();
+        double currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -166,16 +166,18 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    double xoffset = xpos - lastX;
+    double yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     lastX = xpos;
     lastY = ypos;
 
-    //camera->processMouseMovement(xoffset, yoffset);
+    // update camera
+    auto distance = (camera->getViewCenter() - *camera->position).length();
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-   
+   glm::vec3 direction = glm::normalize(camera->getViewCenter() - *camera->position);
+   camera->position = *camera->position + float(yoffset * 0.1f) * direction;
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "DrawableNode.h"
+#include "scene/DrawableNode.h"
 
 namespace coral
 {

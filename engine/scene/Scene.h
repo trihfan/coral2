@@ -17,6 +17,7 @@ namespace coral
 	class Camera;
 	class Material;
 	class Shader;
+	class Light;
 
 	//
 	class Scene : public Object
@@ -57,6 +58,7 @@ namespace coral
     private:
 		std::shared_ptr<Scene> current_scene;
 		std::vector<std::shared_ptr<Camera>> cameras;
+		std::vector<std::shared_ptr<Light>> lights;
 		std::map<unsigned int, RenderQueue> render_queues;
     };
 }

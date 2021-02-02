@@ -7,6 +7,7 @@ using namespace coral;
 Node::Node(std::shared_ptr<Node> parent)
 {
 	this->parent = parent;
+	enabled = true;
 	connect<&Node::updateWorldPosition>(position.changed, this);
 	connect<&Node::updateWorldRotation>(rotation.changed, this);
 	connect<&Node::updateWorldScale>(scale.changed, this);

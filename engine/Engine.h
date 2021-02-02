@@ -11,6 +11,7 @@
 #include "utils/Singleton.h"
 #include <vector>
 #include <memory>
+#include <chrono>
 
 namespace coral
 {
@@ -22,6 +23,8 @@ namespace coral
 	{
         std::shared_ptr<Camera> camera;
         std::vector<std::shared_ptr<Node>> lights;
+        double time;
+        double deltaTime;
 	};
 
     class Engine
@@ -53,6 +56,9 @@ namespace coral
     private:
         // Engine memory resource
         static std::unique_ptr<std::pmr::memory_resource> memory_resource;
+
+        // Time point of engine start
+        static std::chrono::steady_clock::time_point startTime;
     };
 }
 #endif

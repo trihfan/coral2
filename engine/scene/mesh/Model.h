@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include "Node.h"
+#include "scene/Node.h"
 
 namespace coral
 {
