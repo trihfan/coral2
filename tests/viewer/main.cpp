@@ -178,6 +178,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-   glm::vec3 direction = glm::normalize(camera->getViewCenter() - *camera->position);
-   camera->position = *camera->position + float(yoffset * 0.1f) * direction;
+   glm::vec3 view = camera->getViewCenter() - *camera->position;
+   float distance = float(view.length());
+   float movement = std::min(distance, float(yoffset) * 0.1f);
+   glm::vec3 direction = view / distance;
+   camera->position = *camera->position + movement * direction;
 }
