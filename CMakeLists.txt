@@ -27,7 +27,7 @@ set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 
 # subdirectories
 add_subdirectory(engine)
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
 # resources
 file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")

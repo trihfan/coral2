@@ -118,7 +118,7 @@ namespace coral
     template<auto Function, typename From, typename... Args>
     std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, From* object)
     {
-        return signal.connect<From, Function>(std::forward<From*>(object));
+        return signal.template connect<From, Function>(std::forward<From*>(object));
     }
 
     template<typename... Args>

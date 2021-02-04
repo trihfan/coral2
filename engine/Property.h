@@ -58,7 +58,7 @@ namespace coral
     template<typename Type>
     const Type& Property<Type>::get() const
     {
-        return value;
+        return this->value;
     }
 
     template<typename Type>
@@ -90,19 +90,19 @@ namespace coral
     template<typename Type, typename ArrayType>
     size_t PropertyArray<Type, ArrayType>::size() const
     {
-        return value.size();
+        return this->value.size();
     }
 
     template<typename Type, typename ArrayType>
     const Type& PropertyArray<Type, ArrayType>::get(size_t index) const
     {
-        return value[index];
+        return this->value[index];
     }
 
     template<typename Type, typename ArrayType>
     const Type& PropertyArray<Type, ArrayType>::operator[](size_t index) const
     {
-        return value[index];
+        return this->value[index];
     }
 
     template<typename Type, typename ArrayType>
@@ -139,7 +139,7 @@ namespace coral
     template<typename Type, typename ArrayType>
     void PropertyArray<Type, ArrayType>::erase(size_t index)
     {
-        value.erase(value.begin() + index);
+        this->value.erase(this->value.begin() + index);
     }
 
     template<typename Type, typename ArrayType>

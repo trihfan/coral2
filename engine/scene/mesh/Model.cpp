@@ -1,5 +1,5 @@
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+///*#include <assimp/postprocess.h>
 #include "Model.h"
 #include "Mesh.h"
 #include "materials/MeshMaterial.h"
@@ -15,7 +15,7 @@ Model::Model(std::string const& path, bool gamma) : gammaCorrection(gamma)
 void Model::loadModel(std::string const& path)
 {
     // read file via ASSIMP
-    Assimp::Importer importer;
+    /*Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     // check for errors
@@ -29,10 +29,10 @@ void Model::loadModel(std::string const& path)
     directory = path.substr(0, path.find_last_of('/'));
 
     // process ASSIMP's root node recursively
-    processNode(scene->mRootNode, scene);
+    processNode(scene->mRootNode, scene);*/
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene)
+/*void Model::processNode(aiNode* node, const aiScene* scene)
 {
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -165,4 +165,4 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         textures.push_back(texture);
     }
     return textures;
-}
+}*/

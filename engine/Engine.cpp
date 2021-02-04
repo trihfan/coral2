@@ -1,4 +1,5 @@
 #include <glad/glad.h>
+#include <new>
 #include "Engine.h"
 #include "Object.h"
 #include "Shader.h"
@@ -67,7 +68,11 @@ void Engine::setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory
 Engine::Engine()
 {
     startTime = std::chrono::steady_clock::now();
-    std::pmr::memory_resource* resource = memory_resource ? memory_resource.get() : std::pmr::new_delete_resource();
+    if (!Engine::memory_resource)
+    {
+        Engine::memory_resource = std::make_unique<DefaultNewDeleteMemoryResource>();
+    }
+    std::pmr::memory_resource* resource = memory_resource.get();
 
     // load backend
     if (!gladLoadGL())
@@ -157,4 +162,19 @@ void Engine::draw()
         }
     }
     checkGLError();
+}
+
+void* DefaultNewDeleteMemoryResource::do_allocate(size_t bytes, size_t alignment)
+{
+    return ::operator new(bytes);
+}
+
+void DefaultNewDeleteMemoryResource::do_deallocate(void* p, size_t bytes, size_t alignment)
+{
+    operator delete(p);
+}
+
+bool DefaultNewDeleteMemoryResource::do_is_equal(const memory_resource& other) const noexcept
+{
+    return dynamic_cast<const DefaultNewDeleteMemoryResource*>(&other);
 }
