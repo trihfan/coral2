@@ -8,11 +8,8 @@ file(GLOB_RECURSE sources *.h *.cpp *.c)
 set_folder_structure("${sources}" ${web_path})
 add_executable(web ${sources})
 
-# includes
-target_include_directories(web PRIVATE "${web_path}")
-
 # dependencies
-target_link_libraries(web engine egl)
+target_link_libraries(web engine OpenGL::EGL)
 
 # set output directories
 set_target_properties(web PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

@@ -1,4 +1,4 @@
-project (engine)
+project(engine)
 
 # externals
 find_package(OpenGL REQUIRED)
@@ -16,7 +16,14 @@ target_include_directories(engine PUBLIC "${engine_path}")
 target_include_directories(engine PUBLIC "${glm_path}")
 
 # dependencies
-target_link_libraries(engine PUBLIC gl ${CMAKE_DL_LIBS})
+target_link_libraries(engine PUBLIC ${CMAKE_DL_LIBS})
+
+if(EMSCRIPTEN)
+    target_link_libraries(engine PUBLIC OPENGL_gl_LIBRARY)    
+else()
+    target_link_libraries(engine PUBLIC OpenGL::GL)   
+endif()
+
 add_dependencies(engine glm)
 
 # set output directories
