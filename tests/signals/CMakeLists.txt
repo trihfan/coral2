@@ -4,7 +4,7 @@ project (signals)
 link_directories(signals ${lib_output_directory})
 
 # make lib
-file(GLOB_RECURSE sources *.h *.cpp *.inl)
+file(GLOB_RECURSE sources *.h *.cpp)
 set_folder_structure("${sources}" ${signals_path})
 add_executable(signals ${sources})
 

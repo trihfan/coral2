@@ -7,12 +7,9 @@ find_package(glfw3 CONFIG REQUIRED)
 link_directories(viewer ${lib_output_directory})
 
 # make lib
-file(GLOB_RECURSE sources *.h *.cpp *.inl)
+file(GLOB_RECURSE sources *.h *.cpp)
 set_folder_structure("${sources}" ${viewer_path})
 add_executable(viewer ${sources})
-
-# includes
-target_include_directories(viewer PUBLIC "${external_path}/glfw/include")
 
 # dependencies
 target_link_libraries(viewer engine glfw)

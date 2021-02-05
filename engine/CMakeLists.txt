@@ -3,15 +3,14 @@ project (engine)
 # externals
 find_package(OpenGL REQUIRED)
 find_package(glm CONFIG REQUIRED)
-#find_package(assimp CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb.h")
-find_package(OpenGL REQUIRED)
 
 # link directories
 link_directories(engine ${lib_output_directory})
 
 # make lib
-file(GLOB_RECURSE sources *.h *.cpp *.inl *.c)
+file(GLOB_RECURSE sources *.h *.cpp *.c)
 set_folder_structure("${sources}" ${engine_path})
 add_library(engine STATIC ${sources})
 

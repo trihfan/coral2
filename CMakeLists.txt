@@ -15,11 +15,8 @@ include(folder_structure)
 find_package(Python3 REQUIRED)
 
 # directories
-set(external_path ${PROJECT_SOURCE_DIR}/externals)
 set(engine_path ${PROJECT_SOURCE_DIR}/engine)
-set(viewer_path ${PROJECT_SOURCE_DIR}/tests/viewer)
-set(signals_path ${PROJECT_SOURCE_DIR}/tests/signals)
-set(assimp_config_path ${PROJECT_BINARY_DIR}/externals/assimp/include)
+set(test_path ${PROJECT_SOURCE_DIR}/test)
 
 # define output directories
 set(lib_output_directory ${PROJECT_BINARY_DIR}/lib)
@@ -27,7 +24,7 @@ set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 
 # subdirectories
 add_subdirectory(engine)
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 # resources
 file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")
