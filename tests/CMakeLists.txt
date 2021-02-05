@@ -1,20 +1,21 @@
 project(tests)
 
-# externals
-find_package(OpenGL COMPONENTS OpenGL EGL)
-
+# directories
 set(viewer_path ${PROJECT_SOURCE_DIR}/tests/viewer)
 set(signals_path ${PROJECT_SOURCE_DIR}/tests/signals)
 set(web_path ${PROJECT_SOURCE_DIR}/tests/web)
 set(emscripten_path ${PROJECT_SOURCE_DIR}/tests/emscripten)
 
+# emscripten
 if(EMSCRIPTEN)
     add_subdirectory(emscripten)   
 else()
+# default
     add_subdirectory(viewer)
     add_subdirectory(signals)
 endif()
 
-if(OpenGL_EGL_FOUND)
+# server side render on linux
+if(UNIX)
     add_subdirectory(web)
 endif()
