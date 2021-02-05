@@ -1,11 +1,11 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#ifdef __APPLE__
+#ifdef WIN32
+    #include <memory_resource>
+#else
     #include <experimental/memory_resource>
     namespace std { namespace pmr = experimental::pmr; }
-#else
-    #include <memory_resource>
 #endif
 
 #include <memory>

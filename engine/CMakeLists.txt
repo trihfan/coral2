@@ -2,9 +2,6 @@ project (engine)
 
 # externals
 find_package(OpenGL REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
-find_path(STB_INCLUDE_DIRS "stb.h")
 
 # link directories
 link_directories(engine ${lib_output_directory})
@@ -15,12 +12,12 @@ set_folder_structure("${sources}" ${engine_path})
 add_library(engine STATIC ${sources})
 
 # includes
-target_include_directories(engine PUBLIC "${assimp_config_path}")
 target_include_directories(engine PUBLIC "${engine_path}")
-target_include_directories(engine PUBLIC ${STB_INCLUDE_DIRS})
+target_include_directories(engine PUBLIC "${glm_path}")
 
 # dependencies
-target_link_libraries(engine PUBLIC OpenGL::GL ${CMAKE_DL_LIBS} glm)
+target_link_libraries(engine PUBLIC gl ${CMAKE_DL_LIBS})
+add_dependencies(engine glm)
 
 # set output directories
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

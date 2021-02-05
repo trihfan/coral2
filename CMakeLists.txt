@@ -6,6 +6,7 @@ project(coral VERSION ${version} LANGUAGES CXX)
 
 # use c++17
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -std=c++17")
 
 # modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
@@ -15,6 +16,7 @@ include(folder_structure)
 find_package(Python3 REQUIRED)
 
 # directories
+set(glm_path ${PROJECT_SOURCE_DIR}/glm)
 set(engine_path ${PROJECT_SOURCE_DIR}/engine)
 set(test_path ${PROJECT_SOURCE_DIR}/test)
 
@@ -23,6 +25,7 @@ set(lib_output_directory ${PROJECT_BINARY_DIR}/lib)
 set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 
 # subdirectories
+add_subdirectory(glm)
 add_subdirectory(engine)
 add_subdirectory(tests)
 
