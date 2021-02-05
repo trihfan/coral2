@@ -3,3 +3,4 @@ build
 CMakeLists.txt.user
 copy_resources.h
 last_copy.h
+.vscode

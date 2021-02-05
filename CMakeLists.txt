@@ -27,7 +27,7 @@ set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 
 # subdirectories
 add_subdirectory(engine)
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 # resources
 file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")
@@ -42,5 +42,3 @@ add_dependencies(engine copy_resources)
 
 # setup coral project directory
 set_target_properties(copy_resources PROPERTIES FOLDER "coral/utils")
-set_target_properties(engine PROPERTIES FOLDER "coral")
-set_target_properties(viewer PROPERTIES FOLDER "coral/tests")

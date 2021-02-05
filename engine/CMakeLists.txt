@@ -3,7 +3,7 @@ project (engine)
 # externals
 find_package(OpenGL REQUIRED)
 find_package(glm CONFIG REQUIRED)
-#find_package(assimp CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb.h")
 find_package(OpenGL REQUIRED)
 
@@ -27,3 +27,4 @@ target_link_libraries(engine PUBLIC OpenGL::GL ${CMAKE_DL_LIBS} glm)
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${bin_output_directory})
+set_target_properties(engine PROPERTIES FOLDER "coral")
