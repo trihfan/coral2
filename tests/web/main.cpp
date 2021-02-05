@@ -1,9 +1,8 @@
 #include <numeric>
-#include <cstddef>
-#include <cstdint>
-#include <fstream>
-#define EGL_CAST(X, Y) static_cast<X>(Y)
+#include <Windows.h>
+#include <glad/glad.h>
 #include "glad/glad_egl.h"
+#include "glad/glad.h"
 #include "Engine.h"
 #include "Shader.h"
 #include "Object.h"
@@ -17,11 +16,12 @@ using namespace coral;
 // Egl parameters
 static const EGLint configAttribs[]
 {
-    EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
+    EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
     EGL_BLUE_SIZE, 8,
     EGL_GREEN_SIZE, 8,
     EGL_RED_SIZE, 8,
-    EGL_DEPTH_SIZE, 8,
+    EGL_ALPHA_SIZE, 8,
+    EGL_DEPTH_SIZE, EGL_DONT_CARE,
     EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
     EGL_NONE
 };    
@@ -29,55 +29,66 @@ static const EGLint configAttribs[]
 static const int pbufferWidth = 800;
 static const int pbufferHeight = 600;
 
-static const EGLint pbufferAttribs[]
+static const EGLint windowsAttribs[]
 {
     EGL_WIDTH, pbufferWidth,
     EGL_HEIGHT, pbufferHeight,
     EGL_NONE,
 };
 
-// Bitmap info
-struct BitmapHeader 
+static const EGLint contextAttribs[]
 {
-    char bitmapSignatureBytes[2] = {'B', 'M'};
-    uint32_t sizeOfBitmapFile = 54 + 786432;
-    uint32_t reservedBytes = 0;
-    uint32_t pixelDataOffset = 54;
+    EGL_CONTEXT_MAJOR_VERSION, 3,
+    EGL_CONTEXT_MINOR_VERSION, 3,
+    EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
+    EGL_NONE,
 };
-
-struct BmpInfoHeader 
+			
+static LRESULT CALLBACK __DummyWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    uint32_t sizeOfThisHeader = 40;
-    int32_t width = pbufferWidth; // in pixels
-    int32_t height = pbufferHeight; // in pixels
-    uint16_t numberOfColorPlanes = 1; // must be 1
-    uint16_t colorDepth = 24;
-    uint32_t compressionMethod = 0;
-    uint32_t rawBitmapDataSize = 0; // generally ignored
-    int32_t horizontalResolution = 3780; // in pixel per meter
-    int32_t verticalResolution = 3780; // in pixel per meter
-    uint32_t colorTableEntries = 0;
-    uint32_t importantColors = 0;
-};
-
-struct Pixel 
-{
-    uint8_t blue;
-    uint8_t green;
-    uint8_t red;
-};
+     return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
 
 int main()
 {
+    // create window
+    WNDCLASS wc;
+    memset(&wc, 0, sizeof(WNDCLASS));
+
+    wc.lpfnWndProc   = __DummyWndProc;
+    wc.hInstance     = GetModuleHandle(NULL);
+    wc.lpszClassName = "DummyWindow";
+
+    RegisterClass(&wc);
+
+    HWND hwnd = CreateWindowEx(
+        0,
+        "DummyWindow",
+        "",
+        0,
+        0, 0, 800, 600,
+        NULL,
+        NULL,
+		wc.hInstance,
+        NULL
+    );
+
     // load egl
     // ------------------------------
     if (!gladLoadEGL())
     {
         Logs(error) << "Failed to initialize GLAD EGL";
-        return;
+        return 1;
     }
 
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display== EGL_NO_DISPLAY)
+    {
+        Logs(error) << "Can't get display";
+        Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
+
     EGLint major, minor;
     eglInitialize(display, &major, &minor);
     Logs(info) << "Initialized EGL " << major << "." << minor;
@@ -85,17 +96,45 @@ int main()
     // 2. Select an appropriate configuration
     EGLint numConfigs;
     EGLConfig config;
-    eglChooseConfig(display, configAttribs, &config, 1, &numConfigs);
+    if (!eglChooseConfig(display, configAttribs, &config, 1, &numConfigs) || numConfigs == 0)
+    {
+        Logs(error) << "Can't choose config";
+         Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
 
     // 3. Create a surface
-    EGLSurface surface = eglCreatePbufferSurface(display, config, pbufferAttribs);
+    EGLSurface surface = eglCreateWindowSurface(display, config, hwnd, windowsAttribs);
+    if (surface == EGL_NO_SURFACE)
+    {
+        Logs(error) << "Can't create surface";
+        Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
 
     // 4. Bind the API
-    eglBindAPI(EGL_OPENGL_API);
+    if (!eglBindAPI(EGL_OPENGL_API))
+    {
+        Logs(error) << "Can't bind api";
+        Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
 
     // 5. Create a context and make it current
-    EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, nullptr);
-    eglMakeCurrent(display, surface, surface, context);
+    EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribs);
+    if (context == EGL_NO_CONTEXT)
+    {
+        Logs(error) << "Can't create context";
+        Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
+
+    if (!eglMakeCurrent(display, surface, surface, context))
+    {
+        Logs(error) << "Can't make the context current";
+        Logs(error) << std::hex << eglGetError();
+        return 1;
+    }
 
     // setup engine
     // ------------------------------
@@ -141,31 +180,23 @@ int main()
 
     // main loop
     size_t numberOfPixels = pbufferWidth * pbufferHeight;
-    uint8_t buffer[numberOfPixels * 4];
+    auto buffer = new unsigned char[numberOfPixels * 4];
     while (true)
     {
         Engine::frame();
 
         // read pixels
-        glReadPixels(0, 0, pbufferWidth, pbufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, &buffer);
+        glReadPixels(0, 0, pbufferWidth, pbufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer);
 
-        // write bitmap
-        std::ofstream fout("output.bmp", ios::binary);
-        fout.write((char *) &bmpHeader, 14);
-        fout.write((char *) &bmpInfoHeader, 40);
+        // encode frame
 
-        // writing pixel data
-        for (int i = 0; i < numberOfPixels; i++) 
-        {
-            Pixel pixel { buffer[i * 4], buffer[i * 4 + 1], buffer[i * 4 + 2] };
-            fout.write((char *) &pixel, 3);
-        }
-        fout.close();
+        // send frame
 
         eglSwapBuffers(display, surface);
         break;
     }
 
+    delete[] buffer;
     Engine::destroy();
     eglTerminate(display);
 }
