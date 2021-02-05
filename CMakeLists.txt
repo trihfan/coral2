@@ -39,5 +39,3 @@ add_dependencies(engine copy_resources)
 
 # setup coral project directory
 set_target_properties(copy_resources PROPERTIES FOLDER "coral/utils")
-set_target_properties(engine PROPERTIES FOLDER "coral")
-set_target_properties(viewer PROPERTIES FOLDER "coral/tests")
