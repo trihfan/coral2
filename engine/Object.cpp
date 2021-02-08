@@ -60,7 +60,7 @@ void ObjectManager::destroy(std::shared_ptr<Object> object)
     instance->unregisterObject(object);
 }
 
-ObjectManager::ObjectManager(std::pmr::memory_resource* memory_resource) :
+ObjectManager::ObjectManager(std::shared_ptr<std::pmr::memory_resource> memory_resource) :
       memory_resource(memory_resource)
 {
 }

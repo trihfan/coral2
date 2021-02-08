@@ -181,7 +181,7 @@ std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
     return nullptr;
 }
 
-ShaderManager::ShaderManager(std::pmr::memory_resource* memory_resource)
+ShaderManager::ShaderManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
 {
     // load shaders
     for (const std::filesystem::path& path : paths)

@@ -74,7 +74,7 @@ namespace coral
         static std::shared_ptr<Shader> getShader(const std::string& name);
 
     private:
-        ShaderManager(std::pmr::memory_resource* memory_resource);
+        ShaderManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
         void iterateFolder(const std::filesystem::path& path);
         int getShaderType(const std::filesystem::path& extension) const;
 

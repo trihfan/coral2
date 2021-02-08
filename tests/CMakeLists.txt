@@ -16,6 +16,6 @@ else()
 endif()
 
 # server side render on linux
-if(UNIX)
+if(UNIX AND NOT APPLE)
     add_subdirectory(web)
 endif()

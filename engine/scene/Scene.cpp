@@ -73,6 +73,6 @@ void SceneManager::setCurrentScene(std::shared_ptr<Scene> scene)
 	instance->cameras.clear();
 }
 
-SceneManager::SceneManager(std::pmr::memory_resource* memory_resource)
+SceneManager::SceneManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
 {
 }

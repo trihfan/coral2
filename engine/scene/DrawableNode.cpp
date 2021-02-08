@@ -4,7 +4,7 @@
 using namespace coral;
 
 DrawableNode::DrawableNode(std::shared_ptr<Node> parent) :
-	Node(parent), render_queue(DefaultEngineRenderPass::defaultRenderPass)
+	Node(parent), render_queue(DefaultRenderPassId::defaultRenderPass)
 {
 }
 

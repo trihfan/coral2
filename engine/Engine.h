@@ -8,6 +8,7 @@
     #include <memory_resource>
 #endif
 
+#include "EngineConfig.h"
 #include "utils/Singleton.h"
 #include <vector>
 #include <memory>
@@ -19,7 +20,6 @@ namespace coral
     class Camera;
     class Node;
     class RenderPass;
-    class DefaultNewDeleteMemoryResource;
 
     struct RenderParameters
 	{
@@ -28,23 +28,6 @@ namespace coral
         double time;
         double deltaTime;
 	};
-
-    enum DefaultEngineRenderPass
-    {
-        defaultRenderPass = 1000,
-        transparentRenderPass = 2000
-    };
-
-    enum Transparency { none, simple, depthPeeling, linkedList };
-    struct EngineConfig
-    {
-        // constructor with default config
-        EngineConfig();
-
-        // parameters
-        std::shared_ptr<std::pmr::memory_resource> memoryResource;
-        Transparency transparency;
-    };
 
     class Engine
     {
@@ -71,14 +54,8 @@ namespace coral
     private:
         // Time point of engine start
         static std::chrono::steady_clock::time_point startTime;
-    };
 
-    class DefaultNewDeleteMemoryResource : public std::pmr::memory_resource
-    {
-    protected:
-        void* do_allocate(size_t bytes, size_t alignment) override;
-        void do_deallocate(void* p, size_t bytes, size_t alignment) override;
-        bool do_is_equal(const memory_resource& other) const noexcept override;
+        std::shared_ptr<std::pmr::memory_resource> memoryResource;
     };
 }
 #endif

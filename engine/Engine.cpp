@@ -4,6 +4,7 @@
 #include "Object.h"
 #include "Shader.h"
 #include "renderpasses/RenderPass.h"
+#include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassDefault.h"
 #include "scene/Scene.h"
 #include "scene/Node.h"
@@ -39,11 +40,6 @@ void checkGLError()
     }
 }
 
-EngineConfig::EngineConfig()
-{
-    memoryResource = std::make_shared<DefaultNewDeleteMemoryResource>();
-}
-
 std::chrono::steady_clock::time_point Engine::startTime;
 RenderParameters Engine::current_parameters;
 
@@ -68,6 +64,7 @@ void Engine::destroy()
 Engine::Engine(const EngineConfig& config)
 {
     startTime = std::chrono::steady_clock::now();
+    memoryResource = config.memoryResource;
 
     // load backend
     if (!gladLoadGL())
@@ -76,10 +73,10 @@ Engine::Engine(const EngineConfig& config)
     }
 
     // create instances
-    ObjectManager::createInstance(config.memoryResource.get());
-    ShaderManager::createInstance(config.memoryResource.get());
-    SceneManager::createInstance(config.memoryResource.get());
-    RenderPassManager::createInstance(config.memoryResource.get());
+    ObjectManager::createInstance(config.memoryResource);
+    ShaderManager::createInstance(config.memoryResource);
+    SceneManager::createInstance(config.memoryResource);
+    RenderPassManager::createInstance(config.memoryResource);
 
     // default config
     RenderPassManager::setDefaultRenderPass(ObjectManager::createWithName<RenderPassDefault>("defaultrenderpass"));
@@ -100,6 +97,7 @@ void Engine::frame()
     // update
     ObjectManager::instance->update();
     SceneManager::instance->update();
+    RenderPassManager::instance->update();
 
     // draw
     for (auto camera : SceneManager::instance->cameras)
@@ -128,6 +126,7 @@ void Engine::cull()
         }
         return true;
     });
+
     checkGLError();
 }
 
@@ -138,24 +137,10 @@ void Engine::draw()
     glEnable(GL_CULL_FACE);
 
     // for each render pass
-    for (auto& queue : SceneManager::instance->render_queues)
+    for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
     {
-        RenderPassManager::getRenderPass(queue.first)->render(queue.second);
+        auto it = SceneManager::instance->render_queues.find(renderpass.first);
+        renderpass.second->render(it->second);
     }
     checkGLError();
-}
-
-void* DefaultNewDeleteMemoryResource::do_allocate(size_t bytes, size_t alignment)
-{
-    return ::operator new(bytes, std::align_val_t(alignment));
-}
-
-void DefaultNewDeleteMemoryResource::do_deallocate(void* p, size_t bytes, size_t alignment)
-{
-    ::operator delete(p, bytes, std::align_val_t(alignment));
-}
-
-bool DefaultNewDeleteMemoryResource::do_is_equal(const memory_resource& other) const noexcept
-{
-    return this == &other;
 }

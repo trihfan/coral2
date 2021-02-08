@@ -69,7 +69,7 @@ namespace coral
         static void destroy(std::shared_ptr<Object> object);
 
     private:
-        ObjectManager(std::pmr::memory_resource* memory_resource);
+        ObjectManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
         void registerObject(std::shared_ptr<Object> object);
         void unregisterObject(std::shared_ptr<Object> object);
 
@@ -78,7 +78,7 @@ namespace coral
 
     private:
         // memory pool
-        std::pmr::memory_resource* memory_resource;
+        std::shared_ptr<std::pmr::memory_resource> memory_resource;
 
         // object lists
         std::vector<std::shared_ptr<Object>> objects;
@@ -100,7 +100,7 @@ namespace coral
         static_assert (std::is_base_of<Object, ObjectType>::value, "Only object derivated from Object can be instanciated");
 
         // allocate object in the memory resource
-        std::shared_ptr<ObjectType> object = std::allocate_shared<ObjectType>(std::pmr::polymorphic_allocator<ObjectType>(instance->memory_resource), std::forward<Args>(args)...);
+        std::shared_ptr<ObjectType> object = std::allocate_shared<ObjectType>(std::pmr::polymorphic_allocator<ObjectType>(instance->memory_resource.get()), std::forward<Args>(args)...);
 
         // register object
         instance->registerObject(object);

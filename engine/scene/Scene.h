@@ -53,7 +53,7 @@ namespace coral
 		static void update();
 
     private:
-		SceneManager(std::pmr::memory_resource* memory_resource);
+		SceneManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
 
     private:
 		std::shared_ptr<Scene> current_scene;

@@ -4,38 +4,39 @@ using namespace coral;
 
 void RenderPass::render(RenderQueue& queue)
 {
+    // bind output
+    for (const RenderPassOutput& output : outputs)
+    {
+        switch (output.type)
+        {
+        case RenderPassOutputType::framebuffer:
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            break;
+
+        default:
+            break;
+        }
+    }
+
     internalRender(queue);
 }
 
-//*********************************************************************************
-// RenderPassManager
-
-DEFINE_SINGLETON(RenderPassManager)
-
-void RenderPassManager::setDefaultRenderPass(std::shared_ptr<RenderPass> renderPass)
+void RenderPass::addInput(const RenderPassInput& input)
 {
-    instance->defaultRenderPass = renderPass;
+    inputs.push_back(input);
 }
 
-void RenderPassManager::addRenderPass(unsigned int queueId, std::shared_ptr<RenderPass> renderPass)
+const std::vector<RenderPassInput>& RenderPass::getInputs() const
 {
-    instance->renderPasses[queueId] = renderPass;
+    return inputs;
 }
 
-std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(unsigned int queueId)
+void RenderPass::addOutput(const RenderPassOutput& output)
 {
-    auto it = instance->renderPasses.find(queueId);
-    if (it != instance->renderPasses.end())
-    {
-        return it->second;
-    }
-    return instance->defaultRenderPass;
+    outputs.push_back(output);
 }
 
-void RenderPassManager::update()
+const std::vector<RenderPassOutput>& RenderPass::getOutputs() const
 {
-}
-
-RenderPassManager::RenderPassManager(std::pmr::memory_resource* memory_resource)
-{
+    return outputs;
 }
