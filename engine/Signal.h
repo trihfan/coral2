@@ -45,34 +45,33 @@ namespace coral
 	struct Signal
 	{
         static constexpr bool numberOfArgs = sizeof...(Args) > 0;
-        using Connection = Connection<Args...>;
 
         // connect
         template<typename From, void(From::*Function)(Args...)>
-		std::shared_ptr<Connection> connect(From* object) const
+		std::shared_ptr<Connection<Args...>> connect(From* object) const
         {
-            auto connection = std::make_shared<Connection>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(args...); }), object);
+            auto connection = std::make_shared<Connection<Args...>>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(args...); }), object);
             connections.push_back(connection);
             return connection;
         }
 
         template<typename From, void(From::*Function)()>
-		std::shared_ptr<Connection> connect(typename std::enable_if<numberOfArgs, From*>::type object) const
+		std::shared_ptr<Connection<Args...>> connect(typename std::enable_if<numberOfArgs, From*>::type object) const
         {
-            auto connection = std::make_shared<Connection>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(); }), object);
+            auto connection = std::make_shared<Connection<Args...>>(*this, reinterpret_cast<void*>(+[](void* object, Args... args) {((*reinterpret_cast<From**>(object))->*Function)(); }), object);
             connections.push_back(connection);
             return connection;
         }
 
         // disconnect
-        void disconnect(std::shared_ptr<Connection> connection) const;
-        void disconnect(Connection* connection) const;
+        void disconnect(std::shared_ptr<Connection<Args...>> connection) const;
+        void disconnect(Connection<Args...>* connection) const;
 
         // emit signal
         void operator()(Args... args) const;
 
 	private:
-        mutable std::list<std::shared_ptr<Connection>> connections;
+        mutable std::list<std::shared_ptr<Connection<Args...>>> connections;
 	};
 
     template<typename... Args>
@@ -91,15 +90,15 @@ namespace coral
     }
 
     template<typename... Args>
-    void Signal<Args...>::disconnect(std::shared_ptr<Connection> connection) const
+    void Signal<Args...>::disconnect(std::shared_ptr<Connection<Args...>> connection) const
     {
         disconnect(connection.get());
     }
 
     template<typename... Args>
-    void Signal<Args...>::disconnect(Connection* connection) const
+    void Signal<Args...>::disconnect(Connection<Args...>* connection) const
     {
-        auto it = std::find_if(connections.begin(), connections.end(), [connection](const std::shared_ptr<Connection>& c){ return c.get() == connection; });
+        auto it = std::find_if(connections.begin(), connections.end(), [connection](const std::shared_ptr<Connection<Args...>>& c){ return c.get() == connection; });
         if (it != connections.end())
         {
             connections.erase(it);

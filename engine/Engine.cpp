@@ -3,6 +3,8 @@
 #include "Engine.h"
 #include "Object.h"
 #include "Shader.h"
+#include "renderpasses/RenderPass.h"
+#include "renderpasses/RenderPassDefault.h"
 #include "scene/Scene.h"
 #include "scene/Node.h"
 #include "scene/DrawableNode.h"
@@ -37,15 +39,19 @@ void checkGLError()
     }
 }
 
-std::unique_ptr<std::pmr::memory_resource> Engine::memory_resource;
+EngineConfig::EngineConfig()
+{
+    memoryResource = std::make_shared<DefaultNewDeleteMemoryResource>();
+}
+
 std::chrono::steady_clock::time_point Engine::startTime;
 RenderParameters Engine::current_parameters;
 
 DEFINE_SINGLETON(Engine)
 
-void Engine::create()
+void Engine::create(const EngineConfig& config)
 {
-    createInstance();
+    createInstance(config);
 }
 
 void Engine::destroy()
@@ -54,25 +60,14 @@ void Engine::destroy()
     SceneManager::destroyInstance();
     ShaderManager::destroyInstance();
     ObjectManager::destroyInstance();
-    memory_resource = nullptr;
 
     // destroy
     destroyInstance();
 }
 
-void Engine::setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource)
-{
-    Engine::memory_resource = std::move(memory_resource);
-}
-
-Engine::Engine()
+Engine::Engine(const EngineConfig& config)
 {
     startTime = std::chrono::steady_clock::now();
-    if (!Engine::memory_resource)
-    {
-        Engine::memory_resource = std::make_unique<DefaultNewDeleteMemoryResource>();
-    }
-    std::pmr::memory_resource* resource = memory_resource.get();
 
     // load backend
     if (!gladLoadGL())
@@ -81,9 +76,13 @@ Engine::Engine()
     }
 
     // create instances
-    ObjectManager::createInstance(resource);
-    ShaderManager::createInstance(resource);
-    SceneManager::createInstance(resource);
+    ObjectManager::createInstance(config.memoryResource.get());
+    ShaderManager::createInstance(config.memoryResource.get());
+    SceneManager::createInstance(config.memoryResource.get());
+    RenderPassManager::createInstance(config.memoryResource.get());
+
+    // default config
+    RenderPassManager::setDefaultRenderPass(ObjectManager::createWithName<RenderPassDefault>("defaultrenderpass"));
 }
 
 void Engine::setCurrentScene(std::shared_ptr<Scene> scene)
@@ -141,25 +140,7 @@ void Engine::draw()
     // for each render pass
     for (auto& queue : SceneManager::instance->render_queues)
     {
-        // for each shader
-        for (auto& shader_pair : queue.second.shader_map)
-        {
-            // Set up shader
-            shader_pair.first->use();
-
-            // for each material
-            for (auto material : shader_pair.second)
-            {
-                // Set up material
-                material->use(current_parameters);
-
-                // draw each node
-                for (auto node : queue.second.material_map[material])
-                {
-                    node->draw(current_parameters);
-                }
-            }
-        }
+        RenderPassManager::getRenderPass(queue.first)->render(queue.second);
     }
     checkGLError();
 }

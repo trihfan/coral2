@@ -1,9 +1,10 @@
 #include "DrawableNode.h"
+#include "Engine.h"
 
 using namespace coral;
 
 DrawableNode::DrawableNode(std::shared_ptr<Node> parent) :
-	Node(parent)
+	Node(parent), render_queue(DefaultEngineRenderPass::defaultRenderPass)
 {
 }
 

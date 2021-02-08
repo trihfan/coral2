@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(version "1.0.0")
@@ -7,6 +7,11 @@ project(coral VERSION ${version} LANGUAGES CXX)
 # use c++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -std=c++17")
+
+if(UNIX AND NOT APPLE)
+        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -lstdc++")
+endif()
+
 
 # modules
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)

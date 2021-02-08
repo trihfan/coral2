@@ -1,11 +1,11 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#ifdef WIN32
-    #include <memory_resource>
-#else
+#ifdef __APPLE__
     #include <experimental/memory_resource>
     namespace std { namespace pmr = experimental::pmr; }
+#else
+    #include <memory_resource>
 #endif
 
 #include "utils/Singleton.h"
@@ -18,6 +18,8 @@ namespace coral
     class Scene;
     class Camera;
     class Node;
+    class RenderPass;
+    class DefaultNewDeleteMemoryResource;
 
     struct RenderParameters
 	{
@@ -27,19 +29,33 @@ namespace coral
         double deltaTime;
 	};
 
+    enum DefaultEngineRenderPass
+    {
+        defaultRenderPass = 1000,
+        transparentRenderPass = 2000
+    };
+
+    enum Transparency { none, simple, depthPeeling, linkedList };
+    struct EngineConfig
+    {
+        // constructor with default config
+        EngineConfig();
+
+        // parameters
+        std::shared_ptr<std::pmr::memory_resource> memoryResource;
+        Transparency transparency;
+    };
+
     class Engine
     {
         MAKE_SINGLETON(Engine)
     public:
-        // tmp
+        // render parameters for the current frame
         static RenderParameters current_parameters;
 
         // creation
-        static void create();
+        static void create(const EngineConfig& config = EngineConfig());
         static void destroy();
-
-        // configuration
-        static void setMemoryResource(std::unique_ptr<std::pmr::memory_resource> memory_resource);
 
         // run
         static void setCurrentScene(std::shared_ptr<Scene> scene);
@@ -47,16 +63,12 @@ namespace coral
 
     private:
         // Constructor
-        Engine();
+        Engine(const EngineConfig& config);
 
-        // todo -> RenderQueueManager?
         void cull();
         void draw();
 
     private:
-        // Engine memory resource
-        static std::unique_ptr<std::pmr::memory_resource> memory_resource;
-
         // Time point of engine start
         static std::chrono::steady_clock::time_point startTime;
     };

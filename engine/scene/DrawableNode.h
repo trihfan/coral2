@@ -33,7 +33,7 @@ namespace coral
 
 	protected:
 		std::shared_ptr<Material> material;
-		unsigned int render_queue = 1000;
+		unsigned int render_queue;
 	};
 }
 #endif

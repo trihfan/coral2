@@ -1,11 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#ifdef WIN32
-    #include <memory_resource>
-#else
+#ifdef __APPLE__
     #include <experimental/memory_resource>
     namespace std { namespace pmr = experimental::pmr; }
+#else
+    #include <memory_resource>
 #endif
 
 #include <filesystem>
