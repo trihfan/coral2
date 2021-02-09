@@ -97,6 +97,7 @@ void Engine::frame()
     // update
     ObjectManager::instance->update();
     SceneManager::instance->update();
+    
     RenderPassManager::instance->update();
 
     // draw

@@ -55,6 +55,7 @@ namespace coral
         // Time point of engine start
         static std::chrono::steady_clock::time_point startTime;
 
+        // Memory resource used by the engine
         std::shared_ptr<std::pmr::memory_resource> memoryResource;
     };
 }
