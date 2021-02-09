@@ -81,14 +81,20 @@ void ObjectManager::update()
 {
     for (auto object : initialize_list)
     {
-        object->init();
-        object->state = Object::ObjectState::initialized;
+        if (object->state == Object::ObjectState::not_initialized)
+        {
+            object->init();
+            object->state = Object::ObjectState::initialized;
+        }
     }
 
     for (auto object : release_list)
     {
-        object->release();
-        object->state = Object::ObjectState::released;
+        if (object->state == Object::ObjectState::initialized)
+        {
+            object->release();
+            object->state = Object::ObjectState::released;
+        }
     }
 
     initialize_list.clear();

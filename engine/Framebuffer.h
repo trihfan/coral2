@@ -3,9 +3,17 @@
 
 #include "Object.h"
 #include "utils/Singleton.h"
+#include "glad/glad.h"
 
 namespace coral
 {
+    enum ResourceType { texture };
+    struct Resource
+    {
+        ResourceType type;
+        GLenum internalType;
+    };
+
 	//
 	class Framebuffer : public Object
 	{
@@ -21,6 +29,7 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(FramebufferManager)
     public:
+        std::shared_ptr<Framebuffer> getFramebuffer(const std::string& name);
         std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::string>& colorOutputs);
     };
 }
