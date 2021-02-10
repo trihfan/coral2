@@ -13,7 +13,7 @@ namespace coral
 		void bind();
 
     private:
-        GLuint framebufferId;
+        //GLuint framebufferId;
 	};
 
 	// The framebuffer manager
@@ -21,7 +21,7 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(FramebufferManager)
     public:
-        std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::string>& colorOutputs);
+        static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::string>& colorOutputs);
     };
 }
 #endif

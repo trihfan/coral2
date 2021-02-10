@@ -2,27 +2,27 @@
 #define ENGINECONFIG_H
 
 #ifdef __APPLE__
-    #include <experimental/memory_resource>
-    namespace std { namespace pmr = experimental::pmr; }
+#include <experimental/memory_resource>
+namespace std
+{
+    namespace pmr = experimental::pmr;
+}
 #else
-    #include <memory_resource>
+#include <memory_resource>
 #endif
+#include "Property.h"
 
 namespace coral
 {
-    // transparency type
-    enum Transparency { none, simple, depthPeeling, linkedList };
-
     // config to use for the engine
     // simplify the engine pipeline creation
-    struct EngineConfig
+    class EngineConfig
     {
-        // constructor with default config
+    public:
         EngineConfig();
+        void setup();
 
-        // parameters
-        std::shared_ptr<std::pmr::memory_resource> memoryResource;
-        Transparency transparency;
+        Property<std::shared_ptr<std::pmr::memory_resource> > memoryResource;
     };
 }
 #endif
