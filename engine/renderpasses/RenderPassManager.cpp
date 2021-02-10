@@ -60,3 +60,8 @@ void RenderPassManager::bake()
         renderpass->prepare();
     }
 }
+
+void RenderPassManager::invalidate()
+{
+    instance->orderedRenderPasses.clear();        
+}

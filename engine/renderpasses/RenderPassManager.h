@@ -24,6 +24,8 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(RenderPassManager)
     public:
+        static void invalidate();
+
         // add a render pass
 		static void addRenderPass(std::shared_ptr<RenderPass> renderPass);
 

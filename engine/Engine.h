@@ -27,6 +27,8 @@ namespace coral
         std::vector<std::shared_ptr<Node>> lights;
         double time;
         double deltaTime;
+        int width;
+        int height;
 	};
 
     class Engine
@@ -42,6 +44,7 @@ namespace coral
 
         // run
         static void setCurrentScene(std::shared_ptr<Scene> scene);
+        static void resize(int width, int height);
         static void frame();
 
     private:

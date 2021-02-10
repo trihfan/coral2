@@ -8,6 +8,8 @@ using namespace coral;
 
 Resource::Resource() : id(0)
 {
+    connect<&Resource::init>(Object::init, this);
+    connect<&Resource::release>(Object::release, this);
 }
   
 void Resource::bind()

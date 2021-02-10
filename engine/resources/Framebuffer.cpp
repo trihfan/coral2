@@ -25,7 +25,7 @@ const std::vector<std::pair<std::string, ResourceRole>>& Framebuffer::getResouce
 
 void Framebuffer::bind(GLenum target)
 {
-    //glBindFramebuffer(target, framebufferId);
+    glBindFramebuffer(target, framebufferId);
     CHECK_OPENGL_ERROR
 }
 

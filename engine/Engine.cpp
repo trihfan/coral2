@@ -65,6 +65,13 @@ void Engine::setCurrentScene(std::shared_ptr<Scene> scene)
     SceneManager::setCurrentScene(scene);
 }
 
+void Engine::resize(int width, int height)
+{
+    current_parameters.width = width;
+    current_parameters.height = height;
+    RenderPassManager::invalidate();
+}
+
 void Engine::frame()
 {
     // clear any residual opengl error

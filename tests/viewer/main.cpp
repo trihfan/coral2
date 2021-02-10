@@ -63,6 +63,7 @@ int main()
     // ------------------------------
     ShaderManager::addShaderPath("resources/shaders");
     Engine::create();
+    Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
 
     // scene
     auto scene = ObjectManager::createWithName<Scene>("scene");
@@ -141,6 +142,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     camera->setPerspective(45.f, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100.f));
+    Engine::resize(width * 2, height * 2);
 }
 
 void mouse_button(GLFWwindow* window, int button, int action, int mods)
