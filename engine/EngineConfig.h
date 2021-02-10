@@ -20,9 +20,9 @@ namespace coral
     {
     public:
         EngineConfig();
-        void setup();
+        void setup() const;
 
-        Property<std::shared_ptr<std::pmr::memory_resource> > memoryResource;
+        Property<std::shared_ptr<std::pmr::memory_resource>> memoryResource;
     };
 }
 #endif

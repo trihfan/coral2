@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Object.h"
 #include "Shader.h"
+#include "Framebuffer.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassDefault.h"
@@ -72,7 +73,7 @@ void Engine::destroy()
 Engine::Engine(const EngineConfig& config)
 {
     startTime = std::chrono::steady_clock::now();
-    memoryResource = config.memoryResource;
+    memoryResource = *config.memoryResource;
 
     // load backend
     if (!gladLoadGL())
@@ -81,10 +82,11 @@ Engine::Engine(const EngineConfig& config)
     }
 
     // create instances
-    ObjectManager::createInstance(config.memoryResource);
-    ShaderManager::createInstance(config.memoryResource);
-    SceneManager::createInstance(config.memoryResource);
-    RenderPassManager::createInstance(config.memoryResource);
+    ObjectManager::createInstance(*config.memoryResource);
+    ShaderManager::createInstance(*config.memoryResource);
+    SceneManager::createInstance(*config.memoryResource);
+    RenderPassManager::createInstance(*config.memoryResource);
+    FramebufferManager::createInstance(*config.memoryResource);
 
     // default config
     config.setup();
@@ -102,10 +104,19 @@ void Engine::frame()
     current_parameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count() / 1e6;
     current_parameters.deltaTime = current_parameters.time - lastTime;
 
+    // setup screen
+    auto screen = FramebufferManager::getFramebuffer("screen");
+    screen->setFramebufferId(0);
+
     // update
     ObjectManager::instance->update();
     SceneManager::instance->update();
     RenderPassManager::instance->update();
+    FramebufferManager::instance->update();
+
+    // setup screen
+    auto screen = FramebufferManager::getFramebuffer("screen");
+    screen->setFramebufferId(0);
 
     // draw
     for (auto camera : SceneManager::instance->cameras)

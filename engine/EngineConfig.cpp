@@ -12,7 +12,14 @@ EngineConfig::EngineConfig()
     memoryResource = std::make_shared<DefaultNewDeleteMemoryResource>();
 }
 
-void EngineConfig::setup()
+void EngineConfig::setup() const
 {
-    RenderPassManager::setDefaultRenderPass(ObjectManager::createWithName<RenderPassDefault>("defaultrenderpass"));
+    auto defaultRenderPass = ObjectManager::createWithName<RenderPassDefault>("defaultrenderpass");
+    defaultRenderPass->addOutput(RenderPassResource{ "backbuffer" });
+    RenderPassManager::setDefaultRenderPass(defaultRenderPass);
+
+    auto presentation = ObjectManager::createWithName<RenderPassPresentation>("presentationrenderpass");
+    defaultRenderPass->addInput(RenderPassResource{ "backbuffer" });
+    defaultRenderPass->addOutput(RenderPassResource{ "screen" });
+    RenderPassManager::addRenderPass("presentation", presentation);
 }
