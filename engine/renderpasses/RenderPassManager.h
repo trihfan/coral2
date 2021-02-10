@@ -24,17 +24,14 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(RenderPassManager)
     public:
-        // set the renderpass to use when no renderpass is registered for a given queue id
-        static void setDefaultRenderPass(std::shared_ptr<RenderPass> renderPass);
-
         // add a render pass
-		static void addRenderPass(const std::string& id, std::shared_ptr<RenderPass> renderPass);
+		static void addRenderPass(std::shared_ptr<RenderPass> renderPass);
 
         // remove a render pass
-		static void removeRenderPass(const std::string& id);
+		static void removeRenderPass(const std::string& name);
 
         // return the renderpass for the given id
-        static std::shared_ptr<RenderPass> getRenderPass(const std::string& id);
+        static std::shared_ptr<RenderPass> getRenderPass(const std::string& name);
 
         // update the graph
 		static void update();
@@ -46,9 +43,8 @@ namespace coral
         void bake();
 
     private:
-		std::shared_ptr<RenderPass> defaultRenderPass;
-		std::map<std::string, std::shared_ptr<RenderPass>> renderPasses;
-        std::vector<std::pair<std::string, std::shared_ptr<RenderPass>>> orderedRenderPasses;
+		std::vector<std::shared_ptr<RenderPass>> renderPasses;
+        std::vector<std::shared_ptr<RenderPass>> orderedRenderPasses;
     };
 }
 #endif

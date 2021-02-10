@@ -73,13 +73,10 @@ void Engine::frame()
     current_parameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count() / 1e6;
     current_parameters.deltaTime = current_parameters.time - lastTime;
 
-    // setup screen
-    auto screen = FramebufferManager::getFramebuffer("screen");
-
     // update
     SceneManager::instance->update();
     RenderPassManager::instance->update();
-    ObjectManager::instance->update();
+    ObjectManager::instance->update(); // finish with object manager update to allocate the gl data
 
     // draw
     for (auto camera : SceneManager::instance->cameras)
@@ -97,6 +94,12 @@ void Engine::cull()
 {
     // clear queues
     SceneManager::instance->render_queues.clear();
+
+    // init queues
+    for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
+    {
+        SceneManager::instance->render_queues.insert(std::make_pair(renderpass->getName(), RenderQueue()));
+    }
 
     // fill queues with visible nodes
     traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
@@ -124,11 +127,13 @@ void Engine::draw()
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glEnable(GL_CULL_FACE);
     
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    
     // for each render pass
     for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
     {
-        auto it = SceneManager::instance->render_queues.find(renderpass.first);
-        renderpass.second->render(it->second);
+        auto it = SceneManager::instance->render_queues.find(renderpass->getName());
+        renderpass->render(it->second);
     }
 
     CHECK_OPENGL_ERROR

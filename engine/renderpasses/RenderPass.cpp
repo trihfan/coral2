@@ -5,7 +5,7 @@ using namespace coral;
 
 void RenderPass::render(RenderQueue& queue)
 {
-    framebuffer->bind();
+    //framebuffer->bind();
     internalRender(queue);
 }
 

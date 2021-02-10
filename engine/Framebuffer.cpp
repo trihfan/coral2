@@ -22,7 +22,7 @@ void Framebuffer::setNumberOfSamples(int numberOfSamples)
 
 void Framebuffer::bind(GLenum target)
 {
-    glBindFramebuffer(target, 0);//glBindFramebuffer(target, framebufferId);
+    //glBindFramebuffer(target, framebufferId);
     CHECK_OPENGL_ERROR
 }
 

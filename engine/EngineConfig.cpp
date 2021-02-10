@@ -14,12 +14,12 @@ EngineConfig::EngineConfig()
 
 void EngineConfig::setup() const
 {
-    auto defaultRenderPass = ObjectManager::createWithName<RenderPassDefault>("defaultrenderpass");
+    auto defaultRenderPass = ObjectManager::createWithName<RenderPassDefault>(coral::defaultRenderPassName);
     defaultRenderPass->addOutput(RenderPassResource{ "backbuffer" });
-    RenderPassManager::setDefaultRenderPass(defaultRenderPass);
+    RenderPassManager::addRenderPass(defaultRenderPass);
 
-    auto presentation = ObjectManager::createWithName<RenderPassPresentation>("presentationrenderpass");
+    auto presentation = ObjectManager::createWithName<RenderPassPresentation>("presentationRenderPass");
     defaultRenderPass->addInput(RenderPassResource{ "backbuffer" });
     defaultRenderPass->addOutput(RenderPassResource{ "screen" });
-    RenderPassManager::addRenderPass("presentation", presentation);
+    RenderPassManager::addRenderPass(presentation);
 }

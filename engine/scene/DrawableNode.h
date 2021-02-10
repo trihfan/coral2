@@ -16,7 +16,7 @@ namespace coral
 	{
 	public:
 		// construction
-		DrawableNode(std::shared_ptr<Node> parent = nullptr, const std::vector<std::string>& renderQueueTags = { coral::defaultRenderPassName });
+		DrawableNode(std::shared_ptr<Node> parent = nullptr, const std::vector<std::string>& renderQueueTags = { coral::defaultRenderPassName });
 	
 		// meta
 		bool isDrawable() const override;
