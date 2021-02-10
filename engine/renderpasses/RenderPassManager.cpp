@@ -9,13 +9,13 @@ void RenderPassManager::setDefaultRenderPass(std::shared_ptr<RenderPass> renderP
     instance->defaultRenderPass = renderPass;
 }
 
-void RenderPassManager::addRenderPass(uint16_t id, std::shared_ptr<RenderPass> renderPass)
+void RenderPassManager::addRenderPass(const std::string& id, std::shared_ptr<RenderPass> renderPass)
 {
     instance->renderPasses[id] = renderPass;
     instance->orderedRenderPasses.clear();
 }
 
-void RenderPassManager::removeRenderPass(uint16_t id)
+void RenderPassManager::removeRenderPass(const std::string& id)
 {
     auto it = instance->renderPasses.find(id);
     if (it != instance->renderPasses.end())
@@ -25,7 +25,7 @@ void RenderPassManager::removeRenderPass(uint16_t id)
     }
 }
 
-std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(uint16_t id)
+std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(const std::string& id)
 {
     auto it = instance->renderPasses.find(id);
     if (it != instance->renderPasses.end())
@@ -53,5 +53,5 @@ void RenderPassManager::bake()
     {
         orderedRenderPasses.push_back(std::make_pair(renderpass.first, renderpass.second));
     }
-    orderedRenderPasses.push_back(std::make_pair(DefaultRenderPassId::defaultRenderPass, defaultRenderPass));
+    orderedRenderPasses.push_back(std::make_pair(defaultRenderPassName, defaultRenderPass));
 }

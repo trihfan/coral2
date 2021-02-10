@@ -16,11 +16,7 @@ namespace coral
     class RenderPass;
 
     // Default renderpass ids used by the engine
-    enum DefaultRenderPassId : uint16_t
-    {
-        defaultRenderPass = 1000,
-        transparentRenderPass = 2000
-    };
+    static const std::string defaultRenderPassName = "defaultRenderPass"
 
     // The renderpasses manager
     class RenderPassManager
@@ -31,13 +27,13 @@ namespace coral
         static void setDefaultRenderPass(std::shared_ptr<RenderPass> renderPass);
 
         // add a render pass
-		static void addRenderPass(uint16_t id, std::shared_ptr<RenderPass> renderPass);
+		static void addRenderPass(const std::string& id, std::shared_ptr<RenderPass> renderPass);
 
         // remove a render pass
-		static void removeRenderPass(uint16_t id);
+		static void removeRenderPass(const std::string& id);
 
         // return the renderpass for the given id
-        static std::shared_ptr<RenderPass> getRenderPass(uint16_t id);
+        static std::shared_ptr<RenderPass> getRenderPass(const std::string& id);
 
         // update the graph
 		static void update();
@@ -50,8 +46,8 @@ namespace coral
 
     private:
 		std::shared_ptr<RenderPass> defaultRenderPass;
-		std::map<uint16_t, std::shared_ptr<RenderPass>> renderPasses;
-        std::vector<std::pair<uint16_t, std::shared_ptr<RenderPass>>> orderedRenderPasses;
+		std::map<std::string, std::shared_ptr<RenderPass>> renderPasses;
+        std::vector<std::pair<std::string, std::shared_ptr<RenderPass>>> orderedRenderPasses;
     };
 }
 #endif

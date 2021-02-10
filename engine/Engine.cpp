@@ -15,7 +15,8 @@ using namespace coral;
 
 const char* getGLErrorStr(GLenum err)
 {
-    switch (err) {
+    switch (err)
+    {
     case GL_NO_ERROR:
         return "No error";
     case GL_INVALID_ENUM:
@@ -37,7 +38,8 @@ const char* getGLErrorStr(GLenum err)
 
 void checkGLError()
 {
-    while (true) {
+    while (true)
+    {
         const GLenum err = glGetError();
         if (GL_NO_ERROR == err)
             break;
@@ -73,7 +75,8 @@ Engine::Engine(const EngineConfig& config)
     memoryResource = config.memoryResource;
 
     // load backend
-    if (!gladLoadGL()) {
+    if (!gladLoadGL())
+    {
         Logs(error) << "Failed to initialize GLAD";
     }
 
@@ -102,11 +105,11 @@ void Engine::frame()
     // update
     ObjectManager::instance->update();
     SceneManager::instance->update();
-
     RenderPassManager::instance->update();
 
     // draw
-    for (auto camera : SceneManager::instance->cameras) {
+    for (auto camera : SceneManager::instance->cameras)
+    {
         current_parameters.camera = camera;
         instance->cull();
         instance->draw();
@@ -119,16 +122,18 @@ void Engine::cull()
     SceneManager::instance->render_queues.clear();
 
     // fill queues with visible nodes
-    traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node) {
-        if (node->isDrawable()) {
-            auto drawableNode = node->toHandle<DrawableNode>();
-            auto& render_queue = SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
-            render_queue.nodes.push_back(drawableNode);
-            render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
-            render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);
-        }
-        return true;
-    });
+    traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
+        {
+            if (node->isDrawable())
+            {
+                auto drawableNode = node->toHandle<DrawableNode>();
+                auto& render_queue = SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
+                render_queue.nodes.push_back(drawableNode);
+                render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
+                render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);
+            }
+            return true;
+        });
 
     checkGLError();
 }
@@ -140,7 +145,8 @@ void Engine::draw()
     glEnable(GL_CULL_FACE);
 
     // for each render pass
-    for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses) {
+    for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
+    {
         auto it = SceneManager::instance->render_queues.find(renderpass.first);
         renderpass.second->render(it->second);
     }
