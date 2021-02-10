@@ -37,8 +37,10 @@ std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(const std::string& 
 
 void RenderPassManager::update()
 {
+    // bake the graph
     if (instance->orderedRenderPasses.empty())
     {
+        FramebufferManager::clear();
         instance->bake();
     }
 }
@@ -49,9 +51,11 @@ RenderPassManager::RenderPassManager(std::shared_ptr<std::pmr::memory_resource> 
 
 void RenderPassManager::bake()
 {
+    // sort render passes
     for (auto& renderpass : renderPasses)
     {
         orderedRenderPasses.push_back(std::make_pair(renderpass.first, renderpass.second));
+        renderpass.second->prepare();
     }
     orderedRenderPasses.push_back(std::make_pair(defaultRenderPassName, defaultRenderPass));
 }

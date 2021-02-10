@@ -1,8 +1,10 @@
 #include "Framebuffer.h"
+#include "utils/Error.h"
 
 using namespace coral;
 
-DEFINE_SINGLETON(FramebufferManager)
+//*********************************************************************************
+// Framebuffer
 
 Framebuffer::Framebuffer() : framebufferId(0)
 {
@@ -20,18 +22,36 @@ void Framebuffer::setNumberOfSamples(int numberOfSamples)
 
 void Framebuffer::bind(GLenum target)
 {
-    glBindFramebuffer(target, framebufferId);
+    glBindFramebuffer(target, 0);//glBindFramebuffer(target, framebufferId);
+    CHECK_OPENGL_ERROR
 }
 
-void init()
+void Framebuffer::init()
 {
     glGenFramebuffers(1, &framebufferId);
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
+    CHECK_OPENGL_ERROR
 }
 
-void release()
+void Framebuffer::release()
 {
     glDeleteFramebuffers(1, &framebufferId);
+    CHECK_OPENGL_ERROR
+}
+
+//*********************************************************************************
+// FramebufferManager
+
+DEFINE_SINGLETON(FramebufferManager)
+
+FramebufferManager::FramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
+{
+}
+
+void FramebufferManager::clear()
+{
+    instance->frambufferByName.clear();
+    instance->framebuffers.clear();
 }
 
 std::shared_ptr<Framebuffer> FramebufferManager::getFramebuffer(const std::string& name)
@@ -49,5 +69,10 @@ std::shared_ptr<Framebuffer> FramebufferManager::getFramebuffer(const std::strin
 
 std::shared_ptr<Framebuffer> FramebufferManager::getFramebufferFor(const std::vector<std::string>& colorOutputs)
 {
-    return nullptr;
+    for (auto framebuffer : instance->framebuffers)
+    {
+        return framebuffer;
+    }
+
+    return getFramebuffer("new");
 }

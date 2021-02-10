@@ -59,7 +59,7 @@ namespace coral
 		std::shared_ptr<Scene> current_scene;
 		std::vector<std::shared_ptr<Camera>> cameras;
 		std::vector<std::shared_ptr<Light>> lights;
-		std::map<unsigned int, RenderQueue> render_queues;
+		std::unordered_map<std::string, RenderQueue> render_queues;
     };
 }
 #endif

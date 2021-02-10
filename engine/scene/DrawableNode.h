@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "Node.h"
+#include "renderpasses/RenderPassManager.h"
 
 namespace coral
 {
@@ -15,14 +16,16 @@ namespace coral
 	{
 	public:
 		// construction
-		DrawableNode(std::shared_ptr<Node> parent = nullptr);
+		DrawableNode(std::shared_ptr<Node> parent = nullptr, const std::vector<std::string>& renderQueueTags = { coral::defaultRenderPassName });
 	
 		// meta
 		bool isDrawable() const override;
 
 		// render queue
-		void setRenderQueue(unsigned int render_queue);
-		unsigned int getRenderQueue() const;
+		void addRenderQueueTag(const std::string& renderQueueId);
+		void removeRenderQueueTag(const std::string& renderQueueId);
+		bool isTagForRenderQueue(const std::string& renderQueueId) const;
+		const std::vector<std::string>& getRenderQueueTags() const;
 
 		// material
         void setMaterial(std::shared_ptr<Material> material);
@@ -33,7 +36,7 @@ namespace coral
 
 	protected:
 		std::shared_ptr<Material> material;
-		unsigned int render_queue;
+		std::vector<std::string> renderQueueTags;
 	};
 }
 #endif

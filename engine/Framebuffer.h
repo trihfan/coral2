@@ -1,12 +1,17 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
+#include <memory>
+#include <unordered_map>
+#include <vector>
 #include "Object.h"
 #include "utils/Singleton.h"
 #include "glad/glad.h"
 
 namespace coral
 {
+    class Engine;
+
     struct Resource
     {
         GLenum internalType;
@@ -40,11 +45,16 @@ namespace coral
     {
         MAKE_ENGINE_SINGLETON(FramebufferManager)
     public:
+        static void clear();
         static std::shared_ptr<Framebuffer> getFramebuffer(const std::string& name);
         static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::string>& colorOutputs);
 
     private:
+        FramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
+
+    private:
         std::unordered_map<std::string, std::shared_ptr<Framebuffer>> frambufferByName;
+        std::vector<std::shared_ptr<Framebuffer>> framebuffers;
     };
 }
 #endif

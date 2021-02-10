@@ -17,6 +17,8 @@
 
 namespace coral
 {
+    class Engine;
+
     // The Object class represent an object in coral engine
     class Object : public std::enable_shared_from_this<Object>
     {
@@ -47,8 +49,11 @@ namespace coral
         Object();
         virtual ~Object();
 
-    private:
+        // state
         enum class ObjectState { not_initialized, initialized, released } state;
+        ObjectState getState() const;
+
+    private:
         std::string name;
     };
 

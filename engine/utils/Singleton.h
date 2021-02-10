@@ -21,7 +21,7 @@ private: \
 // Make a class a singleton of the engine, the method to release the instance must be provided
 #define MAKE_ENGINE_SINGLETON(X) \
 private: \
-    friend class Engine; \
+    friend class coral::Engine; \
     MAKE_SINGLETON(X)
 
 #define DEFINE_SINGLETON(X) std::unique_ptr<X> X::instance; void X::release() {}

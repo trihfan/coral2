@@ -29,8 +29,13 @@ const std::string& Object::getName() const
 	return name; 
 }
 
+Object::ObjectState Object::getState() const
+{
+    return state;
+}
+
 //*********************************************************************************
-// ObjectFactory
+// ObjectManager
 
 std::unique_ptr<ObjectManager> ObjectManager::instance;
 

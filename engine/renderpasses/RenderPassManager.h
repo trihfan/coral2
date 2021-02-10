@@ -9,6 +9,7 @@
 #endif
 #include <map>
 #include <memory>
+#include <vector>
 #include "utils/Singleton.h"
 
 namespace coral
@@ -16,7 +17,7 @@ namespace coral
     class RenderPass;
 
     // Default renderpass ids used by the engine
-    static const std::string defaultRenderPassName = "defaultRenderPass"
+    static const std::string defaultRenderPassName = "defaultRenderPass";
 
     // The renderpasses manager
     class RenderPassManager

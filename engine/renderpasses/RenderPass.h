@@ -5,6 +5,7 @@
 
 namespace coral
 {
+    class Framebuffer;
     struct RenderQueue;
 
     struct RenderPassResource
@@ -15,6 +16,11 @@ namespace coral
     class RenderPass : public Object
     {
     public:
+        // retrieve actual resources (if existing or allocate it)
+        void clear();
+        void prepare();
+
+        // render the content
         void render(RenderQueue& queue);
 
         void addInput(const RenderPassResource& input);
@@ -24,9 +30,6 @@ namespace coral
         const std::vector<RenderPassResource>& getOutputs() const;
 
     protected:
-        // inputs
-        // outputs
-
         // render implementation
         virtual void internalRender(RenderQueue& queue) = 0;
 
@@ -35,8 +38,10 @@ namespace coral
         std::vector<RenderPassResource> inputs;
         std::vector<RenderPassResource> outputs;
 
-        // retrieve actual resources (if existing or allocate it)
-        void prepare();
+        // The output framebuffer
+        std::shared_ptr<Framebuffer> framebuffer;
+
+        
     };
 }
 #endif

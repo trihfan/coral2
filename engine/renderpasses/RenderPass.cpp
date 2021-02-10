@@ -5,7 +5,7 @@ using namespace coral;
 
 void RenderPass::render(RenderQueue& queue)
 {
-    prepare();
+    framebuffer->bind();
     internalRender(queue);
 }
 
@@ -31,11 +31,16 @@ const std::vector<RenderPassResource>& RenderPass::getOutputs() const
 
 void RenderPass::prepare()
 {
-    // retrieve inputs
+    clear();
 
+    // retrieve inputs
 
     // output
     std::vector<std::string> colorOutputs;
-    auto framebuffer = FramebufferManager::getFramebufferFor(colorOutputs);
-    framebuffer->bind();
+    framebuffer = FramebufferManager::getFramebufferFor(colorOutputs);
+}
+
+void RenderPass::clear()
+{
+    framebuffer = nullptr;
 }

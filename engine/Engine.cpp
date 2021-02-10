@@ -11,43 +11,9 @@
 #include "scene/Node.h"
 #include "scene/DrawableNode.h"
 #include "materials/Material.h"
+#include "utils/Error.h"
 
 using namespace coral;
-
-const char* getGLErrorStr(GLenum err)
-{
-    switch (err)
-    {
-    case GL_NO_ERROR:
-        return "No error";
-    case GL_INVALID_ENUM:
-        return "Invalid enum";
-    case GL_INVALID_VALUE:
-        return "Invalid value";
-    case GL_INVALID_OPERATION:
-        return "Invalid operation";
-    case GL_STACK_OVERFLOW:
-        return "Stack overflow";
-    case GL_STACK_UNDERFLOW:
-        return "Stack underflow";
-    case GL_OUT_OF_MEMORY:
-        return "Out of memory";
-    default:
-        return "Unknown error";
-    }
-}
-
-void checkGLError()
-{
-    while (true)
-    {
-        const GLenum err = glGetError();
-        if (GL_NO_ERROR == err)
-            break;
-
-        Logs(error) << "gl error: " << getGLErrorStr(err);
-    }
-}
 
 std::chrono::steady_clock::time_point Engine::startTime;
 RenderParameters Engine::current_parameters;
@@ -99,6 +65,9 @@ void Engine::setCurrentScene(std::shared_ptr<Scene> scene)
 
 void Engine::frame()
 {
+    // clear any residual opengl error
+    CHECK_OPENGL_ERROR
+
     // update time
     double lastTime = current_parameters.time;
     current_parameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count() / 1e6;
@@ -106,17 +75,11 @@ void Engine::frame()
 
     // setup screen
     auto screen = FramebufferManager::getFramebuffer("screen");
-    screen->setFramebufferId(0);
 
     // update
-    ObjectManager::instance->update();
     SceneManager::instance->update();
     RenderPassManager::instance->update();
-    FramebufferManager::instance->update();
-
-    // setup screen
-    auto screen = FramebufferManager::getFramebuffer("screen");
-    screen->setFramebufferId(0);
+    ObjectManager::instance->update();
 
     // draw
     for (auto camera : SceneManager::instance->cameras)
@@ -125,6 +88,9 @@ void Engine::frame()
         instance->cull();
         instance->draw();
     }
+
+    // clear any residual opengl error
+    CHECK_OPENGL_ERROR
 }
 
 void Engine::cull()
@@ -134,19 +100,22 @@ void Engine::cull()
 
     // fill queues with visible nodes
     traverse(SceneManager::instance->current_scene->getTopNode(), [](std::shared_ptr<Node> node)
+    {
+        if (node->isDrawable())
         {
-            if (node->isDrawable())
+            auto drawableNode = node->toHandle<DrawableNode>();
+            for (const auto& id : drawableNode->getRenderQueueTags())
             {
-                auto drawableNode = node->toHandle<DrawableNode>();
-                auto& render_queue = SceneManager::instance->render_queues[drawableNode->getRenderQueue()];
+                auto& render_queue = SceneManager::instance->render_queues[id];
                 render_queue.nodes.push_back(drawableNode);
                 render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
                 render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);
             }
-            return true;
-        });
+        }
+        return true;
+    });
 
-    checkGLError();
+    CHECK_OPENGL_ERROR
 }
 
 void Engine::draw()
@@ -154,12 +123,13 @@ void Engine::draw()
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glEnable(GL_CULL_FACE);
-
+    
     // for each render pass
     for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
     {
         auto it = SceneManager::instance->render_queues.find(renderpass.first);
         renderpass.second->render(it->second);
     }
-    checkGLError();
+
+    CHECK_OPENGL_ERROR
 }
