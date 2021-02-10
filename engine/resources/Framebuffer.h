@@ -12,12 +12,7 @@ namespace coral
 {
     class Engine;
 
-    struct Resource
-    {
-        GLenum internalType;
-        GLenum format;
-        GLenum type;
-    };
+    enum class ResourceRole { color, depth, stencil };
 
     //
     class Framebuffer : public Object
@@ -26,9 +21,9 @@ namespace coral
         Framebuffer();
 
         // 
-        void addResouce(const Resource& resouce);
-        void setNumberOfSamples(int numberOfSamples);
-  
+        void addResouce(const std::string& resource, ResourceRole type);
+        const std::vector<std::pair<std::string, ResourceRole>>& getResouces() const;
+
         void bind(GLenum target = GL_DRAW_FRAMEBUFFER);
         
     private:
@@ -38,6 +33,7 @@ namespace coral
         
     private:
         GLuint framebufferId;
+        std::vector<std::pair<std::string, ResourceRole>> resources;
     };
 
     // The framebuffer manager
@@ -46,14 +42,12 @@ namespace coral
         MAKE_ENGINE_SINGLETON(FramebufferManager)
     public:
         static void clear();
-        static std::shared_ptr<Framebuffer> getFramebuffer(const std::string& name);
-        static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::string>& colorOutputs);
+        static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::pair<std::string, ResourceRole>>& resources);
 
     private:
         FramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
 
     private:
-        std::unordered_map<std::string, std::shared_ptr<Framebuffer>> frambufferByName;
         std::vector<std::shared_ptr<Framebuffer>> framebuffers;
     };
 }

@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Engine.h"
-#include "Shader.h"
+#include "resources/Shader.h"
 #include "Object.h"
 #include "scene/Scene.h"
 #include "scene/camera/Camera.h"

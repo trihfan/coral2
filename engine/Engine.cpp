@@ -2,8 +2,9 @@
 #include <new>
 #include "Engine.h"
 #include "Object.h"
-#include "Shader.h"
-#include "Framebuffer.h"
+#include "resources/Shader.h"
+#include "resources/Framebuffer.h"
+#include "resources/Resource.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassDefault.h"
@@ -53,6 +54,7 @@ Engine::Engine(const EngineConfig& config)
     SceneManager::createInstance(*config.memoryResource);
     RenderPassManager::createInstance(*config.memoryResource);
     FramebufferManager::createInstance(*config.memoryResource);
+    ResourceManager::createInstance(*config.memoryResource);
 
     // default config
     config.setup();
@@ -122,19 +124,11 @@ void Engine::cull()
 }
 
 void Engine::draw()
-{
-    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    
+{    
     // for each render pass
     for (auto& renderpass : RenderPassManager::instance->orderedRenderPasses)
     {
         auto it = SceneManager::instance->render_queues.find(renderpass->getName());
         renderpass->render(it->second);
     }
-
-    CHECK_OPENGL_ERROR
 }

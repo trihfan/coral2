@@ -2,15 +2,20 @@
 #define RENDERPASS_H
 
 #include "Object.h"
+#include "resources/Framebuffer.h"
 
 namespace coral
 {
-    class Framebuffer;
     struct RenderQueue;
 
     struct RenderPassResource
     {
         std::string name;
+        ResourceRole role;
+        GLint internalFormat;
+        GLenum format;
+        GLenum type;
+        int sampleCount;
     };
 
     class RenderPass : public Object
@@ -23,8 +28,8 @@ namespace coral
         // render the content
         void render(RenderQueue& queue);
 
-        void addInput(const RenderPassResource& input);
-        const std::vector<RenderPassResource>& getInputs() const;
+        void addInput(const std::string& input);
+        const std::vector<std::string>& getInputs() const;
 
         void addOutput(const RenderPassResource& output);
         const std::vector<RenderPassResource>& getOutputs() const;
@@ -35,7 +40,7 @@ namespace coral
 
     private:
         // render pass resources
-        std::vector<RenderPassResource> inputs;
+        std::vector<std::string> inputs;
         std::vector<RenderPassResource> outputs;
 
         // The output framebuffer

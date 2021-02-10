@@ -1,5 +1,6 @@
 #include "RenderPass.h"
-#include "Framebuffer.h"
+#include "resources/Framebuffer.h"
+#include "resources/Resource.h"
 
 using namespace coral;
 
@@ -9,12 +10,12 @@ void RenderPass::render(RenderQueue& queue)
     internalRender(queue);
 }
 
-void RenderPass::addInput(const RenderPassResource& input)
+void RenderPass::addInput(const std::string& input)
 {
     inputs.push_back(input);
 }
 
-const std::vector<RenderPassResource>& RenderPass::getInputs() const
+const std::vector<std::string>& RenderPass::getInputs() const
 {
     return inputs;
 }
@@ -33,11 +34,22 @@ void RenderPass::prepare()
 {
     clear();
 
-    // retrieve inputs
-
     // output
-    std::vector<std::string> colorOutputs;
-    framebuffer = FramebufferManager::getFramebufferFor(colorOutputs);
+    std::vector<std::pair<std::string, ResourceRole>> outputNames;
+    std::vector<ResourceRole> outputRoles;
+
+    for (const auto& output : outputs)
+    {
+        auto resource = ResourceManager::getResourceByName(output.name);
+        outputNames.push_back(std::make_pair(output.name, output.role));
+
+        resource->internalFormat = output.internalFormat;
+        resource->format = output.format;
+        resource->type = output.type;
+        resource->sampleCount = output.sampleCount;
+    }
+    
+    framebuffer = FramebufferManager::getFramebufferFor(outputNames);
 }
 
 void RenderPass::clear()

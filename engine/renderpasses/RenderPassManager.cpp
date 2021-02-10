@@ -1,6 +1,7 @@
 #include "RenderPassManager.h"
 #include "RenderPass.h"
-#include "Framebuffer.h"
+#include "resources/Framebuffer.h"
+#include "resources/Resource.h"
 #include "scene/Scene.h"
 
 using namespace coral;
@@ -38,7 +39,6 @@ void RenderPassManager::update()
     // bake the graph
     if (instance->orderedRenderPasses.empty())
     {
-        
         instance->bake();
     }
 }
@@ -51,7 +51,7 @@ void RenderPassManager::bake()
 {
     // clear resources
     FramebufferManager::clear();
-    //ResourceManager::clear();
+    ResourceManager::clear();
 
     // sort render passes
     for (auto& renderpass : renderPasses)

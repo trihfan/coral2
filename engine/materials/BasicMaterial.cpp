@@ -1,5 +1,5 @@
 #include "BasicMaterial.h"
-#include "Shader.h"
+#include "resources/Shader.h"
 #include "Engine.h"
 #include "scene/camera/Camera.h"
 #include <glm/gtx/transform.hpp>

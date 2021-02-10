@@ -1,6 +1,6 @@
 #include "MeshMaterial.h"
 #include "scene/camera/Camera.h"
-#include "Shader.h"
+#include "resources/Shader.h"
 #include <unordered_map>
 #include <glm/gtx/transform.hpp>
 

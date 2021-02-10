@@ -2,7 +2,8 @@
 #include "scene/Scene.h"
 #include "scene/DrawableNode.h"
 #include "materials/Material.h"
-#include "Shader.h"
+#include "utils/Error.h"
+#include "resources/Shader.h"
 #include "Engine.h"
 
 using namespace coral;
@@ -14,6 +15,12 @@ RenderPassDefault::RenderPassDefault()
 
 void RenderPassDefault::internalRender(RenderQueue& queue)
 {
+    // setup rendering
+    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glEnable(GL_CULL_FACE);
+    CHECK_OPENGL_ERROR
+
     // for each shader
     for (auto& shader_pair : queue.shader_map)
     {

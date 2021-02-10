@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include "Object.h"
-#include "Shader.h"
+#include "resources/Shader.h"
 
 namespace coral
 {

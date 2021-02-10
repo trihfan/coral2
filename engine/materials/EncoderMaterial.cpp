@@ -1,5 +1,5 @@
 #include "EncoderMaterial.h"
-#include "Shader.h"
+#include "resources/Shader.h"
 
 using namespace coral;
 
