@@ -10,8 +10,7 @@ namespace coral
     class RenderPassDefault : public RenderPass
     {
     public:
-        RenderPassDefault();
-        
+    
     protected:
         virtual void internalRender(RenderQueue& queue) override;
     };

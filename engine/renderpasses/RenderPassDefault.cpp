@@ -8,11 +8,6 @@
 
 using namespace coral;
 
-RenderPassDefault::RenderPassDefault()
-{
-    addOutput(RenderPassResource{ "backbuffer" });
-}
-
 void RenderPassDefault::internalRender(RenderQueue& queue)
 {
     // setup rendering

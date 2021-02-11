@@ -14,22 +14,22 @@ void RenderPass::render(RenderQueue& queue)
     internalRender(queue);
 }
 
-void RenderPass::addInput(const std::string& input)
+void RenderPass::addInput(const RenderPassInput& input)
 {
     inputs.push_back(input);
 }
 
-const std::vector<std::string>& RenderPass::getInputs() const
+const std::vector<RenderPassInput>& RenderPass::getInputs() const
 {
     return inputs;
 }
 
-void RenderPass::addOutput(const RenderPassResource& output)
+void RenderPass::addOutput(const RenderPassOutput& output)
 {
     outputs.push_back(output);
 }
 
-const std::vector<RenderPassResource>& RenderPass::getOutputs() const
+const std::vector<RenderPassOutput>& RenderPass::getOutputs() const
 {
     return outputs;
 }
@@ -38,31 +38,39 @@ void RenderPass::prepare()
 {
     clear();
 
-    // output
+    // Output
     if (!outputs.empty())
     {
-        std::vector<std::pair<std::string, ResourceRole>> outputNames;
-        std::vector<ResourceRole> outputRoles;
-
+        // Setup the resources
+        std::vector<std::pair<std::string, ResourceRole>> framebufferResources;
         for (const auto& output : outputs)
         {
             auto resource = ResourceManager::getResourceByName(output.name);
-            outputNames.push_back(std::make_pair(output.name, output.role));
+            if (!resource)
+            {
+                resource = ObjectManager::createWithName<Resource>(output.name);
+                ResourceManager::registerResource(resource);
 
-            resource->internalFormat = output.internalFormat;
-            resource->format = output.format;
-            resource->type = output.type;
-            resource->sampleCount = output.sampleCount;
+                // Configure resource
+                resource->width = Engine::current_parameters.width;
+                resource->height = Engine::current_parameters.height;
+                resource->internalFormat = output.internalFormat;
+                resource->format = output.format;
+                resource->type = output.type;
+                resource->sampleCount = output.sampleCount;
+            }
 
-            resource->width = Engine::current_parameters.width;
-            resource->height = Engine::current_parameters.height;
+            framebufferResources.push_back(std::make_pair(output.name, output.role));
+            resources.push_back(resource);
         }
         
-        framebuffer = FramebufferManager::getFramebufferFor(outputNames);
+        // Get the framebuffer
+        framebuffer = FramebufferManager::getFramebufferFor(framebufferResources);
     }
 }
 
 void RenderPass::clear()
 {
     framebuffer = nullptr;
+    resources.clear();
 }

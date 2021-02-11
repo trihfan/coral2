@@ -6,9 +6,15 @@
 
 namespace coral
 {
+    class Resource;
     struct RenderQueue;
 
-    struct RenderPassResource
+    struct RenderPassInput
+    {
+        std::string name;
+    };
+
+    struct RenderPassOutput
     {
         std::string name;
         ResourceRole role;
@@ -28,11 +34,13 @@ namespace coral
         // render the content
         void render(RenderQueue& queue);
 
-        void addInput(const std::string& input);
-        const std::vector<std::string>& getInputs() const;
+        // Inputs by name
+        void addInput(const RenderPassInput& input);
+        const std::vector<RenderPassInput>& getInputs() const;
 
-        void addOutput(const RenderPassResource& output);
-        const std::vector<RenderPassResource>& getOutputs() const;
+        // Outputs by name
+        void addOutput(const RenderPassOutput& output);
+        const std::vector<RenderPassOutput>& getOutputs() const;
 
     protected:
         // render implementation
@@ -40,13 +48,12 @@ namespace coral
 
     private:
         // render pass resources
-        std::vector<std::string> inputs;
-        std::vector<RenderPassResource> outputs;
+        std::vector<RenderPassInput> inputs;
+        std::vector<RenderPassOutput> outputs;
+        std::vector<std::shared_ptr<Resource>> resources;
 
         // The output framebuffer
         std::shared_ptr<Framebuffer> framebuffer;
-
-        
     };
 }
 #endif

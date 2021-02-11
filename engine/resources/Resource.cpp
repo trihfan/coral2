@@ -11,7 +11,7 @@ Resource::Resource() : id(0)
     connect<&Resource::init>(Object::init, this);
     connect<&Resource::release>(Object::release, this);
 }
-  
+
 void Resource::bind()
 {
     glBindTexture(*sampleCount == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
@@ -32,6 +32,7 @@ void Resource::init()
 
 void Resource::release()
 {
+    glDeleteTextures(1, &id);
     CHECK_OPENGL_ERROR
 }
 
@@ -42,25 +43,32 @@ DEFINE_SINGLETON(ResourceManager)
 
 void ResourceManager::clear()
 {
-    instance->resources.clear();
+    instance->resourceByName.clear();
 }
 
 std::shared_ptr<Resource> ResourceManager::getResourceByName(const std::string& name)
 {
-    auto it = std::find_if(instance->resources.begin(), instance->resources.end(), [&name](const auto& resource)
+    auto it = instance->resourceByName.find(name);
+    if (it != instance->resourceByName.end())
     {
-        return resource->getName() == name;
-    });
-    if (it != instance->resources.end())
-    {
-        return *it;
+        return it->second->toHandle<Resource>();
     }
 
-    std::shared_ptr<Resource> resource = ObjectManager::createWithName<Resource>(name);
-    instance->resources.push_back(resource);
-    return resource;
+    return nullptr;
 }
 
 ResourceManager::ResourceManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
 {
+}
+
+void ResourceManager::registerResource(std::shared_ptr<Resource> resource)
+{
+    auto it = instance->resourceByName.find(resource->getName());
+    if (it != instance->resourceByName.end())
+    {
+        Logs(error) << "Resource name is already used";
+        return;
+    }
+
+    instance->resourceByName[resource->getName()] = resource;
 }
