@@ -2,6 +2,7 @@
 #define SCENEMANAGER_H
 
 #include "Object.h"
+#include "memory_resource.h"
 #include "utils/Singleton.h"
 #include <functional>
 #include <map>
@@ -27,8 +28,8 @@ namespace coral
     struct RenderQueue
     {
         std::vector<std::shared_ptr<DrawableNode>> nodes;
-        std::unordered_map<std::shared_ptr<Shader>, std::set<std::shared_ptr<Material>>> shader_map;
-        std::map<std::shared_ptr<Material>, std::vector<std::shared_ptr<DrawableNode>>> material_map;
+        std::unordered_map<std::shared_ptr<Shader>, std::set<std::shared_ptr<Material>>> shaderMap;
+        std::map<std::shared_ptr<Material>, std::vector<std::shared_ptr<DrawableNode>>> materialMap;
     };
 
     /**

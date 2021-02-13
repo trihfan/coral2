@@ -39,7 +39,7 @@ void RenderPassManager::update(const RenderParameters& parameters)
     // bake the graph
     if (instance->orderedRenderPasses.empty())
     {
-        instance->bake();
+        instance->bake(parameters);
     }
 }
 

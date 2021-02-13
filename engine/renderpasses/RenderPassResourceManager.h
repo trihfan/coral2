@@ -1,6 +1,7 @@
 #ifndef RENDERPASSRESOURCEMANAGER_H
 #define RENDERPASSRESOURCEMANAGER_H
 
+#include "memory_resource.h"
 #include "resources/Resource.h"
 #include "utils/Singleton.h"
 #include <memory>

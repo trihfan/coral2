@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "ObjectManager.h"
 #include "utils/FileUtils.h"
 #include "utils/Logs.h"
 
@@ -165,6 +166,10 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
 
 DEFINE_SINGLETON(ShaderManager)
 std::vector<std::filesystem::path> ShaderManager::paths;
+
+void ShaderManager::release()
+{
+}
 
 void ShaderManager::addShaderPath(const std::filesystem::path& path)
 {

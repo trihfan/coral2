@@ -42,7 +42,7 @@ void RenderPassPresentation::internalRender(RenderQueue& queue, const RenderPara
     glActiveTexture(GL_TEXTURE0);
     resource->bind();
 
-    screenQuad->draw(Engine::current_parameters);
+    screenQuad->draw(parameters);
 
     glEnable(GL_DEPTH_TEST);
     CHECK_OPENGL_ERROR

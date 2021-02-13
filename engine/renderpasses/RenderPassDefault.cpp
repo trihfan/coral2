@@ -4,6 +4,7 @@
 #include "resources/Shader.h"
 #include "scene/DrawableNode.h"
 #include "scene/Scene.h"
+#include "scene/SceneManager.h"
 #include "utils/Error.h"
 
 using namespace coral;

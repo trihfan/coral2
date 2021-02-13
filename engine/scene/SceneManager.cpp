@@ -12,6 +12,10 @@ using namespace coral;
 
 DEFINE_SINGLETON(SceneManager)
 
+void SceneManager::release()
+{
+}
+
 void SceneManager::update(const RenderParameters& parameters)
 {
     // check scene
@@ -75,8 +79,8 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
             {
                 auto& render_queue = queues[id];
                 render_queue.nodes.push_back(drawableNode);
-                render_queue.shader_map[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
-                render_queue.material_map[drawableNode->getMaterial()].push_back(drawableNode);
+                render_queue.shaderMap[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
+                render_queue.materialMap[drawableNode->getMaterial()].push_back(drawableNode);
             }
         }
         return true;
