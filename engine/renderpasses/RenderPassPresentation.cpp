@@ -31,16 +31,11 @@ void RenderPassPresentation::internalRender(RenderQueue& queue, const RenderPara
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 1);
-    glBlitFramebuffer(0, 0, parameters.width, parameters.height, 0, 0, parameters.width, parameters.height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    return;
-
-    auto resource = inputResources[0];
+    glActiveTexture(GL_TEXTURE0);
+    inputResources[0]->bind();
 
     presentationMaterial->getShader()->use();
     presentationMaterial->getShader()->setInt("backbuffer", 0);
-    glActiveTexture(GL_TEXTURE0);
-    resource->bind();
 
     screenQuad->draw(parameters);
 
