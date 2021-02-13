@@ -1,6 +1,6 @@
 #include "Shader.h"
-#include "utils/Logs.h"
 #include "utils/FileUtils.h"
+#include "utils/Logs.h"
 
 using namespace coral;
 
@@ -144,7 +144,8 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
+                        << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
     else
@@ -153,7 +154,8 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
+                        << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
 }
@@ -232,7 +234,7 @@ int ShaderManager::getShaderType(const std::filesystem::path& extension) const
     {
         return Shader::fragment;
     }
-   
+
     // geometry
     if (extension == ".geom" || extension == ".gs" || extension == ".gs.glsl")
     {

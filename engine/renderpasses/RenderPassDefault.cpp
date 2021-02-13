@@ -1,14 +1,14 @@
 #include "RenderPassDefault.h"
-#include "scene/Scene.h"
-#include "scene/DrawableNode.h"
-#include "materials/Material.h"
-#include "utils/Error.h"
-#include "resources/Shader.h"
 #include "Engine.h"
+#include "materials/Material.h"
+#include "resources/Shader.h"
+#include "scene/DrawableNode.h"
+#include "scene/Scene.h"
+#include "utils/Error.h"
 
 using namespace coral;
 
-void RenderPassDefault::internalRender(RenderQueue& queue)
+void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
     // setup rendering
     glClearColor(0.1f, 0.1f, 0.1f, 1.f);
@@ -17,7 +17,7 @@ void RenderPassDefault::internalRender(RenderQueue& queue)
     CHECK_OPENGL_ERROR
 
     // for each shader
-    for (auto& shader_pair : queue.shader_map)
+    for (auto& shader_pair : queue.shaderMap)
     {
         // Set up shader
         shader_pair.first->use();
@@ -26,12 +26,12 @@ void RenderPassDefault::internalRender(RenderQueue& queue)
         for (auto material : shader_pair.second)
         {
             // Set up material
-            material->use(Engine::current_parameters);
+            material->use(parameters);
 
             // draw each node
-            for (auto node : queue.material_map[material])
+            for (auto node : queue.materialMap[material])
             {
-                node->draw(Engine::current_parameters);
+                node->draw(parameters);
             }
         }
     }

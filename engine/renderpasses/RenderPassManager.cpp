@@ -1,7 +1,7 @@
 #include "RenderPassManager.h"
 #include "RenderPass.h"
-#include "resources/Framebuffer.h"
-#include "resources/Resource.h"
+#include "RenderPassFramebufferManager.h"
+#include "RenderPassResourceManager.h"
 #include "scene/Scene.h"
 
 using namespace coral;
@@ -16,7 +16,7 @@ void RenderPassManager::addRenderPass(std::shared_ptr<RenderPass> renderPass)
 
 void RenderPassManager::removeRenderPass(const std::string& name)
 {
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const std::shared_ptr<RenderPass> renderpass){ return renderpass->getName() == name; });
+    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const std::shared_ptr<RenderPass> renderpass) { return renderpass->getName() == name; });
     if (it != instance->renderPasses.end())
     {
         instance->renderPasses.erase(it);
@@ -26,7 +26,7 @@ void RenderPassManager::removeRenderPass(const std::string& name)
 
 std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(const std::string& name)
 {
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const std::shared_ptr<RenderPass> renderpass){ return renderpass->getName() == name; });
+    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const std::shared_ptr<RenderPass> renderpass) { return renderpass->getName() == name; });
     if (it != instance->renderPasses.end())
     {
         return *it;
@@ -34,7 +34,7 @@ std::shared_ptr<RenderPass> RenderPassManager::getRenderPass(const std::string& 
     return nullptr;
 }
 
-void RenderPassManager::update()
+void RenderPassManager::update(const RenderParameters& parameters)
 {
     // bake the graph
     if (instance->orderedRenderPasses.empty())
@@ -47,21 +47,26 @@ RenderPassManager::RenderPassManager(std::shared_ptr<std::pmr::memory_resource> 
 {
 }
 
-void RenderPassManager::bake()
+void RenderPassManager::bake(const RenderParameters& parameters)
 {
     // clear resources
-    FramebufferManager::clear();
-    ResourceManager::clear();
+    RenderPassFramebufferManager::clear();
+    RenderPassResourceManager::clear();
 
     // sort render passes
     for (auto& renderpass : renderPasses)
     {
         orderedRenderPasses.push_back(renderpass);
-        renderpass->prepare();
+        renderpass->prepare(parameters);
     }
 }
 
 void RenderPassManager::invalidate()
 {
-    instance->orderedRenderPasses.clear();        
+    instance->orderedRenderPasses.clear();
+}
+
+const std::vector<std::shared_ptr<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
+{
+    return instance->orderedRenderPasses;
 }

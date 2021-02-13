@@ -8,13 +8,9 @@ namespace coral
 {
     class Resource;
     struct RenderQueue;
+    struct RenderParameters;
 
-    struct RenderPassInput
-    {
-        std::string name;
-    };
-
-    struct RenderPassOutput
+    struct RenderPassResource
     {
         std::string name;
         ResourceRole role;
@@ -27,30 +23,34 @@ namespace coral
     class RenderPass : public Object
     {
     public:
-        // retrieve actual resources (if existing or allocate it)
-        void clear();
-        void prepare();
+        void invalidate();
+        void prepare(const RenderParameters& parameters);
 
         // render the content
-        void render(RenderQueue& queue);
+        void render(RenderQueue& queue, const RenderParameters& parameters);
 
         // Inputs by name
-        void addInput(const RenderPassInput& input);
-        const std::vector<RenderPassInput>& getInputs() const;
+        void addInput(const RenderPassResource& input);
+        const std::vector<RenderPassResource>& getInputs() const;
 
         // Outputs by name
-        void addOutput(const RenderPassOutput& output);
-        const std::vector<RenderPassOutput>& getOutputs() const;
+        void addOutput(const RenderPassResource& output);
+        const std::vector<RenderPassResource>& getOutputs() const;
 
     protected:
-        // render implementation
-        virtual void internalRender(RenderQueue& queue) = 0;
+        virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) = 0;
+
+        // Loaded resouces
+        std::vector<std::shared_ptr<Resource>> inputResources;
+        std::vector<std::shared_ptr<Resource>> outputResources;
+
+    private:
+        std::shared_ptr<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
 
     private:
         // render pass resources
-        std::vector<RenderPassInput> inputs;
-        std::vector<RenderPassOutput> outputs;
-        std::vector<std::shared_ptr<Resource>> resources;
+        std::vector<RenderPassResource> inputs;
+        std::vector<RenderPassResource> outputs;
 
         // The output framebuffer
         std::shared_ptr<Framebuffer> framebuffer;

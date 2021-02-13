@@ -1,21 +1,21 @@
-#include <numeric>
-#include <QApplication>
-#include <QDialog>
-#include <QPainter>
-#include <vector>
-#include <thread>
-#include <fstream>
-#include <chrono>
-#include "glad/glad_egl.h"
-#include "nvencode/nvEncodeAPI.h"
-#include "nvencode/NvEncoderGL.h"
 #include "Engine.h"
-#include "Shader.h"
 #include "Object.h"
+#include "Shader.h"
+#include "glad/glad_egl.h"
+#include "materials/BasicMaterial.h"
+#include "nvencode/NvEncoderGL.h"
+#include "nvencode/nvEncodeAPI.h"
 #include "scene/Scene.h"
 #include "scene/camera/Camera.h"
 #include "scene/mesh/Mesh.h"
-#include "materials/BasicMaterial.h"
+#include <QApplication>
+#include <QDialog>
+#include <QPainter>
+#include <chrono>
+#include <fstream>
+#include <numeric>
+#include <thread>
+#include <vector>
 
 using namespace coral;
 
@@ -45,16 +45,16 @@ public:
     {
         buffer.resize(::width * ::height * 4);
         setFixedSize(::width, ::height);
-        connect(this, &DebugOutput::finished, this, [](){ running = false; });
+        connect(this, &DebugOutput::finished, this, []() { running = false; });
     }
 
     void updateFrame()
     {
-        glReadPixels(0, 0, ::width, ::height, GL_RGBA,  GL_UNSIGNED_INT_8_8_8_8, buffer.data());
+        glReadPixels(0, 0, ::width, ::height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer.data());
         update();
     }
 
-    void paintEvent(QPaintEvent *event) override
+    void paintEvent(QPaintEvent* event) override
     {
         QPainter painter(this);
         for (int x = 0; x < ::width; x++)
@@ -72,7 +72,7 @@ private:
     std::vector<uint8_t> buffer;
 };
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // egl
     if (!initializeEgl())
@@ -113,17 +113,16 @@ int main(int argc, char **argv)
     }
 
     // Create quad
-    float vertices[] = 
-    {
-         0.5f,  0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
+    float vertices[] = {
+        0.5f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
         -0.5f, -0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
+        -0.5f, 0.5f, 0.0f
     };
-    unsigned int indices[] = {  0, 1, 3, 1, 2, 3 };
+    unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
 
     GLuint quadVbo, quadVao, quadEbo;
-    
+
     glGenVertexArrays(1, &quadVao);
     glGenBuffers(1, &quadVbo);
     glGenBuffers(1, &quadEbo);
@@ -137,8 +136,8 @@ int main(int argc, char **argv)
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    glBindVertexArray(0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
     auto shader = ShaderManager::getShader("encoder");
 
     // main loop
@@ -180,7 +179,7 @@ int main(int argc, char **argv)
         encoder->EncodeFrame(packet);
 
         // send frame
-        for (std::vector<uint8_t> &packet : packet)
+        for (std::vector<uint8_t>& packet : packet)
         {
             fpOut.write(reinterpret_cast<char*>(packet.data()), packet.size());
         }
@@ -190,7 +189,7 @@ int main(int argc, char **argv)
         std::this_thread::sleep_for(std::chrono::microseconds(std::max(0l, 1000 * 16 - elapsed)));
     }
     encoder->EndEncode(packet);
-    for (std::vector<uint8_t> &packet : packet)
+    for (std::vector<uint8_t>& packet : packet)
     {
         fpOut.write(reinterpret_cast<char*>(packet.data()), packet.size());
     }
@@ -212,7 +211,7 @@ bool initializeEgl()
 
     // get display
     EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (display== EGL_NO_DISPLAY)
+    if (display == EGL_NO_DISPLAY)
     {
         Logs(error) << "Can't get display (0x" << std::hex << eglGetError() << ")";
         return false;
@@ -227,8 +226,7 @@ bool initializeEgl()
     }
 
     // select an appropriate configuration
-    const EGLint configAttribs[]
-    {
+    const EGLint configAttribs[] {
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
         EGL_BLUE_SIZE, 8,
         EGL_GREEN_SIZE, 8,
@@ -237,7 +235,7 @@ bool initializeEgl()
         EGL_DEPTH_SIZE, EGL_DONT_CARE,
         EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
         EGL_NONE
-    }; 
+    };
     EGLint numConfigs;
     EGLConfig config;
     if (!eglChooseConfig(display, configAttribs, &config, 1, &numConfigs) || numConfigs == 0)
@@ -247,10 +245,11 @@ bool initializeEgl()
     }
 
     // create a surface
-    const EGLint windowsAttribs[]
-    {
-        EGL_WIDTH, width,
-        EGL_HEIGHT, height,
+    const EGLint windowsAttribs[] {
+        EGL_WIDTH,
+        width,
+        EGL_HEIGHT,
+        height,
         EGL_NONE,
     };
     EGLSurface surface = eglCreatePbufferSurface(display, config, windowsAttribs);
@@ -268,11 +267,13 @@ bool initializeEgl()
     }
 
     // create a context
-    const EGLint contextAttribs[]
-    {
-        EGL_CONTEXT_MAJOR_VERSION, 3,
-        EGL_CONTEXT_MINOR_VERSION, 3,
-        EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
+    const EGLint contextAttribs[] {
+        EGL_CONTEXT_MAJOR_VERSION,
+        3,
+        EGL_CONTEXT_MINOR_VERSION,
+        3,
+        EGL_CONTEXT_OPENGL_PROFILE_MASK,
+        EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
         EGL_NONE,
     };
     EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextAttribs);
@@ -333,19 +334,18 @@ bool setupEngine()
     material->shininess = 128;
 
     // vertices
-    std::vector<Vertex> vertices 
-    {
-        Vertex{ glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f,-0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+    std::vector<Vertex> vertices {
+        Vertex { glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
     };
 
     std::vector<unsigned int> indices(vertices.size());
     std::iota(indices.begin(), indices.end(), 0);
-    
+
     // mesh
     auto mesh = ObjectManager::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
@@ -353,12 +353,12 @@ bool setupEngine()
     return true;
 }
 
-static inline bool operator==(const GUID &guid1, const GUID &guid2) 
+static inline bool operator==(const GUID& guid1, const GUID& guid2)
 {
     return !memcmp(&guid1, &guid2, sizeof(GUID));
 }
 
-static inline bool operator!=(const GUID &guid1, const GUID &guid2) 
+static inline bool operator!=(const GUID& guid1, const GUID& guid2)
 {
     return !(guid1 == guid2);
 }
@@ -366,7 +366,7 @@ static inline bool operator!=(const GUID &guid1, const GUID &guid2)
 /*bool initializeEncoder()
 {
     // create instance
-    NVENCSTATUS result = NvEncodeAPICreateInstance(&encoderInstance);
+    NVENCSTATUS result = NvEncodeAPIcreate(&encoderInstance);
     if (result != NVENCSTATUS::NV_ENC_SUCCESS)
     {
         Logs(error) << "Failed to create encode api instance (" << result << ")";

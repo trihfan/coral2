@@ -3,9 +3,6 @@
 
 using namespace coral;
 
-//*********************************************************************************
-// Resource
-
 Resource::Resource() : id(0)
 {
     connect<&Resource::init>(Object::init, this);
@@ -34,41 +31,4 @@ void Resource::release()
 {
     glDeleteTextures(1, &id);
     CHECK_OPENGL_ERROR
-}
-
-//*********************************************************************************
-// ResourceManager
-
-DEFINE_SINGLETON(ResourceManager)
-
-void ResourceManager::clear()
-{
-    instance->resourceByName.clear();
-}
-
-std::shared_ptr<Resource> ResourceManager::getResourceByName(const std::string& name)
-{
-    auto it = instance->resourceByName.find(name);
-    if (it != instance->resourceByName.end())
-    {
-        return it->second->toHandle<Resource>();
-    }
-
-    return nullptr;
-}
-
-ResourceManager::ResourceManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
-{
-}
-
-void ResourceManager::registerResource(std::shared_ptr<Resource> resource)
-{
-    auto it = instance->resourceByName.find(resource->getName());
-    if (it != instance->resourceByName.end())
-    {
-        Logs(error) << "Resource name is already used";
-        return;
-    }
-
-    instance->resourceByName[resource->getName()] = resource;
 }

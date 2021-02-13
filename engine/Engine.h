@@ -1,18 +1,12 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#ifdef __APPLE__
-    #include <experimental/memory_resource>
-    namespace std { namespace pmr = experimental::pmr; }
-#else
-    #include <memory_resource>
-#endif
-
 #include "EngineConfig.h"
+#include "memory_resource.h"
 #include "utils/Singleton.h"
-#include <vector>
-#include <memory>
 #include <chrono>
+#include <memory>
+#include <vector>
 
 namespace coral
 {
@@ -21,45 +15,57 @@ namespace coral
     class Node;
     class RenderPass;
 
+    /**
+     * @brief Parameters for the rendering
+     */
     struct RenderParameters
-	{
+    {
+        // Scene
         std::shared_ptr<Camera> camera;
         std::vector<std::shared_ptr<Node>> lights;
+
+        // Time
         double time;
         double deltaTime;
+
+        // Viewport
         int width;
         int height;
-	};
+    };
 
+    /**
+     * @brief Main class of the engine
+     */
     class Engine
     {
         MAKE_SINGLETON(Engine)
     public:
-        // render parameters for the current frame
-        static RenderParameters current_parameters;
-
-        // creation
-        static void create(const EngineConfig& config = EngineConfig());
-        static void destroy();
-
-        // run
-        static void setCurrentScene(std::shared_ptr<Scene> scene);
+        /**
+         * @brief Resize the pipeline
+         */
         static void resize(int width, int height);
+
+        /**
+         * @brief Render a frame
+         */
         static void frame();
 
     private:
-        // Constructor
-        Engine(const EngineConfig& config);
-
-        void cull();
-        void draw();
+        /**
+         * @brief Constructor
+         * @param config The engine config used to create the render graph
+         */
+        Engine(const EngineConfig& config = EngineConfig());
 
     private:
         // Time point of engine start
-        static std::chrono::steady_clock::time_point startTime;
+        std::chrono::steady_clock::time_point startTime;
 
         // Memory resource used by the engine
         std::shared_ptr<std::pmr::memory_resource> memoryResource;
+
+        // Current render parameters
+        RenderParameters currentParameters;
     };
 }
 #endif

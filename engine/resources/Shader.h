@@ -1,22 +1,17 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#ifdef __APPLE__
-    #include <experimental/memory_resource>
-    namespace std { namespace pmr = experimental::pmr; }
-#else
-    #include <memory_resource>
-#endif
+#include "memory_resource.h"
 
-#include <filesystem>
-#include <string>
-#include <array>
-#include <unordered_map>
-#include <variant>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
 #include "Object.h"
 #include "utils/Singleton.h"
+#include <array>
+#include <filesystem>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <string>
+#include <unordered_map>
+#include <variant>
 
 namespace coral
 {
@@ -24,7 +19,12 @@ namespace coral
     {
     public:
         // supported shader types
-        enum ShaderType : int { vertex, fragment, geometry };
+        enum ShaderType : int
+        {
+            vertex,
+            fragment,
+            geometry
+        };
 
         // Construction
         Shader();
@@ -65,7 +65,7 @@ namespace coral
     // The shader manager
     class ShaderManager
     {
-        MAKE_ENGINE_SINGLETON(ShaderManager)
+        MAKE_SINGLETON(ShaderManager)
     public:
         // add a path to looks for loading shaders
         static void addShaderPath(const std::filesystem::path& path);

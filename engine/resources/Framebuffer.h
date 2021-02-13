@@ -1,28 +1,34 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-#include <memory>
-#include <unordered_map>
 #include <vector>
 #include "Object.h"
-#include "utils/Singleton.h"
 #include "glad/glad.h"
 
 namespace coral
 {
     class Engine;
+    class Resource;
 
     enum class ResourceRole { color, depth, stencil };
-
+    struct FramebufferResource
+    {
+        std::shared_ptr<Resource> resource;
+        ResourceRole role;
+    };
+    
     //
     class Framebuffer : public Object
     {
     public:
         Framebuffer();
 
+        /// Custom framebuffer
+        Framebuffer(GLuint id);
+
         // 
-        void addResouce(const std::string& resource, ResourceRole type);
-        const std::vector<std::pair<std::string, ResourceRole>>& getResouces() const;
+        void addResource(const FramebufferResource& resource);
+        const std::vector<FramebufferResource>& getResources() const;
 
         void bind(GLenum target = GL_DRAW_FRAMEBUFFER);
         
@@ -33,22 +39,7 @@ namespace coral
         
     private:
         GLuint framebufferId;
-        std::vector<std::pair<std::string, ResourceRole>> resources;
-    };
-
-    // The framebuffer manager
-    class FramebufferManager
-    {
-        MAKE_ENGINE_SINGLETON(FramebufferManager)
-    public:
-        static void clear();
-        static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<std::pair<std::string, ResourceRole>>& resources);
-
-    private:
-        FramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
-
-    private:
-        std::vector<std::shared_ptr<Framebuffer>> framebuffers;
+        std::vector<FramebufferResource> resources;
     };
 }
 #endif

@@ -2,6 +2,7 @@
 #define BASIC_MATERIAL_H
 
 #include <glm/glm.hpp>
+#include "Property.h"
 #include "Material.h"
 
 namespace coral
@@ -17,10 +18,10 @@ namespace coral
         virtual void use(const RenderParameters& parameters) override;
 
         // uniforms
-        glm::vec3 ambient;
-        glm::vec3 diffuse;
-        glm::vec3 specular;
-        float shininess;
+        Property<glm::vec3> ambient;
+        Property<glm::vec3> diffuse;
+        Property<glm::vec3> specular;
+        Property<float> shininess;
     };
 }
 #endif

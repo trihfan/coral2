@@ -1,8 +1,8 @@
 #include "MeshMaterial.h"
-#include "scene/camera/Camera.h"
 #include "resources/Shader.h"
-#include <unordered_map>
+#include "scene/camera/Camera.h"
 #include <glm/gtx/transform.hpp>
+#include <unordered_map>
 
 using namespace coral;
 
@@ -12,8 +12,9 @@ const unsigned int SCR_HEIGHT = 600;
 
 static std::unordered_map<std::string, GLuint> sLoadedTextures;
 
-MeshMaterial::MeshMaterial(const std::vector<Texture>& textures) :
-      Material(""), textures(textures)
+MeshMaterial::MeshMaterial(const std::vector<Texture>& textures)
+    : Material("")
+    , textures(textures)
 {
     texture_ids.resize(textures.size(), 0);
     //shader = std::make_shared<Shader>("resources/shaders/1.model_loading.vs", "resources/shaders/1.model_loading.fs");
@@ -37,8 +38,6 @@ MeshMaterial::MeshMaterial(const std::vector<Texture>& textures) :
 
 void MeshMaterial::use(const RenderParameters& parameters)
 {
-    shader->use();
-
     // bind appropriate textures
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
@@ -77,6 +76,6 @@ void MeshMaterial::use(const RenderParameters& parameters)
     // render the loaded model
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f)); // it's a bit too big for our scene, so scale it down
     shader->setMat4("model", model);
 }

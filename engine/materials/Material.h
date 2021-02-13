@@ -1,12 +1,12 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "Object.h"
+#include "resources/Shader.h"
 #include <array>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include "Object.h"
-#include "resources/Shader.h"
 
 namespace coral
 {
@@ -21,7 +21,7 @@ namespace coral
         std::shared_ptr<Shader> getShader() const;
 
         // setup the shader and its parameters
-        virtual void use(const RenderParameters& parameters) {};
+        virtual void use(const RenderParameters& parameters) = 0;
 
     protected:
         // constructor

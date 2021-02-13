@@ -1,16 +1,8 @@
 #ifndef ENGINECONFIG_H
 #define ENGINECONFIG_H
 
-#ifdef __APPLE__
-#include <experimental/memory_resource>
-namespace std
-{
-    namespace pmr = experimental::pmr;
-}
-#else
-#include <memory_resource>
-#endif
 #include "Property.h"
+#include "memory_resource.h"
 
 namespace coral
 {

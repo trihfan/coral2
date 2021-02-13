@@ -1,19 +1,21 @@
-#include <numeric>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include "Engine.h"
-#include "resources/Shader.h"
 #include "Object.h"
+#include "ObjectManager.h"
+#include "materials/BasicMaterial.h"
+#include "resources/Shader.h"
 #include "scene/Scene.h"
+#include "scene/SceneManager.h"
 #include "scene/camera/Camera.h"
 #include "scene/mesh/Mesh.h"
-#include "materials/BasicMaterial.h"
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <numeric>
 
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 1200;
+const unsigned int SCR_WIDTH = 600;
+const unsigned int SCR_HEIGHT = 400;
 double lastX = SCR_WIDTH / 2.0f;
 double lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -21,7 +23,7 @@ bool mousePressed = false;
 std::shared_ptr<Camera> camera;
 
 // timing todo timemanager
-double deltaTime = 0; 
+double deltaTime = 0;
 double lastFrame = 0;
 
 // callback
@@ -84,19 +86,18 @@ int main()
     material->shininess = 128;
 
     // vertices
-    std::vector<Vertex> vertices 
-    {
-        Vertex{ glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f,-0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
-        Vertex{ glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f,  0.0f, 1.0f) },
+    std::vector<Vertex> vertices {
+        Vertex { glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
     };
 
     std::vector<unsigned int> indices(vertices.size());
     std::iota(indices.begin(), indices.end(), 0);
-    
+
     // mesh
     auto mesh = ObjectManager::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
@@ -115,7 +116,7 @@ int main()
         // input
         // -----
         processInput(window);
-        
+
         // render
         // ------
         Engine::frame();
@@ -138,7 +139,7 @@ void processInput(GLFWwindow* window)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     camera->setPerspective(45.f, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100.f));
@@ -180,9 +181,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-   glm::vec3 view = camera->getViewCenter() - *camera->position;
-   float distance = float(view.length());
-   float movement = std::min(distance, float(yoffset) * 0.1f);
-   glm::vec3 direction = view / distance;
-   camera->position = *camera->position + movement * direction;
+    glm::vec3 view = camera->getViewCenter() - *camera->position;
+    float distance = float(view.length());
+    float movement = std::min(distance, float(yoffset) * 0.1f);
+    glm::vec3 direction = view / distance;
+    camera->position = *camera->position + movement * direction;
 }

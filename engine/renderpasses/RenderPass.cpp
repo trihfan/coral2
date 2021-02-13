@@ -1,76 +1,88 @@
 #include "RenderPass.h"
 #include "Engine.h"
+#include "ObjectManager.h"
+#include "RenderPassFramebufferManager.h"
+#include "RenderPassResourceManager.h"
 #include "resources/Framebuffer.h"
 #include "resources/Resource.h"
 
 using namespace coral;
 
-void RenderPass::render(RenderQueue& queue)
+void RenderPass::render(RenderQueue& queue, const RenderParameters& parameters)
 {
     if (framebuffer)
     {
         framebuffer->bind();
     }
-    internalRender(queue);
+    internalRender(queue, parameters);
 }
 
-void RenderPass::addInput(const RenderPassInput& input)
+void RenderPass::addInput(const RenderPassResource& input)
 {
     inputs.push_back(input);
 }
 
-const std::vector<RenderPassInput>& RenderPass::getInputs() const
+const std::vector<RenderPassResource>& RenderPass::getInputs() const
 {
     return inputs;
 }
 
-void RenderPass::addOutput(const RenderPassOutput& output)
+void RenderPass::addOutput(const RenderPassResource& output)
 {
     outputs.push_back(output);
 }
 
-const std::vector<RenderPassOutput>& RenderPass::getOutputs() const
+const std::vector<RenderPassResource>& RenderPass::getOutputs() const
 {
     return outputs;
 }
 
-void RenderPass::prepare()
+void RenderPass::prepare(const RenderParameters& parameters)
 {
-    clear();
+    invalidate();
 
-    // Output
-    if (!outputs.empty())
+    // Inputs
+    inputResources.resize(inputs.size());
+    for (size_t i = 0; i < inputs.size(); i++)
     {
-        // Setup the resources
-        std::vector<std::pair<std::string, ResourceRole>> framebufferResources;
-        for (const auto& output : outputs)
-        {
-            auto resource = ResourceManager::getResourceByName(output.name);
-            if (!resource)
-            {
-                resource = ObjectManager::createWithName<Resource>(output.name);
-                ResourceManager::registerResource(resource);
-
-                // Configure resource
-                resource->width = Engine::current_parameters.width;
-                resource->height = Engine::current_parameters.height;
-                resource->internalFormat = output.internalFormat;
-                resource->format = output.format;
-                resource->type = output.type;
-                resource->sampleCount = output.sampleCount;
-            }
-
-            framebufferResources.push_back(std::make_pair(output.name, output.role));
-            resources.push_back(resource);
-        }
-        
-        // Get the framebuffer
-        framebuffer = FramebufferManager::getFramebufferFor(framebufferResources);
+        inputResources[i] = getResource(inputs[i], parameters);
     }
+
+    // Outputs
+    std::vector<FramebufferResource> framebufferResources;
+    outputResources.resize(outputs.size());
+    for (size_t i = 0; i < outputs.size(); i++)
+    {
+        outputResources[i] = getResource(outputs[i], parameters);
+        framebufferResources.push_back(FramebufferResource { outputResources[i], outputs[i].role });
+    }
+
+    // Get the framebuffer
+    framebuffer = RenderPassFramebufferManager::getFramebufferFor(framebufferResources);
 }
 
-void RenderPass::clear()
+void RenderPass::invalidate()
 {
     framebuffer = nullptr;
-    resources.clear();
+    inputResources.clear();
+    outputResources.clear();
+}
+
+std::shared_ptr<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
+{
+    auto allocatedResource = RenderPassResourceManager::getResourceByName(resource.name);
+    if (!allocatedResource)
+    {
+        allocatedResource = ObjectManager::createWithName<Resource>(resource.name);
+        RenderPassResourceManager::registerResource(allocatedResource);
+
+        // Configure resource
+        allocatedResource->width = parameters.width;
+        allocatedResource->height = parameters.height;
+        allocatedResource->internalFormat = resource.internalFormat;
+        allocatedResource->format = resource.format;
+        allocatedResource->type = resource.type;
+        allocatedResource->sampleCount = resource.sampleCount;
+    }
+    return allocatedResource;
 }
