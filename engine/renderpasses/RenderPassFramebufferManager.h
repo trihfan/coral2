@@ -2,6 +2,7 @@
 #define RENDERPASSFRAMEBUFFERMANAGER_H
 
 #include "resources/Framebuffer.h"
+#include "memory_resource.h"
 #include "utils/Singleton.h"
 #include <memory>
 #include <vector>
@@ -9,6 +10,7 @@
 namespace coral
 {
     class Engine;
+    struct FramebufferResource;
 
     // The framebuffer manager
     class RenderPassFramebufferManager

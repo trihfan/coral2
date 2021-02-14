@@ -9,6 +9,7 @@
 *
 */
 
+#pragma once
 #include <iostream>
 #include "NvEncoder.h"
 #include <unordered_map>

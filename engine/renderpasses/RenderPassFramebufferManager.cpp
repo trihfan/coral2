@@ -1,4 +1,7 @@
 #include "RenderPassFramebufferManager.h"
+#include "resources/Framebuffer.h"
+#include "ObjectManager.h"
+#include "resources/Resource.h"
 
 using namespace coral;
 

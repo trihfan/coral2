@@ -1,16 +1,15 @@
+#include "glad/glad.h"
+#include "glad/glad_egl.h"
 #include "Engine.h"
 #include "Object.h"
-#include "Shader.h"
-#include "glad/glad_egl.h"
+#include "ObjectManager.h"
+#include "resources/Shader.h"
 #include "materials/BasicMaterial.h"
-#include "nvencode/NvEncoderGL.h"
-#include "nvencode/nvEncodeAPI.h"
+#include "NvEncoder/NvEncoderGL.h"
 #include "scene/Scene.h"
+#include "scene/SceneManager.h"
 #include "scene/camera/Camera.h"
 #include "scene/mesh/Mesh.h"
-#include <QApplication>
-#include <QDialog>
-#include <QPainter>
 #include <chrono>
 #include <fstream>
 #include <numeric>
@@ -37,41 +36,6 @@ bool initializeEgl();
 bool setupEngine();
 bool initializeEncoder();
 
-// Window used to show debug output
-class DebugOutput : public QDialog
-{
-public:
-    DebugOutput()
-    {
-        buffer.resize(::width * ::height * 4);
-        setFixedSize(::width, ::height);
-        connect(this, &DebugOutput::finished, this, []() { running = false; });
-    }
-
-    void updateFrame()
-    {
-        glReadPixels(0, 0, ::width, ::height, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, buffer.data());
-        update();
-    }
-
-    void paintEvent(QPaintEvent* event) override
-    {
-        QPainter painter(this);
-        for (int x = 0; x < ::width; x++)
-        {
-            for (int y = 0; y < ::height; y++)
-            {
-                int current = y * ::width + x;
-                painter.setPen(QColor(buffer[current * 4 + 1], buffer[current * 4 + 2], buffer[current * 4 + 3]));
-                painter.drawPoint(x, y);
-            }
-        }
-    }
-
-private:
-    std::vector<uint8_t> buffer;
-};
-
 int main(int argc, char** argv)
 {
     // egl
@@ -91,11 +55,6 @@ int main(int argc, char** argv)
     {
         return 1;
     }
-
-    // Create output debug window
-    QApplication application(argc, argv);
-    DebugOutput output;
-    output.open();
 
     // Generate framebuffer
     GLuint framebuffer, depthbuffer;
@@ -150,10 +109,6 @@ int main(int argc, char** argv)
         // Render frame
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         Engine::frame();
-
-        // show debug output
-        output.updateFrame();
-        application.processEvents();
 
         // get next buffer
         const NvEncInputFrame* encoderInputFrame = encoder->GetNextInputFrame();
@@ -352,188 +307,3 @@ bool setupEngine()
     scene->add(mesh);
     return true;
 }
-
-static inline bool operator==(const GUID& guid1, const GUID& guid2)
-{
-    return !memcmp(&guid1, &guid2, sizeof(GUID));
-}
-
-static inline bool operator!=(const GUID& guid1, const GUID& guid2)
-{
-    return !(guid1 == guid2);
-}
-
-/*bool initializeEncoder()
-{
-    // create instance
-    NVENCSTATUS result = NvEncodeAPIcreate(&encoderInstance);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to create encode api instance (" << result << ")";
-        return false;
-    }
-
-    // encoding session
-    NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS encodeSessionExParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
-    encodeSessionExParams.device = nullptr;
-    encodeSessionExParams.deviceType = NV_ENC_DEVICE_TYPE_OPENGL;
-    encodeSessionExParams.apiVersion = NVENCAPI_VERSION;
-    
-    result = encoderInstance.nvEncOpenEncodeSessionEx(&encodeSessionExParams, &encoder);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to create encode session (" << result << ")";
-        return false;
-    }
-
-    // list guid
-    uint32_t guidCount;
-    result = encoderInstance.nvEncGetEncodeGUIDCount(encoder, &guidCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get guid count (" << result << ")";
-        return false;
-    }
-
-    std::vector<GUID> guids(guidCount);
-    result = encoderInstance.nvEncGetEncodeGUIDs(encoder, guids.data(), guidCount, &guidCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get guids( " << result << ")";
-        return false;
-    }
-
-    // select encode guid
-    bool found = false;
-    for (const GUID& guid : guids)
-    {
-        if (guid == NV_ENC_CODEC_H264_GUID)
-        {
-            encodeGuid = guid;
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        Logs(error) << "Can't found h264 guid";
-        return false;
-    }
-
-    // list preset
-    result = encoderInstance.nvEncGetEncodePresetCount(encoder, encodeGuid, &guidCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get preset count (" << result << ")";
-        return false;
-    }
-
-    guids.resize(guidCount);
-    result = encoderInstance.nvEncGetEncodePresetGUIDs(encoder, encodeGuid, guids.data(), guidCount, &guidCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get preset (" << result << ")";
-        return false;
-    }
-
-    // select preset
-    found = false;
-    for (const GUID& guid : guids)
-    {
-        if (guid == NV_ENC_PRESET_P7_GUID)
-        {
-            presetGuid = guid;
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        Logs(error) << "Can't found preset guid";
-        return false;
-    }
-
-    NV_ENC_PRESET_CONFIG presetConfig { NV_ENC_PRESET_CONFIG_VER, { NV_ENC_CONFIG_VER } };
-    result = encoderInstance.nvEncGetEncodePresetConfigEx(encoder, encodeGuid, presetGuid, NV_ENC_TUNING_INFO::NV_ENC_TUNING_INFO_ULTRA_LOW_LATENCY, &presetConfig);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Can't set low latency config (" << result << ")";
-        return false;
-    }
-    return true;
-
-    // list formats
-    uint32_t inputTypeCount;
-    result = encoderInstance.nvEncGetInputFormatCount(encoder, encodeGuid, &inputTypeCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get input format count (" << result << ")";
-        return false;
-    }
-
-    std::vector<NV_ENC_BUFFER_FORMAT> formats(inputTypeCount);
-    result = encoderInstance.nvEncGetInputFormats(encoder, encodeGuid, formats.data(), inputTypeCount, &inputTypeCount);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Failed to get formats ( " << result << ")";
-        return false;
-    }
-
-    // select format
-    found = false;
-    for (const NV_ENC_BUFFER_FORMAT& format : formats)
-    {
-        if (format == NV_ENC_BUFFER_FORMAT_ARGB)
-        {
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        Logs(error) << "Can't found format";
-        return false;
-    }
-
-    // initialize encoder session
-    NV_ENC_INITIALIZE_PARAMS initializedParams {};
-    initializedParams.encodeConfig->version = NV_ENC_CONFIG_VER;
-    initializedParams.version = NV_ENC_INITIALIZE_PARAMS_VER;
-
-    initializedParams.encodeGUID = encodeGuid;
-    initializedParams.presetGUID = presetGuid;
-    initializedParams.encodeWidth = width;
-    initializedParams.encodeHeight = height;
-    initializedParams.darWidth = width;
-    initializedParams.darHeight = height;
-    initializedParams.frameRateNum = 30;
-    initializedParams.frameRateDen = 1;
-    initializedParams.enablePTD = 1;
-    initializedParams.reportSliceOffsets = 0;
-    initializedParams.enableSubFrameWrite = 0;
-    initializedParams.maxEncodeWidth = width;
-    initializedParams.maxEncodeHeight = height;
-    initializedParams.enableMEOnlyMode = false;
-    initializedParams.enableOutputInVidmem = false;
-
-    initializedParams.encodeConfig->frameIntervalP = 1;
-    initializedParams.encodeConfig->gopLength = NVENC_INFINITE_GOPLENGTH;
-    initializedParams.encodeConfig->rcParams.rateControlMode = NV_ENC_PARAMS_RC_CBR;
-    initializedParams.encodeConfig->encodeCodecConfig.h264Config.idrPeriod = initializedParams.encodeConfig->gopLength;
-
-    result = encoderInstance.nvEncInitializeEncoder(encoder, &initializedParams);
-    if (result != NVENCSTATUS::NV_ENC_SUCCESS)
-    {
-        Logs(error) << "Can't initialize hardware session ( " << result << ")";
-        return false;
-    }
-
-    // Create input
-
-    // Create output
-
-    return true;
-}*/

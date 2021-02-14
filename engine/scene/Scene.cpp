@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Node.h"
+#include "ObjectManager.h"
 
 using namespace coral;
 

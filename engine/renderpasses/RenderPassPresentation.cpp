@@ -1,7 +1,10 @@
 #include "RenderPassPresentation.h"
 #include "Engine.h"
+#include "ObjectManager.h"
 #include "materials/PresentationMaterial.h"
 #include "scene/mesh/Mesh.h"
+#include "resources/Resource.h"
+#include "utils/Error.h"
 #include <numeric>
 
 using namespace coral;
