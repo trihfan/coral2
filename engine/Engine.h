@@ -2,37 +2,14 @@
 #define ENGINE_H
 
 #include "EngineConfig.h"
+#include "RenderParameters.h"
 #include "memory_resource.h"
 #include "utils/Singleton.h"
 #include <chrono>
 #include <memory>
-#include <vector>
 
 namespace coral
 {
-    class Scene;
-    class Camera;
-    class Node;
-    class RenderPass;
-
-    /**
-     * @brief Parameters for the rendering
-     */
-    struct RenderParameters
-    {
-        // Scene
-        std::shared_ptr<Camera> camera;
-        std::vector<std::shared_ptr<Node>> lights;
-
-        // Time
-        double time;
-        double deltaTime;
-
-        // Viewport
-        int width;
-        int height;
-    };
-
     /**
      * @brief Main class of the engine
      */
