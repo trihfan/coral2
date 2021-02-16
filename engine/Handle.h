@@ -51,6 +51,9 @@ namespace coral
         bool operator>(const Handle& other) const;
         bool operator>=(const Handle& other) const;
 
+        // Meta
+        uint32_t useCount() const;
+
     private:
         friend ObjectFactory;
         ObjectType* data;

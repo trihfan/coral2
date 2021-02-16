@@ -8,14 +8,20 @@
 using namespace coral;
 
 std::atomic<uint64_t> ObjectFactory::counter(0);
-ObjectFactoryData* ObjectFactoryData::instance = nullptr;
-#define internalData ObjectFactoryData::instance
+bool ObjectFactoryData::isDestroyed = false;
+#define internalData ObjectFactoryData::get()
 
+DEFINE_SINGLETON(ObjectFactoryData)
 DEFINE_SINGLETON(ObjectFactory)
+
+void ObjectFactoryData::release()
+{
+    isDestroyed = true;
+}
 
 ObjectFactory::ObjectFactory()
 {
-    internalData = new ObjectFactoryData();
+    ObjectFactoryData::create();
 }
 
 void ObjectFactory::release()
@@ -27,7 +33,7 @@ void ObjectFactory::release()
     }
     update();
 
-    delete ObjectFactoryData::instance;
+    ObjectFactoryData::destroy();
 }
 
 void ObjectFactory::add(Handle<Object> object)

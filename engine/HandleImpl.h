@@ -12,7 +12,6 @@ namespace coral
         : data(nullptr)
         , sharedMemory(nullptr)
     {
-        set(nullptr, nullptr);
     }
 
     template <typename ObjectType>
@@ -20,7 +19,6 @@ namespace coral
         : data(nullptr)
         , sharedMemory(nullptr)
     {
-        set(nullptr, nullptr);
     }
 
     template <typename ObjectType>
@@ -51,6 +49,7 @@ namespace coral
     template <typename ObjectType>
     Handle<ObjectType>::~Handle()
     {
+        set(nullptr, nullptr);
     }
 
     template <typename ObjectType>
@@ -125,12 +124,12 @@ namespace coral
     void Handle<ObjectType>::set(ObjectType* data, HandleSharedMemory* sharedMemory)
     {
         // Remove old ref
-        if (this->sharedMemory)
+        if (this->sharedMemory && !ObjectFactoryData::isDestroyed)
         {
             uint32_t count = this->sharedMemory->useCount.fetch_sub(1, std::memory_order_acquire);
             if (count == 2)
             {
-                ObjectFactoryData::instance->releaseList.enqueue(*this);
+                ObjectFactoryData::get()->releaseList.enqueue(*this);
             }
         }
 
@@ -146,6 +145,12 @@ namespace coral
             }
             this->sharedMemory->useCount.fetch_add(1, std::memory_order_release);
         }
+    }
+
+    template <typename ObjectType>
+    uint32_t Handle<ObjectType>::useCount() const
+    {
+        return sharedMemory->useCount.load(std::memory_order_relaxed);
     }
 
     template <typename ObjectType>

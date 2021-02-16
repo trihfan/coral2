@@ -1,6 +1,7 @@
 #ifndef OBJECTFACTORYDATA_H
 #define OBJECTFACTORYDATA_H
 
+#include "utils/Singleton.h"
 #include "utils/concurrentqueue.h"
 #include <thread>
 #include <vector>
@@ -17,6 +18,11 @@ namespace coral
      */
     struct ObjectFactoryData
     {
+        MAKE_SINGLETON(ObjectFactoryData)
+
+    public:
+        static ObjectFactoryData* get() { return instance.get(); }
+
         // Object pool, todo data structure
         std::vector<Handle<Object>> objects;
 
@@ -24,7 +30,9 @@ namespace coral
         moodycamel::ConcurrentQueue<Handle<Object>> initializeList;
         moodycamel::ConcurrentQueue<Handle<Object>> releaseList;
 
-        static ObjectFactoryData* instance;
+        static bool isDestroyed;
+
+        // Construction
         ObjectFactoryData()
             : initializeList(1000)
             , releaseList(1000)
