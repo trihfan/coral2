@@ -1,6 +1,10 @@
 #ifndef RENDERPARAMETERS_H
 #define RENDERPARAMETERS_H
 
+#include "scene/light/AreaLight.h"
+#include "scene/light/DirectionalLight.h"
+#include "scene/light/PointLight.h"
+#include "scene/light/SpotLight.h"
 #include <chrono>
 #include <memory>
 #include <vector>
@@ -11,17 +15,13 @@ namespace coral
     class Camera;
     class Node;
     class RenderPass;
-    class PointLight;
-    class DirectionalLight;
-    class SpotLight;
-    class AreaLight;
 
     struct LightArray
     {
-        std::vector<std::shared_ptr<PointLight>> pointLights;
-        std::vector<std::shared_ptr<DirectionalLight>> directionalLights;
-        std::vector<std::shared_ptr<SpotLight>> spotLights;
-        std::vector<std::shared_ptr<AreaLight>> areaLights;
+        std::vector<Handle<PointLight>> pointLights;
+        std::vector<Handle<DirectionalLight>> directionalLights;
+        std::vector<Handle<SpotLight>> spotLights;
+        std::vector<Handle<AreaLight>> areaLights;
     };
 
     /**
@@ -30,7 +30,7 @@ namespace coral
     struct RenderParameters
     {
         // Scene
-        std::shared_ptr<Camera> camera;
+        Handle<Camera> camera;
         LightArray lights;
 
         // Time

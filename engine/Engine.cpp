@@ -1,6 +1,7 @@
 #include "Engine.h"
+#include "EngineConfig.h"
 #include "Object.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
 #include "materials/Material.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassFramebufferManager.h"
@@ -9,43 +10,42 @@
 #include "resources/Shader.h"
 #include "scene/DrawableNode.h"
 #include "scene/Node.h"
+#include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "utils/Error.h"
-#include <glad/glad.h>
 #include <new>
 
 using namespace coral;
 
 DEFINE_SINGLETON(Engine)
 
-Engine::Engine(const EngineConfig& config)
+Engine::Engine(std::shared_ptr<Backend> backend)
+    : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
-    memoryResource = *config.memoryResource;
 
-    // load backend
-    if (!gladLoadGL())
-    {
-        Logs(error) << "Failed to initialize GLAD";
-    }
+    // Create backend
+    this->backend->init();
 
     // create instances
-    ObjectManager::create(*config.memoryResource);
-    ShaderManager::create(*config.memoryResource);
-    SceneManager::create(*config.memoryResource);
-    RenderPassManager::create(*config.memoryResource);
-    RenderPassFramebufferManager::create(*config.memoryResource);
-    RenderPassResourceManager::create(*config.memoryResource);
+    ObjectFactory::create();
+    ShaderManager::create();
+    SceneManager::create();
+    RenderPassManager::create();
+    RenderPassFramebufferManager::create();
+    RenderPassResourceManager::create();
 
-    // default config
-    config.setup();
+    // Setup engine
+    EngineConfig::setup();
 }
 
 void Engine::release()
 {
     SceneManager::destroy();
     ShaderManager::destroy();
-    ObjectManager::destroy();
+    ObjectFactory::destroy();
+
+    backend->destroy();
 }
 
 void Engine::resize(int width, int height)
@@ -60,8 +60,7 @@ void Engine::frame()
     auto& currentParameters = instance->currentParameters;
 
     // Update time
-    double lastTime
-        = currentParameters.time;
+    double lastTime = currentParameters.time;
     currentParameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count() / 1e6;
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
@@ -69,7 +68,7 @@ void Engine::frame()
     currentParameters.camera = nullptr;
     SceneManager::update(currentParameters);
     RenderPassManager::update(currentParameters);
-    ObjectManager::update(); // finish with object manager update to allocate the gl data
+    ObjectFactory::update(); // finish with object manager update to allocate the gl data
 
     // Draw
     for (auto camera : SceneManager::getCameras())

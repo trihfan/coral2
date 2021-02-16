@@ -1,8 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "memory_resource.h"
-
 #include "Object.h"
 #include "utils/Singleton.h"
 #include <array>
@@ -71,16 +69,16 @@ namespace coral
         static void addShaderPath(const std::filesystem::path& path);
 
         // get the shader of the given name
-        static std::shared_ptr<Shader> getShader(const std::string& name);
+        static Handle<Shader> getShader(const std::string& name);
 
     private:
-        ShaderManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
+        ShaderManager();
         void iterateFolder(const std::filesystem::path& path);
         int getShaderType(const std::filesystem::path& extension) const;
 
     private:
         static std::vector<std::filesystem::path> paths;
-        std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
+        std::unordered_map<std::string, Handle<Shader>> shaders;
     };
 }
 #endif

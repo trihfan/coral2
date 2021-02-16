@@ -1,5 +1,5 @@
-#include <glad/glad.h>
 #include "Material.h"
+#include "resources/Shader.h"
 
 using namespace coral;
 
@@ -8,7 +8,7 @@ Material::Material(const std::string& shader_name)
     shader = ShaderManager::getShader(shader_name);
 }
 
-std::shared_ptr<Shader> Material::getShader() const
+Handle<Shader> Material::getShader() const
 {
     return shader;
 }

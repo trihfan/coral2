@@ -2,7 +2,6 @@
 #define SCENEMANAGER_H
 
 #include "Object.h"
-#include "memory_resource.h"
 #include "utils/Singleton.h"
 #include <functional>
 #include <map>
@@ -27,9 +26,9 @@ namespace coral
      */
     struct RenderQueue
     {
-        std::vector<std::shared_ptr<DrawableNode>> nodes;
-        std::unordered_map<std::shared_ptr<Shader>, std::set<std::shared_ptr<Material>>> shaderMap;
-        std::map<std::shared_ptr<Material>, std::vector<std::shared_ptr<DrawableNode>>> materialMap;
+        std::vector<Handle<DrawableNode>> nodes;
+        std::map<Handle<Shader>, std::set<Handle<Material>>> shaderMap;
+        std::map<Handle<Material>, std::vector<Handle<DrawableNode>>> materialMap;
     };
 
     /**
@@ -42,12 +41,12 @@ namespace coral
         /**
          * @brief Set the current scene
          */
-        static void setCurrentScene(std::shared_ptr<Scene> scene);
+        static void setCurrentScene(Handle<Scene> scene);
 
         /**
          * @brief Return the cameras
          */
-        static const std::vector<std::shared_ptr<Camera>>& getCameras();
+        static const std::vector<Handle<Camera>>& getCameras();
 
         /**
          * @brief Update all nodes of the scene
@@ -60,24 +59,22 @@ namespace coral
         static std::unordered_map<std::string, RenderQueue> buildRenderQueuesFor(const RenderParameters& parameters);
 
     private:
-        // Constructor
-        SceneManager(std::shared_ptr<std::pmr::memory_resource> memoryResource);
+        SceneManager() = default;
 
-    private:
         /**
          * @brief The current scene
          */
-        std::shared_ptr<Scene> currentScene;
+        Handle<Scene> currentScene;
 
         /**
          * @brief List of camera in the currrent scene
          */
-        std::vector<std::shared_ptr<Camera>> cameras;
+        std::vector<Handle<Camera>> cameras;
 
         /**
          * @brief List of lights in the currrent scene
          */
-        std::vector<std::shared_ptr<Light>> lights;
+        std::vector<Handle<Light>> lights;
     };
 }
 #endif

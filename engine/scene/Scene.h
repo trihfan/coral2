@@ -1,8 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Object.h"
-#include <memory>
+#include "pch.h"
 
 namespace coral
 {
@@ -15,14 +14,14 @@ namespace coral
         Scene();
 
         // Objects
-        void add(std::shared_ptr<Node> node);
-        void remove(std::shared_ptr<Node> node);
+        void add(Handle<Node> node);
+        void remove(Handle<Node> node);
 
         // Get top node
-        std::shared_ptr<Node> getTopNode() const;
+        Handle<Node> getTopNode() const;
 
     private:
-        std::shared_ptr<Node> top_node;
+        Handle<Node> top_node;
     };
 }
 #endif

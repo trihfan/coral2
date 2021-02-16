@@ -1,18 +1,17 @@
 #ifndef BASIC_MATERIAL_H
 #define BASIC_MATERIAL_H
 
-#include <glm/glm.hpp>
-#include "Property.h"
 #include "Material.h"
+#include "Property.h"
+#include <glm/glm.hpp>
 
 namespace coral
 {
+
     class BasicMaterial : public Material
     {
     public:
-        // construction
         BasicMaterial();
-        virtual ~BasicMaterial() = default;
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;

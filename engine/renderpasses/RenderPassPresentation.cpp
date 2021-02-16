@@ -1,9 +1,10 @@
 #include "RenderPassPresentation.h"
 #include "Engine.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
 #include "materials/PresentationMaterial.h"
-#include "scene/mesh/Mesh.h"
 #include "resources/Resource.h"
+#include "resources/Shader.h"
+#include "scene/mesh/Mesh.h"
 #include "utils/Error.h"
 #include <numeric>
 
@@ -11,7 +12,7 @@ using namespace coral;
 
 RenderPassPresentation::RenderPassPresentation()
 {
-    presentationMaterial = ObjectManager::create<PresentationMaterial>();
+    presentationMaterial = ObjectFactory::create<PresentationMaterial>();
 
     std::vector<Vertex> vertices {
         Vertex { glm::vec3(-1, -1, 0), glm::vec3(0, 0, 1) },
@@ -25,7 +26,7 @@ RenderPassPresentation::RenderPassPresentation()
     std::vector<unsigned int> indices(vertices.size());
     std::iota(indices.begin(), indices.end(), 0);
 
-    screenQuad = ObjectManager::create<Mesh>(vertices, indices);
+    screenQuad = ObjectFactory::create<Mesh>(vertices, indices);
     screenQuad->setMaterial(presentationMaterial);
 }
 

@@ -14,7 +14,7 @@ namespace coral
     {
     public:
         Resource();
-  
+
         void bind();
         GLuint getId() const;
 
@@ -30,7 +30,7 @@ namespace coral
         // initialization
         void init();
         void release();
-        
+
     private:
         GLuint id;
     };

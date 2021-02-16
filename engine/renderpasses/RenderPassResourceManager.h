@@ -1,7 +1,6 @@
 #ifndef RENDERPASSRESOURCEMANAGER_H
 #define RENDERPASSRESOURCEMANAGER_H
 
-#include "memory_resource.h"
 #include "resources/Resource.h"
 #include "utils/Singleton.h"
 #include <memory>
@@ -18,16 +17,14 @@ namespace coral
 
     public:
         static void clear();
-        static std::shared_ptr<Resource> getResourceByName(const std::string& name);
+        static Handle<Resource> getResourceByName(const std::string& name);
 
         // Register named resources
-        static void registerResource(std::shared_ptr<Resource> resource);
+        static void registerResource(Handle<Resource> resource);
 
     private:
-        RenderPassResourceManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
-
-    private:
-        std::unordered_map<std::string, std::shared_ptr<Resource>> resourceByName;
+        RenderPassResourceManager() = default;
+        std::unordered_map<std::string, Handle<Resource>> resourceByName;
     };
 }
 #endif

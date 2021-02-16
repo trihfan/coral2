@@ -2,6 +2,7 @@
 #define RENDERPASSPRESENTATION_H
 
 #include "RenderPass.h"
+#include "scene/mesh/Mesh.h"
 #include <memory>
 #include <string>
 
@@ -20,8 +21,8 @@ namespace coral
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) override;
 
     private:
-        std::shared_ptr<Mesh> screenQuad;
-        std::shared_ptr<PresentationMaterial> presentationMaterial;
+        Handle<Mesh> screenQuad;
+        Handle<PresentationMaterial> presentationMaterial;
     };
 }
 #endif

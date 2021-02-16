@@ -1,6 +1,6 @@
 #include "RenderPass.h"
 #include "Engine.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
 #include "RenderPassFramebufferManager.h"
 #include "RenderPassResourceManager.h"
 #include "resources/Framebuffer.h"
@@ -68,12 +68,12 @@ void RenderPass::invalidate()
     outputResources.clear();
 }
 
-std::shared_ptr<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
+Handle<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
 {
     auto allocatedResource = RenderPassResourceManager::getResourceByName(resource.name);
     if (!allocatedResource)
     {
-        allocatedResource = ObjectManager::createWithName<Resource>(resource.name);
+        allocatedResource = ObjectFactory::createWithName<Resource>(resource.name);
         RenderPassResourceManager::registerResource(allocatedResource);
 
         // Configure resource

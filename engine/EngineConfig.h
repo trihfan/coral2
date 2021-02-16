@@ -2,7 +2,6 @@
 #define ENGINECONFIG_H
 
 #include "Property.h"
-#include "memory_resource.h"
 
 namespace coral
 {
@@ -11,10 +10,7 @@ namespace coral
     class EngineConfig
     {
     public:
-        EngineConfig();
-        void setup() const;
-
-        Property<std::shared_ptr<std::pmr::memory_resource>> memoryResource;
+        static void setup();
     };
 }
 #endif

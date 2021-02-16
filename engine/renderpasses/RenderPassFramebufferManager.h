@@ -2,7 +2,6 @@
 #define RENDERPASSFRAMEBUFFERMANAGER_H
 
 #include "resources/Framebuffer.h"
-#include "memory_resource.h"
 #include "utils/Singleton.h"
 #include <memory>
 #include <vector>
@@ -18,13 +17,11 @@ namespace coral
         MAKE_SINGLETON(RenderPassFramebufferManager)
     public:
         static void clear();
-        static std::shared_ptr<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
+        static Handle<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
 
     private:
-        RenderPassFramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
-
-    private:
-        std::vector<std::shared_ptr<Framebuffer>> framebuffers;
+        RenderPassFramebufferManager() = default;
+        std::vector<Handle<Framebuffer>> framebuffers;
     };
 }
 #endif

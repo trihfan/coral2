@@ -41,11 +41,11 @@ namespace coral
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) = 0;
 
         // Loaded resouces
-        std::vector<std::shared_ptr<Resource>> inputResources;
-        std::vector<std::shared_ptr<Resource>> outputResources;
+        std::vector<Handle<Resource>> inputResources;
+        std::vector<Handle<Resource>> outputResources;
 
     private:
-        std::shared_ptr<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
+        Handle<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
 
     private:
         // render pass resources
@@ -53,7 +53,7 @@ namespace coral
         std::vector<RenderPassResource> outputs;
 
         // The output framebuffer
-        std::shared_ptr<Framebuffer> framebuffer;
+        Handle<Framebuffer> framebuffer;
     };
 }
 #endif

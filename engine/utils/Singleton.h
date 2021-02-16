@@ -9,7 +9,7 @@ private:                                                                   \
     X& operator=(const X&) = delete;                                       \
     X(X&&) = delete;                                                       \
     X& operator=(X&&) = delete;                                            \
-    static std::unique_ptr<X> instance;                                    \
+    static std::shared_ptr<X> instance;                                    \
                                                                            \
 public:                                                                    \
     template <class... Args>                                               \
@@ -19,7 +19,7 @@ public:                                                                    \
         {                                                                  \
             Logs(warning) << #X << " already created, recreating";         \
         }                                                                  \
-        instance = std::unique_ptr<X>(new X(std::forward<Args>(args)...)); \
+        instance = std::shared_ptr<X>(new X(std::forward<Args>(args)...)); \
         Logs(success) << #X << " created";                                 \
     }                                                                      \
     static void destroy()                                                  \
@@ -29,4 +29,4 @@ public:                                                                    \
         Logs(success) << #X << " destroyed";                               \
     }
 
-#define DEFINE_SINGLETON(X) std::unique_ptr<X> X::instance;
+#define DEFINE_SINGLETON(X) std::shared_ptr<X> X::instance;

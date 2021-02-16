@@ -29,7 +29,7 @@ void SceneManager::update(const RenderParameters& parameters)
     instance->lights.clear();
 
     traverse(
-        instance->currentScene->getTopNode(), +[](std::shared_ptr<Node> node) {
+        instance->currentScene->getTopNode(), +[](Handle<Node> node) {
             if (node->isA<Camera>())
             {
                 instance->cameras.push_back(node->toHandle<Camera>());
@@ -43,19 +43,19 @@ void SceneManager::update(const RenderParameters& parameters)
 
     // update
     traverse(
-        instance->currentScene->getTopNode(), +[](std::shared_ptr<Node> node) {
+        instance->currentScene->getTopNode(), +[](Handle<Node> node) {
             node->update();
             return true;
         });
 }
 
-void SceneManager::setCurrentScene(std::shared_ptr<Scene> scene)
+void SceneManager::setCurrentScene(Handle<Scene> scene)
 {
     instance->currentScene = scene;
     instance->cameras.clear();
 }
 
-const std::vector<std::shared_ptr<Camera>>& SceneManager::getCameras()
+const std::vector<Handle<Camera>>& SceneManager::getCameras()
 {
     return instance->cameras;
 }
@@ -71,7 +71,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     }
 
     // Fill queues with visible nodes
-    traverse(instance->currentScene->getTopNode(), [&queues](std::shared_ptr<Node> node) {
+    traverse(instance->currentScene->getTopNode(), [&queues](Handle<Node> node) {
         if (node->isDrawable())
         {
             auto drawableNode = node->toHandle<DrawableNode>();
@@ -87,8 +87,4 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     });
 
     return queues;
-}
-
-SceneManager::SceneManager(std::shared_ptr<std::pmr::memory_resource> memoryResource)
-{
 }

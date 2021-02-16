@@ -1,16 +1,16 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "scene/DrawableNode.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include "scene/DrawableNode.h"
 
 namespace coral
 {
-    struct Vertex 
+    struct Vertex
     {
         glm::vec3 position;
         glm::vec3 normal;
@@ -34,7 +34,7 @@ namespace coral
         std::vector<unsigned int> indices;
         GLuint VAO;
 
-        // render data 
+        // render data
         GLuint VBO, EBO;
 
         // initializes all the buffer objects/arrays

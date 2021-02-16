@@ -1,9 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "scene/Node.h"
 #include <glm/glm.hpp>
 #include <vector>
-#include "scene/Node.h"
 
 namespace coral
 {

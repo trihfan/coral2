@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Object.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
+#include "backend/opengl/OpenGLBackend.h"
 #include "materials/BasicMaterial.h"
 #include "resources/Shader.h"
 #include "scene/Scene.h"
@@ -20,7 +21,7 @@ double lastX = SCR_WIDTH / 2.0f;
 double lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool mousePressed = false;
-std::shared_ptr<Camera> camera;
+Handle<Camera> camera;
 
 // timing todo timemanager
 double deltaTime = 0;
@@ -38,8 +39,8 @@ int main()
     // glfw: initialize and configure
     // ------------------------------0
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
@@ -64,22 +65,22 @@ int main()
     // setup engine
     // ------------------------------
     ShaderManager::addShaderPath("resources/shaders");
-    Engine::create();
+    Engine::create(std::make_unique<OpenGLBackend>());
     Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
 
     // scene
-    auto scene = ObjectManager::createWithName<Scene>("scene");
+    auto scene = ObjectFactory::createWithName<Scene>("scene");
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectManager::createWithName<Camera>("camera");
+    camera = ObjectFactory::createWithName<Camera>("camera");
     camera->setPerspective(45.f, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100.f));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
     scene->add(camera);
 
     // material
-    auto material = ObjectManager::createWithName<BasicMaterial>("material");
+    auto material = ObjectFactory::createWithName<BasicMaterial>("material");
     material->ambient = glm::vec3(0.1, 0.1, 0.1);
     material->diffuse = glm::vec3(0.1, 0.8, 0.3);
     material->specular = glm::vec3(0.8, 0.8, 0.8);
@@ -99,7 +100,7 @@ int main()
     std::iota(indices.begin(), indices.end(), 0);
 
     // mesh
-    auto mesh = ObjectManager::createWithName<Mesh>("mesh", vertices, indices);
+    auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
     scene->add(mesh);
 
@@ -129,6 +130,7 @@ int main()
 
     glfwTerminate();
     Engine::destroy();
+    return 0;
 }
 
 void processInput(GLFWwindow* window)

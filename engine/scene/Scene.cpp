@@ -1,25 +1,25 @@
 #include "Scene.h"
 #include "Node.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
 
 using namespace coral;
 
 Scene::Scene()
-    : top_node(ObjectManager::create<Node>())
+    : top_node(ObjectFactory::create<Node>())
 {
 }
 
-void Scene::add(std::shared_ptr<Node> node)
+void Scene::add(Handle<Node> node)
 {
     top_node->children.add(node);
 }
 
-void Scene::remove(std::shared_ptr<Node> node)
+void Scene::remove(Handle<Node> node)
 {
     top_node->children.remove(node);
 }
 
-std::shared_ptr<Node> Scene::getTopNode() const
+Handle<Node> Scene::getTopNode() const
 {
     return top_node;
 }

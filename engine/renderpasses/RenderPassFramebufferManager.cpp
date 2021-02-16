@@ -1,6 +1,6 @@
 #include "RenderPassFramebufferManager.h"
+#include "ObjectFactory.h"
 #include "resources/Framebuffer.h"
-#include "ObjectManager.h"
 #include "resources/Resource.h"
 
 using namespace coral;
@@ -22,16 +22,12 @@ bool operator==(std::vector<FramebufferResource> a, const std::vector<Framebuffe
     return true;
 }
 
-RenderPassFramebufferManager::RenderPassFramebufferManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
-{
-}
-
 void RenderPassFramebufferManager::clear()
 {
     instance->framebuffers.clear();
 }
 
-std::shared_ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::vector<FramebufferResource>& resources)
+Handle<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::vector<FramebufferResource>& resources)
 {
     if (resources.empty())
     {
@@ -46,7 +42,7 @@ std::shared_ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(con
         }
     }
 
-    std::shared_ptr<Framebuffer> framebuffer = ObjectManager::create<Framebuffer>();
+    Handle<Framebuffer> framebuffer = ObjectFactory::create<Framebuffer>();
     for (const auto& resource : resources)
     {
         framebuffer->addResource(resource);

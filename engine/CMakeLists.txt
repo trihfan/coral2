@@ -10,6 +10,7 @@ link_directories(engine ${lib_output_directory})
 file(GLOB_RECURSE sources *.h *.cpp *.c)
 set_folder_structure("${sources}" ${engine_path})
 add_library(engine STATIC ${sources})
+#target_precompile_headers(engine PRIVATE pch.h)
 
 # includes
 target_include_directories(engine PUBLIC "${engine_path}")

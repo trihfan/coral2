@@ -1,5 +1,5 @@
 #include "Shader.h"
-#include "ObjectManager.h"
+#include "ObjectFactory.h"
 #include "utils/FileUtils.h"
 #include "utils/Logs.h"
 
@@ -176,7 +176,7 @@ void ShaderManager::addShaderPath(const std::filesystem::path& path)
     paths.push_back(path);
 }
 
-std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
+Handle<Shader> ShaderManager::getShader(const std::string& name)
 {
     auto it = instance->shaders.find(name);
     if (it != instance->shaders.end())
@@ -188,7 +188,7 @@ std::shared_ptr<Shader> ShaderManager::getShader(const std::string& name)
     return nullptr;
 }
 
-ShaderManager::ShaderManager(std::shared_ptr<std::pmr::memory_resource> memory_resource)
+ShaderManager::ShaderManager()
 {
     // load shaders
     for (const std::filesystem::path& path : paths)
@@ -218,7 +218,7 @@ void ShaderManager::iterateFolder(const std::filesystem::path& path)
                 std::string name = entry.path().stem().string();
                 if (!shaders[name])
                 {
-                    shaders[name] = ObjectManager::createWithName<Shader>(name);
+                    shaders[name] = ObjectFactory::createWithName<Shader>(name);
                 }
                 shaders[name]->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
             }

@@ -1,11 +1,11 @@
+#include "Engine.h"
+#include "NvEncoder/NvEncoderGL.h"
+#include "Object.h"
+#include "ObjectFactory.h"
 #include "glad/glad.h"
 #include "glad/glad_egl.h"
-#include "Engine.h"
-#include "Object.h"
-#include "ObjectManager.h"
-#include "resources/Shader.h"
 #include "materials/BasicMaterial.h"
-#include "NvEncoder/NvEncoderGL.h"
+#include "resources/Shader.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/Camera.h"
@@ -271,18 +271,18 @@ bool setupEngine()
     Engine::create();
 
     // scene
-    auto scene = ObjectManager::createWithName<Scene>("scene");
+    auto scene = ObjectFactory::createWithName<Scene>("scene");
     SceneManager::setCurrentScene(scene);
 
     // camera
-    auto camera = ObjectManager::createWithName<Camera>("camera");
+    auto camera = ObjectFactory::createWithName<Camera>("camera");
     camera->setPerspective(45.f, glm::vec4(0, 0, 800, 600), glm::vec2(0.1f, 100.f));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
     scene->add(camera);
 
     // material
-    auto material = ObjectManager::createWithName<BasicMaterial>("material");
+    auto material = ObjectFactory::createWithName<BasicMaterial>("material");
     material->ambient = glm::vec3(0.1, 0.1, 0.1);
     material->diffuse = glm::vec3(0.1, 0.8, 0.3);
     material->specular = glm::vec3(0.8, 0.8, 0.8);
@@ -302,7 +302,7 @@ bool setupEngine()
     std::iota(indices.begin(), indices.end(), 0);
 
     // mesh
-    auto mesh = ObjectManager::createWithName<Mesh>("mesh", vertices, indices);
+    auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
     scene->add(mesh);
     return true;

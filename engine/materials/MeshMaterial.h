@@ -1,11 +1,11 @@
 #ifndef MESH_MATERIAL_H
 #define MESH_MATERIAL_H
 
+#include "Material.h"
+#include <glad/glad.h>
 #include <memory>
 #include <string>
 #include <vector>
-#include <glad/glad.h>
-#include "Material.h"
 
 namespace coral
 {
@@ -21,12 +21,13 @@ namespace coral
     {
     public:
         MeshMaterial(const std::vector<Texture>& textures);
+
         virtual void use(const RenderParameters& parameters) override;
 
-    private:
+    protected:
         std::vector<Texture> textures;
         std::vector<GLuint> texture_ids;
-        std::shared_ptr<Shader> shader;
+        Handle<Shader> shader;
     };
 }
 #endif

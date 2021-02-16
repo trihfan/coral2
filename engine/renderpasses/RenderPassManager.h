@@ -1,7 +1,7 @@
 #ifndef RENDERPASSMANAGER_H
 #define RENDERPASSMANAGER_H
 
-#include "memory_resource.h"
+#include "Object.h"
 #include "utils/Singleton.h"
 #include <map>
 #include <memory>
@@ -36,7 +36,7 @@ namespace coral
         /**
          * @brief Add a render pass
          */
-        static void addRenderPass(std::shared_ptr<RenderPass> renderPass);
+        static void addRenderPass(Handle<RenderPass> renderPass);
 
         /**
          * @brief Remove a render pass
@@ -46,18 +46,15 @@ namespace coral
         /**
          * @brief Return the renderpass for the given id
          */
-        static std::shared_ptr<RenderPass> getRenderPass(const std::string& name);
+        static Handle<RenderPass> getRenderPass(const std::string& name);
 
         /**
          * @brief Return the renderpasses ordered by render order
          */
-        static const std::vector<std::shared_ptr<RenderPass>>& getOrderedRenderPasses();
+        static const std::vector<Handle<RenderPass>>& getOrderedRenderPasses();
 
     private:
-        /**
-         * @brief Constructor
-         */
-        RenderPassManager(std::shared_ptr<std::pmr::memory_resource> memory_resource);
+        RenderPassManager() = default;
 
         /**
          * @brief Bake the render graph
@@ -66,10 +63,10 @@ namespace coral
 
     private:
         // The renderpasses list
-        std::vector<std::shared_ptr<RenderPass>> renderPasses;
+        std::vector<Handle<RenderPass>> renderPasses;
 
         // Ordered renderpasses by render priority
-        std::vector<std::shared_ptr<RenderPass>> orderedRenderPasses;
+        std::vector<Handle<RenderPass>> orderedRenderPasses;
     };
 }
 #endif
