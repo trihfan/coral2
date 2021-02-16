@@ -1,29 +1,36 @@
 #ifndef OBJECTFACTORYDATA_H
 #define OBJECTFACTORYDATA_H
 
+#include "utils/concurrentqueue.h"
+#include <thread>
 #include <vector>
 
 namespace coral
 {
     class Object;
+
     template <typename ObjectType>
     class Handle;
-
-    class SafeList
-    {
-    public:
-        void push_back();
-    };
 
     /**
      * @brief Data for the Object factory
      */
-    class ObjectFactoryData
+    struct ObjectFactoryData
     {
-    public:
-        static std::vector<Handle<Object>> objects;
-        static std::vector<Handle<Object>> initializeList;
-        static std::vector<Handle<Object>> releaseList;
+        // Object pool, todo data structure
+        std::vector<Handle<Object>> objects;
+
+        // Initialize and release queues
+        moodycamel::ConcurrentQueue<Handle<Object>> initializeList;
+        moodycamel::ConcurrentQueue<Handle<Object>> releaseList;
+
+        static ObjectFactoryData* instance;
+        ObjectFactoryData()
+            : initializeList(1000)
+            , releaseList(1000)
+        {
+            objects.reserve(1000);
+        }
     };
 }
 #endif

@@ -130,7 +130,7 @@ namespace coral
             uint32_t count = this->sharedMemory->useCount.fetch_sub(1, std::memory_order_acquire);
             if (count == 2)
             {
-                ObjectFactoryData::releaseList.push_back(*this);
+                ObjectFactoryData::instance->releaseList.enqueue(*this);
             }
         }
 
@@ -139,7 +139,11 @@ namespace coral
         this->sharedMemory = sharedMemory;
         if (this->sharedMemory)
         {
-            dynamic_cast<HandleFromThis*>(data)->sharedMemoryPtr = sharedMemory;
+            auto handleFromThis = dynamic_cast<HandleFromThis*>(data);
+            if (handleFromThis && handleFromThis->sharedMemoryPtr != sharedMemory)
+            {
+                handleFromThis->sharedMemoryPtr = sharedMemory;
+            }
             this->sharedMemory->useCount.fetch_add(1, std::memory_order_release);
         }
     }

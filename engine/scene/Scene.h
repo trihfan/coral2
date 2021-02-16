@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "pch.h"
+#include "Object.h"
 
 namespace coral
 {

@@ -3,7 +3,6 @@
 
 #include "RenderParameters.h"
 #include "backend/interfaces/Backend.h"
-#include "pch.h"
 #include "utils/Singleton.h"
 #include <chrono>
 #include <memory>

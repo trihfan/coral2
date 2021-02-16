@@ -13,6 +13,7 @@ namespace coral
     struct HandleSharedMemory
     {
         std::atomic<uint32_t> useCount = 0;
+        uint64_t index;
     };
 
     /**
@@ -59,11 +60,19 @@ namespace coral
         void destroy();
     };
 
+    /**
+     * @brief The class HandleFromThis allow any class deriving from it to call toHandle
+     * to obtain an handle from the class ptr
+     */
     class HandleFromThis
     {
     public:
+        // Destructor
         virtual ~HandleFromThis() = default;
 
+        /**
+         * @brief Return an handle of type ObjectType for this object
+         */
         template <typename ObjectType>
         inline Handle<ObjectType> toHandle() const;
 

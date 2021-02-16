@@ -7,72 +7,81 @@
 
 using namespace coral;
 
-std::vector<Handle<Object>> ObjectFactoryData::objects;
-std::vector<Handle<Object>> ObjectFactoryData::initializeList;
-std::vector<Handle<Object>> ObjectFactoryData::releaseList;
+std::atomic<uint64_t> ObjectFactory::counter(0);
+ObjectFactoryData* ObjectFactoryData::instance = nullptr;
+#define internalData ObjectFactoryData::instance
 
 DEFINE_SINGLETON(ObjectFactory)
+
+ObjectFactory::ObjectFactory()
+{
+    internalData = new ObjectFactoryData();
+}
 
 void ObjectFactory::release()
 {
     // Destroy all objects
-    for (auto object : ObjectFactoryData::objects)
+    for (const auto& object : internalData->objects)
     {
-        ObjectFactoryData::releaseList.push_back(object);
+        internalData->releaseList.enqueue(object);
     }
-    ObjectFactoryData::objects.clear();
     update();
+
+    delete ObjectFactoryData::instance;
 }
 
 void ObjectFactory::add(Handle<Object> object)
 {
-    ObjectFactoryData::objects.push_back(object);
-    ObjectFactoryData::initializeList.push_back(object);
+    internalData->initializeList.enqueue(object);
 }
 
 void ObjectFactory::remove(Handle<Object> object)
 {
     // Move to release list
-    ObjectFactoryData::releaseList.push_back(object);
-
-    // Erase from object list
-    auto it = std::find(ObjectFactoryData::objects.begin(), ObjectFactoryData::objects.end(), object);
-    if (it != ObjectFactoryData::objects.end())
-    {
-        ObjectFactoryData::objects.erase(it);
-    }
+    internalData->releaseList.enqueue(object);
 }
 
 void ObjectFactory::update()
 {
     // Initilize objects
-    for (auto object : ObjectFactoryData::initializeList)
+    Handle<Object> object;
+    while (internalData->initializeList.try_dequeue(object))
     {
-        if (object->state == Object::ObjectState::not_initialized)
+        if (*object && object->state == Object::ObjectState::not_initialized)
         {
             object->init();
             object->state = Object::ObjectState::initialized;
+
+            // Add to object pool
+            uint64_t index = object.sharedMemory->index;
+            if (index >= internalData->objects.size())
+            {
+                internalData->objects.resize(index);
+            }
+            internalData->objects[index] = object;
         }
     }
 
     // Release objects
     std::vector<std::pair<HandleSharedMemory*, Object*>> toDelete;
-    for (auto object : ObjectFactoryData::releaseList)
+    while (internalData->releaseList.try_dequeue(object))
     {
-        if (object->state == Object::ObjectState::initialized)
+        if (*object && object->state == Object::ObjectState::initialized)
         {
             object->release();
             object->state = Object::ObjectState::released;
 
             // Unallocate
             toDelete.push_back(std::make_pair(object.sharedMemory, object.data));
+
+            // Remove from object pool
+            uint64_t index = object.sharedMemory->index;
+            internalData->objects[index] = nullptr;
         }
     }
 
-    ObjectFactoryData::initializeList.clear();
-    ObjectFactoryData::releaseList.clear();
-
     // Deallocate
+    object = nullptr;
     for (const auto& pair : toDelete)
     {
         delete pair.first;

@@ -2,6 +2,7 @@
 #define OBJECTFACTORY_H
 
 #include "utils/Singleton.h"
+#include <atomic>
 #include <string>
 
 namespace coral
@@ -37,7 +38,11 @@ namespace coral
         static void update();
 
     private:
-        ObjectFactory() = default;
+        // Handle counter
+        static std::atomic<uint64_t> counter;
+
+        // Constructor
+        ObjectFactory();
 
         /**
          * @brief Add an object to be managed by the factory
@@ -66,10 +71,10 @@ namespace coral
         // allocate object
         ObjectType* object = new ObjectType(std::forward<Args>(args)...);
         HandleSharedMemory* sharedMemory = new HandleSharedMemory();
-
-        Handle<ObjectType> handle(object, sharedMemory);
+        sharedMemory->index = counter.fetch_add(1, std::memory_order_relaxed);
 
         // register object
+        Handle<ObjectType> handle(object, sharedMemory);
         instance->add(handle);
 
         // return created object

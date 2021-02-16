@@ -12,6 +12,8 @@
 #include <glad/glad.h>
 #include <numeric>
 
+#include "utils/concurrentqueue.h"
+
 using namespace coral;
 
 // variables
