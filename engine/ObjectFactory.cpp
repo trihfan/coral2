@@ -1,13 +1,15 @@
-#include "ObjectFactory.h"
 #include "Handle.h"
+#include "HandleImpl.h"
+// /\ Must be included before: ||
+// || ------------------------ \/
 #include "Object.h"
+#include "ObjectFactory.h"
 #include "ObjectFactoryData.h"
 #include "utils/Logs.h"
 #include <algorithm>
 
 using namespace coral;
 
-std::atomic<uint64_t> ObjectFactory::counter(0);
 bool ObjectFactoryData::isDestroyed = false;
 #define internalData ObjectFactoryData::get()
 
@@ -16,7 +18,6 @@ DEFINE_SINGLETON(ObjectFactory)
 
 void ObjectFactoryData::release()
 {
-    isDestroyed = true;
 }
 
 ObjectFactory::ObjectFactory()
@@ -27,9 +28,13 @@ ObjectFactory::ObjectFactory()
 void ObjectFactory::release()
 {
     // Destroy all objects
+    ObjectFactoryData::isDestroyed = true;
     for (const auto& object : internalData->objects)
     {
-        internalData->releaseList.enqueue(object);
+        if (object.sharedMemory)
+        {
+            internalData->releaseList.enqueue(object);
+        }
     }
     update();
 
@@ -53,18 +58,21 @@ void ObjectFactory::update()
     Handle<Object> object;
     while (internalData->initializeList.try_dequeue(object))
     {
-        if (*object && object->state == Object::ObjectState::not_initialized)
+        if (object->state == Object::ObjectState::not_initialized)
         {
             object->init();
             object->state = Object::ObjectState::initialized;
 
-            // Add to object pool
-            uint64_t index = object.sharedMemory->index;
-            if (index >= internalData->objects.size())
+            // Add space in the objects pool
+            if (internalData->freeIndex.empty())
             {
-                internalData->objects.resize(index);
+                internalData->extends();
             }
-            internalData->objects[index] = object;
+
+            // Insert the object
+            object.sharedMemory->index = internalData->freeIndex.front();
+            internalData->freeIndex.pop_front();
+            internalData->objects[object.sharedMemory->index] = object;
         }
     }
 
@@ -72,7 +80,7 @@ void ObjectFactory::update()
     std::vector<std::pair<HandleSharedMemory*, Object*>> toDelete;
     while (internalData->releaseList.try_dequeue(object))
     {
-        if (*object && object->state == Object::ObjectState::initialized)
+        if (object->state == Object::ObjectState::initialized)
         {
             object->release();
             object->state = Object::ObjectState::released;
@@ -83,6 +91,7 @@ void ObjectFactory::update()
             // Remove from object pool
             uint64_t index = object.sharedMemory->index;
             internalData->objects[index] = nullptr;
+            internalData->freeIndex.push_back(index);
         }
     }
 

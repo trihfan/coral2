@@ -2,17 +2,16 @@
 #include "Object.h"
 #include "ObjectFactory.h"
 #include "backend/opengl/OpenGLBackend.h"
+#include "backend/vulkan/VulkanBackend.h"
 #include "materials/BasicMaterial.h"
 #include "resources/Shader.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/Camera.h"
+#include "scene/light/PointLight.h"
 #include "scene/mesh/Mesh.h"
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <numeric>
-
-#include "utils/concurrentqueue.h"
 
 using namespace coral;
 
@@ -36,18 +35,43 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
+enum BackendType
+{
+    opengl,
+    vulkan
+};
+
 int main()
 {
+    BackendType type = opengl;
+
     // glfw: initialize and configure
     // ------------------------------0
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    if (type == opengl)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+    }
+    else if (type == vulkan)
+    {
+        if (!glfwVulkanSupported())
+        {
+            std::cout << "Vulkan not supported" << std::endl;
+            return -1;
+        }
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+        VulkanBackend* test = new VulkanBackend();
+        test->init();
+        test->destroy();
+        return 0;
+    }
 
     // glfw window creation
     // --------------------
@@ -83,9 +107,7 @@ int main()
 
     // material
     auto material = ObjectFactory::createWithName<BasicMaterial>("material");
-    material->ambient = glm::vec3(0.1, 0.1, 0.1);
-    material->diffuse = glm::vec3(0.1, 0.8, 0.3);
-    material->specular = glm::vec3(0.8, 0.8, 0.8);
+    material->color = glm::vec3(0.1, 0.8, 0.3);
     material->shininess = 128;
 
     // vertices
@@ -105,6 +127,23 @@ int main()
     auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
     scene->add(mesh);
+
+    // Lights
+    auto light1 = ObjectFactory::create<PointLight>();
+    light1->position = glm::vec3(0, -0.5, 3);
+    light1->color = glm::vec3(1, 1, 1);
+    light1->constant = 1;
+    light1->linear = 0.09f;
+    light1->quadratic = 0.032f;
+    scene->add(light1);
+
+    auto light2 = ObjectFactory::create<PointLight>();
+    light2->position = glm::vec3(0, 0.5, 3);
+    light2->color = glm::vec3(1, 1, 1);
+    light2->constant = 1;
+    light2->linear = 0.09f;
+    light2->quadratic = 0.032f;
+    scene->add(light2);
 
     // main loop
     // ------------------------------

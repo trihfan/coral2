@@ -8,7 +8,9 @@ namespace coral
     class PointLight : public Light
     {
     public:
-    private:
+        Property<float> constant;
+        Property<float> linear;
+        Property<float> quadratic;
     };
 }
 #endif

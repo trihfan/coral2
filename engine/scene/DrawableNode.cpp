@@ -1,5 +1,6 @@
 #include "DrawableNode.h"
 #include "Engine.h"
+#include "materials/Material.h"
 
 using namespace coral;
 

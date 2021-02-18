@@ -1,9 +1,10 @@
 #include "SceneManager.h"
 #include "DrawableNode.h"
 #include "Node.h"
+#include "RenderParameters.h"
 #include "Scene.h"
 #include "camera/Camera.h"
-#include "light/Light.h"
+#include "light/PointLight.h"
 #include "materials/Material.h"
 #include "renderpasses/RenderPass.h"
 #include <functional>
@@ -16,7 +17,7 @@ void SceneManager::release()
 {
 }
 
-void SceneManager::update(const RenderParameters& parameters)
+void SceneManager::update()
 {
     // check scene
     if (!instance->currentScene)
@@ -24,7 +25,7 @@ void SceneManager::update(const RenderParameters& parameters)
         return;
     }
 
-    // list cameras and lights
+    // list cameras
     instance->cameras.clear();
     instance->lights.clear();
 
@@ -33,10 +34,6 @@ void SceneManager::update(const RenderParameters& parameters)
             if (node->isA<Camera>())
             {
                 instance->cameras.push_back(node->toHandle<Camera>());
-            }
-            else if (node->isA<Light>())
-            {
-                instance->lights.push_back(node->toHandle<Light>());
             }
             return true;
         });
@@ -60,7 +57,7 @@ const std::vector<Handle<Camera>>& SceneManager::getCameras()
     return instance->cameras;
 }
 
-std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(const RenderParameters& parameters)
+std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(RenderParameters& parameters)
 {
     std::unordered_map<std::string, RenderQueue> queues;
 
@@ -71,7 +68,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     }
 
     // Fill queues with visible nodes
-    traverse(instance->currentScene->getTopNode(), [&queues](Handle<Node> node) {
+    traverse(instance->currentScene->getTopNode(), [&queues, &parameters](Handle<Node> node) {
         if (node->isDrawable())
         {
             auto drawableNode = node->toHandle<DrawableNode>();
@@ -82,6 +79,12 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
                 render_queue.shaderMap[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
                 render_queue.materialMap[drawableNode->getMaterial()].push_back(drawableNode);
             }
+        }
+
+        // tmp while no culling
+        if (node->isA<PointLight>())
+        {
+            parameters.lights.pointLights.push_back(node->toHandle<PointLight>());
         }
         return true;
     });

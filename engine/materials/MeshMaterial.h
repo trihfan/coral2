@@ -2,10 +2,11 @@
 #define MESH_MATERIAL_H
 
 #include "Material.h"
-#include <glad/glad.h>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

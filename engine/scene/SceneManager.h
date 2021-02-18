@@ -51,12 +51,12 @@ namespace coral
         /**
          * @brief Update all nodes of the scene
          */
-        static void update(const RenderParameters& parameters);
+        static void update();
 
         /**
          * @brief Build the render queues for the given parameters
          */
-        static std::unordered_map<std::string, RenderQueue> buildRenderQueuesFor(const RenderParameters& parameters);
+        static std::unordered_map<std::string, RenderQueue> buildRenderQueuesFor(RenderParameters& parameters);
 
     private:
         SceneManager() = default;

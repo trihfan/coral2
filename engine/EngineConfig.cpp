@@ -5,6 +5,7 @@
 #include "renderpasses/RenderPassDefault.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassPresentation.h"
+#include "resources/Resource.h"
 
 using namespace coral;
 

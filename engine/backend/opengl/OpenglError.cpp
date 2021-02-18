@@ -1,5 +1,5 @@
-#include "Error.h"
-#include "Logs.h"
+#include "OpenglError.h"
+#include "utils/Logs.h"
 
 using namespace coral;
 

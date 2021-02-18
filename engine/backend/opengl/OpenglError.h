@@ -1,8 +1,9 @@
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef OPENGLERROR_H
+#define OPENGLERROR_H
 
-#include "glad/glad.h"
 #include <string>
+
+#include "OpenGLBackend.h"
 
 #define CHECK_OPENGL_ERROR coral::OpenglError::check(std::string(__FILE__), std::string(__PRETTY_FUNCTION__), std::to_string(__LINE__));
 

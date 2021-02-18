@@ -2,6 +2,7 @@
 #include "EngineConfig.h"
 #include "Object.h"
 #include "ObjectFactory.h"
+#include "backend/opengl/OpenglError.h"
 #include "materials/Material.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassFramebufferManager.h"
@@ -12,10 +13,16 @@
 #include "scene/Node.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
-#include "utils/Error.h"
+#include "scene/camera/Camera.h"
 #include <new>
 
 using namespace coral;
+
+void RenderParameters::clear()
+{
+    camera = nullptr;
+    lights = LightArray();
+}
 
 DEFINE_SINGLETON(Engine)
 
@@ -65,15 +72,14 @@ void Engine::frame()
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
     // Update managers
-    currentParameters.camera = nullptr;
-    SceneManager::update(currentParameters);
+    SceneManager::update();
     RenderPassManager::update(currentParameters);
     ObjectFactory::update(); // finish with object manager update to allocate the gl data
 
     // Draw
-    for (auto camera : SceneManager::getCameras())
+    for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
     {
-        currentParameters.camera = camera;
+        currentParameters.camera = SceneManager::getCameras()[i];
 
         // Cull
         auto queues = SceneManager::buildRenderQueuesFor(currentParameters);
@@ -84,5 +90,7 @@ void Engine::frame()
             auto it = queues.find(renderpass->getName());
             renderpass->render(it->second, currentParameters);
         }
+
+        currentParameters.clear();
     }
 }

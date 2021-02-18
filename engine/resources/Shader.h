@@ -5,11 +5,12 @@
 #include "utils/Singleton.h"
 #include <array>
 #include <filesystem>
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <unordered_map>
 #include <variant>
+
+#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

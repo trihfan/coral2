@@ -1,5 +1,4 @@
 #include "Logs.h"
-#include "rang.hpp"
 
 using namespace coral;
 
@@ -12,7 +11,7 @@ Logs::Logs(LogType type) : type(type)
 
 Logs::~Logs()
 {
-    *this << rang::style::reset << rang::fg::reset << std::endl;
+    *this << "\033[0m" << std::endl;
 }
 
 Logs& Logs::operator<<(coutManipulator manip)
@@ -26,29 +25,27 @@ void Logs::setColor(LogType type)
     switch (type)
     {
     case error:
-        write(rang::fg::red);
+        write("\033[31m");
         break;
 
     case warning:
-        write(rang::fg::yellow);
+        write("\033[33m");
         break;
 
     case info:
-        write(rang::fg::cyan);
+        write("\033[36m");
         break;
 
     case success:
-        write(rang::fg::green);
-        write(rang::style::bold);
+        write("\033[32m");
         break;
 
     case fail:
-        write(rang::fg::red);
-        write(rang::style::bold);
+        write("\033[31m");
         break;
 
     case debug:
-        write(rang::fg::magenta);
+        write("\033[35m");
         break;
     }
 }

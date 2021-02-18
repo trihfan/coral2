@@ -1,30 +1,40 @@
 #version 330 core
 
-#define LIGHTS_COUNT 32
+#define LIGHT_MAX 32
 
 struct Material
 {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 color;
     float shininess;
 };
 
-struct Light
+struct PointLight
 {
     vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+    vec3 color;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+struct AmbientLight
+{
+    float t;
 };
 
 in vec3 fPosition;
 in vec3 fNormal;
+//in vec2 fTextureCoordinates;
 out vec4 fColor;
 
 uniform vec3 viewPosition;
 uniform Material material;
-uniform Light light;
+
+// Lighting
+uniform PointLight pointLights[LIGHT_MAX];
+uniform int pointLightCount;
+
+uniform AmbientLight ambientLight;
 
 void main()
 {
@@ -32,19 +42,30 @@ void main()
     vec3 normal = normalize(fNormal);
     vec3 viewDirection = normalize(viewPosition - fPosition);
 
-    // ambient
-    vec3 ambient = light.ambient * material.ambient;
+    // Ambient
+    vec3 result = material.color * 0.1;
 
-    // diffuse
-    vec3 lightDir = normalize(light.position - fPosition);
-    float diff = max(dot(normal, lightDir), 0);
-    vec3 diffuse = light.diffuse * (diff * material.diffuse);
+    // Point lights
+    for (int i = 0; i < pointLightCount; i++)
+    {
+        vec3 lightDir = normalize(pointLights[i].position - fPosition);
 
-    // specular
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDirection, reflectDir), 0), material.shininess);
-    vec3 specular = light.specular * (spec * material.specular);
+        // diffuse
+        float diff = max(dot(normal, lightDir), 0);
 
-    vec3 result = ambient + diffuse + specular;
+        // specular shading
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float spec = pow(max(dot(viewDirection, reflectDir), 0.0), material.shininess);
+
+        // attenuation
+        float distance = length(pointLights[i].position - fPosition);
+        float attenuation = 1.0 / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
+
+        vec3 diffuse = pointLights[i].color * diff;
+        vec3 specular = pointLights[i].color * spec;
+
+        result += (diffuse + specular) * material.color * attenuation;
+    }
+
     fColor = vec4(result, 1);
 }

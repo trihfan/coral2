@@ -3,6 +3,8 @@
 
 #include "utils/Singleton.h"
 #include "utils/concurrentqueue.h"
+#include <list>
+#include <numeric>
 #include <thread>
 #include <vector>
 
@@ -25,6 +27,7 @@ namespace coral
 
         // Object pool, todo data structure
         std::vector<Handle<Object>> objects;
+        std::list<uint32_t> freeIndex;
 
         // Initialize and release queues
         moodycamel::ConcurrentQueue<Handle<Object>> initializeList;
@@ -34,10 +37,18 @@ namespace coral
 
         // Construction
         ObjectFactoryData()
-            : initializeList(1000)
-            , releaseList(1000)
         {
-            objects.reserve(1000);
+            extends();
+        }
+
+        void extends()
+        {
+            size_t start = objects.size();
+            objects.resize(start + 1000);
+            for (uint32_t i = static_cast<uint32_t>(start); i < objects.size(); i++)
+            {
+                freeIndex.push_back(i);
+            }
         }
     };
 }

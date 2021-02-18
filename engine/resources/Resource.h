@@ -3,7 +3,8 @@
 
 #include "Object.h"
 #include "Property.h"
-#include "glad/glad.h"
+
+#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

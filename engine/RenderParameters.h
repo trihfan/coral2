@@ -40,6 +40,8 @@ namespace coral
         // Viewport
         int width;
         int height;
+
+        void clear();
     };
 }
 #endif

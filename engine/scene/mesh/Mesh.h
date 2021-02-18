@@ -2,11 +2,12 @@
 #define MESH_H
 
 #include "scene/DrawableNode.h"
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

@@ -2,8 +2,9 @@
 #define FRAMEBUFFER_H
 
 #include "Object.h"
-#include "glad/glad.h"
 #include <vector>
+
+#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

@@ -1,17 +1,19 @@
 #include "OpenGLBackend.h"
 #include "utils/Logs.h"
-#include <glad/glad.h>
 
 using namespace coral;
 
 bool OpenGLBackend::init()
 {
-    if (!gladLoadGL())
+#ifndef __EMSCRIPTEN__
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        Logs(error) << "Failed to initialize GLAD";
+        Logs(error) << "Glew init error " << glewGetErrorString(err);
         return false;
     }
-
+    Logs(success) << "Using glew " << glewGetString(GLEW_VERSION);
+#endif
     return true;
 }
 

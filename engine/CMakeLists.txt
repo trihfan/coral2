@@ -1,32 +1,39 @@
 project(engine)
 
-# externals
-find_package(OpenGL REQUIRED)
-
-# link directories
-link_directories(engine ${lib_output_directory})
-
-# make lib
+# Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
 set_folder_structure("${sources}" ${engine_path})
+
+# Make lib
 add_library(engine STATIC ${sources})
-
-# includes
 target_include_directories(engine PUBLIC "${engine_path}")
-target_include_directories(engine PUBLIC "${glm_path}")
 
-# dependencies
-target_link_libraries(engine PUBLIC ${CMAKE_DL_LIBS})
-
-if(EMSCRIPTEN)
-    target_link_libraries(engine PUBLIC OPENGL_gl_LIBRARY)    
-else()
-    target_link_libraries(engine PUBLIC OpenGL::GL)   
+# OpenGL
+if(ENABLE_OPENGL)
+    find_package(OpenGL REQUIRED)
+    if(NOT EMSCRIPTEN)
+        target_link_libraries(engine PUBLIC OpenGL::GL)
+        find_package(GLEW REQUIRED)
+        target_include_directories(engine PUBLIC ${GLEW_INCLUDE_DIRS})
+        target_link_libraries(engine PUBLIC GLEW::GLEW)
+    endif()
 endif()
 
+# Vulkan
+if(ENABLE_VULKAN AND NOT EMSCRIPTEN)
+    find_package(Vulkan REQUIRED)
+    option(USE_VALIDATION_LAYERS "use vulkan validation layers" OFF)
+    if (USE_VALIDATION_LAYERS)
+        add_definitions(-DUSE_VALIDATION_LAYERS)
+    endif()
+    target_link_libraries(engine PUBLIC Vulkan::Vulkan)
+endif()
+
+# glm
+target_include_directories(engine PUBLIC "${glm_path}")
 add_dependencies(engine glm)
 
-# set output directories
+# Set output directories
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(engine PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${bin_output_directory})

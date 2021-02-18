@@ -13,30 +13,31 @@ BasicMaterial::BasicMaterial()
 
 void BasicMaterial::use(const RenderParameters& parameters)
 {
-    // matrix
+    // Matrix
     shader->setMat4("model", glm::mat4(1));
     shader->setMat4("view", parameters.camera->getViewProjectionMatrix());
     shader->setVec3("viewPosition", parameters.camera->getWorldPosition());
 
-    // lights
-    shader->setVec3("light.position", parameters.camera->getWorldPosition());
-    shader->setVec3("light.ambient", glm::vec3(1, 1, 1));
-    shader->setVec3("light.diffuse", glm::vec3(1, 1, 1));
-    shader->setVec3("light.specular", glm::vec3(1, 1, 1));
-    /*shader->setInt("lightCount", std::min(static_cast<int>(parameters.lights.size()), 32));
-    for (size_t i = 0; i < parameters.lights.size(); i++)
+    // Point lights
+    size_t lightCount = std::min(parameters.lights.pointLights.size(), static_cast<size_t>(32));
+    shader->setInt("pointLightCount", static_cast<int>(lightCount));
+    for (size_t i = 0; i < lightCount; i++)
     {
-        auto light = parameters.lights[i];
-        std::string lightStr = "light[" + std::to_string(i) + "]";
+        const auto& light = parameters.lights.pointLights[i];
+        std::string lightStr = "pointLights[" + std::to_string(i) + "]";
         shader->setVec3(lightStr + ".position", *light->position);
-        shader->setVec3(lightStr + ".ambient", *light->ambient);
-        shader->setVec3(lightStr + ".diffuse", *light->diffuse);
-        shader->setVec3(lightStr + ".specular", *light->specular);
-    }*/
+        shader->setVec3(lightStr + ".color", *light->color);
+        shader->setFloat(lightStr + ".constant", *light->constant);
+        shader->setFloat(lightStr + ".linear", *light->linear);
+        shader->setFloat(lightStr + ".quadratic", *light->quadratic);
+    }
 
-    // material
-    shader->setVec3("material.ambient", *ambient);
-    shader->setVec3("material.diffuse", *diffuse);
-    shader->setVec3("material.specular", *specular);
+    // Ambient light
+    if (!parameters.lights.areaLights.empty())
+    {
+    }
+
+    // Material
+    shader->setVec3("material.color", *color);
     shader->setFloat("material.shininess", *shininess);
 }

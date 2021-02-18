@@ -2,6 +2,7 @@ project (viewer)
 
 # externals
 find_package(glfw3 CONFIG REQUIRED)
+add_definitions(-DGLFW_INCLUDE_VULKAN)
 
 # link directories
 link_directories(viewer ${lib_output_directory})

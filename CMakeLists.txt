@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # unity build
-set(CMAKE_UNITY_BUILD ON)
+#set(CMAKE_UNITY_BUILD ON)
 
 # project
 set(version "1.0.0")
@@ -11,7 +11,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # use c++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -std=c++17")
-
 if(UNIX AND NOT APPLE)
         set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -lstdc++")
 endif()
@@ -22,6 +21,16 @@ include(folder_structure)
 
 # Python 3
 find_package(Python3 REQUIRED)
+
+# Options
+option(ENABLE_OPENGL "enable opengl backend" ON)
+option(ENABLE_VULKAN "enable vulkan backend" ON)
+
+# Emscripten
+if(EMSCRIPTEN)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_WEBGL2=1 -s WASM=1 -s USE_PTHREADS=1")
+endif()
 
 # define output directories
 set(lib_output_directory ${PROJECT_BINARY_DIR}/lib)

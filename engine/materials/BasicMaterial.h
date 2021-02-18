@@ -17,9 +17,7 @@ namespace coral
         virtual void use(const RenderParameters& parameters) override;
 
         // uniforms
-        Property<glm::vec3> ambient;
-        Property<glm::vec3> diffuse;
-        Property<glm::vec3> specular;
+        Property<glm::vec3> color;
         Property<float> shininess;
     };
 }

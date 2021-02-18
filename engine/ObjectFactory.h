@@ -38,9 +38,6 @@ namespace coral
         static void update();
 
     private:
-        // Handle counter
-        static std::atomic<uint64_t> counter;
-
         // Constructor
         ObjectFactory();
 
@@ -71,7 +68,6 @@ namespace coral
         // allocate object
         ObjectType* object = new ObjectType(std::forward<Args>(args)...);
         HandleSharedMemory* sharedMemory = new HandleSharedMemory();
-        sharedMemory->index = counter.fetch_add(1, std::memory_order_relaxed);
 
         // register object
         Handle<ObjectType> handle(object, sharedMemory);

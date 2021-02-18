@@ -1,6 +1,6 @@
 #include "Framebuffer.h"
 #include "Resource.h"
-#include "utils/Error.h"
+#include "backend/opengl/OpenglError.h"
 
 using namespace coral;
 

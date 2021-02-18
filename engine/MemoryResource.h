@@ -1,7 +1,7 @@
 #ifndef MEMORYRESOURCE_H
 #define MEMORYRESOURCE_H
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #include <experimental/memory_resource>
 namespace std
 {

@@ -2,6 +2,7 @@
 #define OPENGLBACKEND_H
 
 #include "backend/interfaces/Backend.h"
+#include <GL/glew.h>
 
 namespace coral
 {
