@@ -86,7 +86,7 @@ int main()
     std::unique_ptr<Backend> backend;
     if (type == opengl)
     {
-        backend = std::make_unique<OpenGLBackend>();
+        backend = std::make_unique<OpenglBackend>();
     }
     else if (type == vulkan)
     {

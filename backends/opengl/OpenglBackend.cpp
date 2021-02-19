@@ -1,9 +1,9 @@
-#include "OpenGLBackend.h"
+#include "OpenglBackend.h"
 #include "Logs.h"
 
 using namespace coral;
 
-bool OpenGLBackend::init()
+bool OpenglBackend::init()
 {
 #ifndef __EMSCRIPTEN__
     GLenum err = glewInit();
@@ -17,12 +17,12 @@ bool OpenGLBackend::init()
     return true;
 }
 
-bool OpenGLBackend::destroy()
+bool OpenglBackend::destroy()
 {
     return true;
 }
 
-bool OpenGLBackend::resize(int width, int height)
+bool OpenglBackend::resize(int width, int height)
 {
     return true;
 }

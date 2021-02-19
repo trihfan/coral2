@@ -5,6 +5,7 @@
 #include "VulkanValidation.h"
 #include <algorithm>
 #include <set>
+#include <cstring>
 
 using namespace coral;
 

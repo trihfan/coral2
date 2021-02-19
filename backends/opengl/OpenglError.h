@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "OpenGLBackend.h"
+#include <GL/glew.h>
 
 #if _WIN32
 #define CHECK_OPENGL_ERROR coral::OpenglError::check(std::string(__FILE__), std::string(__FUNCSIG__), std::to_string(__LINE__));

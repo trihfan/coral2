@@ -9,7 +9,7 @@
 *
 */
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 #include "NvEncoderGL.h"
 
