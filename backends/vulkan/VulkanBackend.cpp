@@ -1,8 +1,9 @@
 #include "VulkanBackend.h"
+#include "CoralException.h"
+#include "Logs.h"
 #include "VulkanError.h"
 #include "VulkanValidation.h"
-#include "utils/CoralException.h"
-#include "utils/Logs.h"
+#include <algorithm>
 #include <set>
 
 using namespace coral;
@@ -132,7 +133,7 @@ void VulkanBackend::createSwapchain()
 
     // Number of images in the swap chain, min image + 1 for being able to do triple buffering
     uint32_t imageCount = swapchainDetails.surfaceCapabilities.minImageCount + 1;
-    if (swapchainDetails.surfaceCapabilities.maxImageCount > 0 and imageCount > swapchainDetails.surfaceCapabilities.maxImageCount)
+    if (swapchainDetails.surfaceCapabilities.maxImageCount > 0 && imageCount > swapchainDetails.surfaceCapabilities.maxImageCount)
     {
         imageCount = swapchainDetails.surfaceCapabilities.maxImageCount;
     }
@@ -155,7 +156,7 @@ void VulkanBackend::createSwapchain()
     // Get queue family indices
     QueueFamilyIndices indices = getQueueFamilies(mainDevice.physicalDevice);
 
-    // If graphics and presentation family are different, then swapchain image must be shared between queue families
+    // If graphics && presentation family are different, then swapchain image must be shared between queue families
     if (indices.graphicsFamily != indices.graphicsFamily)
     {
         uint32_t queueFamilyIndices[] = { static_cast<uint32_t>(indices.graphicsFamily), static_cast<uint32_t>(indices.graphicsFamily) };
@@ -244,7 +245,7 @@ void VulkanBackend::createLogicalDevice()
         queueCreateInfo.queueFamilyIndex = static_cast<uint32_t>(queueFamilyIndex); // The index of the family to create a queue from
         queueCreateInfo.queueCount = 1; // Number of queues to create
         float priority = 1.0f;
-        queueCreateInfo.pQueuePriorities = &priority; // Vulkan needs to know how to handle multiple queues, so decide priority (1 = highest priority)
+        queueCreateInfo.pQueuePriorities = &priority; // Vulkan needs to know how to h&&le multiple queues, so decide priority (1 = highest priority)
         queueCreateInfos.push_back(queueCreateInfo);
     }
 
@@ -268,7 +269,7 @@ void VulkanBackend::createLogicalDevice()
     }
 
     // Queues are created at the same time as the device...
-    // So we want handle to queues
+    // So we want h&&le to queues
     // From given logical device, of given Queue Family, of given Queue Index (0 since only one queue), place reference in given VkQueue
     vkGetDeviceQueue(mainDevice.logicalDevice, static_cast<uint32_t>(indices.graphicsFamily), 0, &graphicsQueue);
     vkGetDeviceQueue(mainDevice.logicalDevice, static_cast<uint32_t>(indices.presentationFamily), 0, &presentationQueue);
@@ -372,10 +373,10 @@ bool VulkanBackend::checkDeviceSuitable(VkPhysicalDevice device)
 
     // Get swap chain details
     SwapchainDetails swapChainDetails = getSwapChainDetails(device);
-    bool swapChainValid = !swapChainDetails.presentationModes.empty() and !swapChainDetails.formats.empty();
+    bool swapChainValid = !swapChainDetails.presentationModes.empty() && !swapChainDetails.formats.empty();
 
     // Check validity
-    if (deviceExtensionSupport and indices.isValid() and swapChainValid)
+    if (deviceExtensionSupport && indices.isValid() && swapChainValid)
     {
         Logs(info) << deviceProperties.deviceName << " selected";
         return true;
@@ -394,12 +395,12 @@ QueueFamilyIndices VulkanBackend::getQueueFamilies(VkPhysicalDevice device)
     std::vector<VkQueueFamilyProperties> queueFamilyList(queueFamilyCount);
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilyList.data());
 
-    // Go through each queue family and check if it has at least 1 of the required types of queue
+    // Go through each queue family && check if it has at least 1 of the required types of queue
     int i = 0;
     for (const auto& queueFamily : queueFamilyList)
     {
         // First check if queue family has at least 1 queue in that family (could have no queues)
-        // Queue can be multiple types defined through bitfield. Need to bitwise AND with VK_QUEUE_*_BIT to check if has required type
+        // Queue can be multiple types defined through bitfield. Need to bitwise && with VK_QUEUE_*_BIT to check if has required type
         if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             indices.graphicsFamily = i; // If queue family is valid, then get index
@@ -408,7 +409,7 @@ QueueFamilyIndices VulkanBackend::getQueueFamilies(VkPhysicalDevice device)
         // Check if queue family support presentation
         VkBool32 presentationSupport = false;
         vkGetPhysicalDeviceSurfaceSupportKHR(device, static_cast<uint32_t>(i), surface, &presentationSupport);
-        if (queueFamily.queueCount > 0 and presentationSupport)
+        if (queueFamily.queueCount > 0 && presentationSupport)
         {
             indices.presentationFamily = i;
         }
@@ -456,7 +457,7 @@ SwapchainDetails VulkanBackend::getSwapChainDetails(VkPhysicalDevice device)
 VkSurfaceFormatKHR VulkanBackend::chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats)
 {
     // All formats available
-    if (formats.size() == 1 and formats[0].format == VK_FORMAT_UNDEFINED)
+    if (formats.size() == 1 && formats[0].format == VK_FORMAT_UNDEFINED)
     {
         return VkSurfaceFormatKHR { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR };
     }
@@ -464,7 +465,7 @@ VkSurfaceFormatKHR VulkanBackend::chooseBestSurfaceFormat(const std::vector<VkSu
     // Search for optimal format
     for (const auto& format : formats)
     {
-        if ((format.format == VK_FORMAT_R8G8B8A8_UNORM or format.format == VK_FORMAT_B8G8R8A8_UNORM) and format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        if ((format.format == VK_FORMAT_R8G8B8A8_UNORM || format.format == VK_FORMAT_B8G8R8A8_UNORM) && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             return format;
         }

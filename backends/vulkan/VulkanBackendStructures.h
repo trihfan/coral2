@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -23,7 +22,7 @@ namespace coral
         // Check if queue families are valid
         bool isValid()
         {
-            return graphicsFamily >= 0 and presentationFamily >= 0;
+            return graphicsFamily >= 0 && presentationFamily >= 0;
         }
     };
 

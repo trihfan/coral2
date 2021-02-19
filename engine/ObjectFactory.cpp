@@ -5,7 +5,7 @@
 #include "Object.h"
 #include "ObjectFactory.h"
 #include "ObjectFactoryData.h"
-#include "utils/Logs.h"
+#include "Logs.h"
 #include <algorithm>
 
 using namespace coral;

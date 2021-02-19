@@ -1,10 +1,10 @@
 #pragma once
 
+#include <gl/glew.h>
+
 #include "Material.h"
 #include "Property.h"
 #include <glm/glm.hpp>
-
-#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

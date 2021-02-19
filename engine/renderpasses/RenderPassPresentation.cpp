@@ -1,7 +1,7 @@
 #include "RenderPassPresentation.h"
 #include "Engine.h"
 #include "ObjectFactory.h"
-#include "backend/opengl/OpenglError.h"
+#include "OpenglError.h"
 #include "materials/PresentationMaterial.h"
 #include "resources/Resource.h"
 #include "resources/Shader.h"

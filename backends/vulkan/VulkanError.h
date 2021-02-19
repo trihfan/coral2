@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/Logs.h"
+#include "Logs.h"
 
 #ifndef USE_VALIDATION_LAYERS
 #define	VERIFY(R) R == VK_SUCCESS

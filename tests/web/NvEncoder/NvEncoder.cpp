@@ -9,8 +9,6 @@
 *
 */
 
-
-#include "glad/glad.h"
 #include "NvEncoder.h"
 
 #ifndef _WIN32

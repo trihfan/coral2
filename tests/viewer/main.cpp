@@ -1,8 +1,8 @@
 #include "Engine.h"
 #include "Object.h"
 #include "ObjectFactory.h"
-#include "backend/opengl/OpenGLBackend.h"
-#include "backend/vulkan/VulkanBackend.h"
+#include "OpenglBackend.h"
+#include "VulkanBackend.h"
 #include "materials/BasicMaterial.h"
 #include "resources/Shader.h"
 #include "scene/Scene.h"
@@ -43,7 +43,7 @@ enum BackendType
 
 int main()
 {
-    BackendType type = vulkan;
+    BackendType type = opengl;
 
     // glfw: initialize and configure
     // ------------------------------0
@@ -158,12 +158,6 @@ int main()
     // ------------------------------
     while (!glfwWindowShouldClose(window))
     {
-        // per-frame time logic
-        // --------------------
-        double currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
         // input
         // -----
         processInput(window);

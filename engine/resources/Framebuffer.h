@@ -1,9 +1,9 @@
 #pragma once
 
+#include <gl/glew.h>
+
 #include "Object.h"
 #include <vector>
-
-#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

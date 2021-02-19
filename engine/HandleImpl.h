@@ -2,7 +2,7 @@
 
 #include "MemoryResource.h"
 #include "ObjectFactoryData.h"
-#include "utils/Logs.h"
+#include "Logs.h"
 
 namespace coral
 {

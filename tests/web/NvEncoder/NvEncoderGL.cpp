@@ -9,8 +9,8 @@
 *
 */
 
+#include <gl/glew.h>
 
-#include "glad/glad.h"
 #include "NvEncoderGL.h"
 
 NvEncoderGL::NvEncoderGL(uint32_t nWidth, uint32_t nHeight, NV_ENC_BUFFER_FORMAT eBufferFormat,

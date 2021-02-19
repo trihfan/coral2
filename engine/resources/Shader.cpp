@@ -1,7 +1,7 @@
 #include "Shader.h"
 #include "ObjectFactory.h"
 #include "utils/FileUtils.h"
-#include "utils/Logs.h"
+#include "Logs.h"
 
 using namespace coral;
 

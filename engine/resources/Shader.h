@@ -1,7 +1,8 @@
 #pragma once
 
+#include <gl/glew.h>
+
 #include "Object.h"
-#include "backend/opengl/OpenGLBackend.h"
 #include "utils/Singleton.h"
 #include <array>
 #include <filesystem>

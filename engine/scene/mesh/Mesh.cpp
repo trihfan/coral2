@@ -1,6 +1,6 @@
 #include "Mesh.h"
 #include "materials/Material.h"
-#include "utils/Logs.h"
+#include "Logs.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

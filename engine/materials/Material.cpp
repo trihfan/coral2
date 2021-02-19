@@ -13,7 +13,7 @@ Handle<Shader> Material::getShader() const
     return shader;
 }
 
-#include "utils/Logs.h"
+#include "Logs.h"
 //#include <stb_image.h>
 unsigned int Material::textureFromFile(const std::string& path, bool gamma)
 {

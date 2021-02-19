@@ -1,11 +1,11 @@
 #pragma once
 
+#include <gl/glew.h>
+
 #include "Material.h"
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {

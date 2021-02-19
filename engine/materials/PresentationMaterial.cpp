@@ -1,6 +1,5 @@
 #include "PresentationMaterial.h"
 #include "Engine.h"
-#include "backend/opengl/OpenglError.h"
 #include "resources/Resource.h"
 #include "resources/Shader.h"
 #include "scene/camera/Camera.h"

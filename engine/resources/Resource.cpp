@@ -1,5 +1,5 @@
 #include "Resource.h"
-#include "backend/opengl/OpenglError.h"
+#include "OpenglError.h"
 
 using namespace coral;
 

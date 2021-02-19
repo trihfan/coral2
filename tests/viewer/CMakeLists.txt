@@ -13,7 +13,7 @@ set_folder_structure("${sources}" ${viewer_path})
 add_executable(viewer ${sources})
 
 # dependencies
-target_link_libraries(viewer engine glfw)
+target_link_libraries(viewer engine glfw opengl_backend vulkan_backend)
 
 # set output directories
 set_target_properties(viewer PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
