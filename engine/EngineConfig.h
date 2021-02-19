@@ -1,5 +1,4 @@
-#ifndef ENGINECONFIG_H
-#define ENGINECONFIG_H
+#pragma once
 
 #include "Property.h"
 
@@ -13,4 +12,3 @@ namespace coral
         static void setup();
     };
 }
-#endif

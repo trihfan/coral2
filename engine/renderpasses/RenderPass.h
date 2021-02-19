@@ -1,5 +1,4 @@
-#ifndef RENDERPASS_H
-#define RENDERPASS_H
+#pragma once
 
 #include "Object.h"
 #include "resources/Framebuffer.h"
@@ -56,4 +55,3 @@ namespace coral
         Handle<Framebuffer> framebuffer;
     };
 }
-#endif

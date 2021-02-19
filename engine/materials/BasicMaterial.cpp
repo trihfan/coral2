@@ -1,6 +1,7 @@
 #include "BasicMaterial.h"
 #include "Engine.h"
 #include "resources/Shader.h"
+#include "scene/Node.h"
 #include "scene/camera/Camera.h"
 #include <glm/gtx/transform.hpp>
 
@@ -13,8 +14,6 @@ BasicMaterial::BasicMaterial()
 
 void BasicMaterial::use(const RenderParameters& parameters)
 {
-    // Matrix
-    shader->setMat4("model", glm::mat4(1));
     shader->setMat4("view", parameters.camera->getViewProjectionMatrix());
     shader->setVec3("viewPosition", parameters.camera->getWorldPosition());
 
@@ -40,4 +39,10 @@ void BasicMaterial::use(const RenderParameters& parameters)
     // Material
     shader->setVec3("material.color", *color);
     shader->setFloat("material.shininess", *shininess);
+}
+
+void BasicMaterial::setNode(Handle<Node> node)
+{
+    // Matrix
+    shader->setMat4("model", node->getWorldMatrix());
 }

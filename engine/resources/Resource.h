@@ -1,5 +1,4 @@
-#ifndef RESOURCE_H
-#define RESOURCE_H
+#pragma once
 
 #include "Object.h"
 #include "Property.h"
@@ -36,4 +35,3 @@ namespace coral
         GLuint id;
     };
 }
-#endif

@@ -1,7 +1,7 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include "Object.h"
+#include "backend/opengl/OpenGLBackend.h"
 #include "utils/Singleton.h"
 #include <array>
 #include <filesystem>
@@ -9,8 +9,6 @@
 #include <string>
 #include <unordered_map>
 #include <variant>
-
-#include "backend/opengl/OpenGLBackend.h"
 
 namespace coral
 {
@@ -82,4 +80,3 @@ namespace coral
         std::unordered_map<std::string, Handle<Shader>> shaders;
     };
 }
-#endif

@@ -1,5 +1,4 @@
-#ifndef ENGINE_H
-#define ENGINE_H
+#pragma once
 
 #include "RenderParameters.h"
 #include "backend/interfaces/Backend.h"
@@ -46,4 +45,3 @@ namespace coral
         RenderParameters currentParameters;
     };
 }
-#endif

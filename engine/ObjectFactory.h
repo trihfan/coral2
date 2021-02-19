@@ -1,5 +1,4 @@
-#ifndef OBJECTFACTORY_H
-#define OBJECTFACTORY_H
+#pragma once
 
 #include "utils/Singleton.h"
 #include <atomic>
@@ -77,4 +76,3 @@ namespace coral
         return handle;
     }
 }
-#endif

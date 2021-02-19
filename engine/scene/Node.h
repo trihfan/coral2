@@ -1,5 +1,4 @@
-#ifndef NODE_H
-#define NODE_H
+#pragma once
 
 #include "Object.h"
 #include "Property.h"
@@ -35,6 +34,7 @@ namespace coral
         const glm::vec3& getWorldPosition() const;
         const glm::vec3& getWorldRotation() const;
         const glm::vec3& getWorldScale() const;
+        const glm::mat4& getWorldMatrix() const;
 
     private:
         glm::vec3 worldPosition;
@@ -61,4 +61,3 @@ namespace coral
         }
     }
 }
-#endif

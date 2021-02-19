@@ -1,5 +1,4 @@
-#ifndef OBJECTFACTORYDATA_H
-#define OBJECTFACTORYDATA_H
+#pragma once
 
 #include "utils/Singleton.h"
 #include "utils/concurrentqueue.h"
@@ -52,4 +51,3 @@ namespace coral
         }
     };
 }
-#endif

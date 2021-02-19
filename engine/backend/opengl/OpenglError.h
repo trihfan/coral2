@@ -1,5 +1,4 @@
-#ifndef OPENGLERROR_H
-#define OPENGLERROR_H
+#pragma once
 
 #include <string>
 
@@ -13,7 +12,5 @@ class OpenglError
 {
 public:
     static void check(const std::string& file, const std::string& function, const std::string& line);
-};    
+};
 }
-
-#endif

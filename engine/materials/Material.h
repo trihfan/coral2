@@ -1,5 +1,4 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#pragma once
 
 #include "Object.h"
 #include "resources/Shader.h"
@@ -9,6 +8,7 @@
 namespace coral
 {
     struct RenderParameters;
+    class Node;
 
     // A material is the class containing the shader and the shader parameters
     class Material : public Object
@@ -22,6 +22,7 @@ namespace coral
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) = 0;
+        virtual void setNode(Handle<Node> node) = 0;
 
     protected:
         // constructor
@@ -31,4 +32,3 @@ namespace coral
         unsigned int textureFromFile(const std::string& path, bool gamma = false);
     };
 }
-#endif

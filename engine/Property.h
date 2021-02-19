@@ -1,5 +1,4 @@
-#ifndef PROPERTY_H
-#define PROPERTY_H
+#pragma once
 
 #include "Signal.h"
 
@@ -148,4 +147,3 @@ namespace coral
         return std::find(this->value.begin(), this->value.end(), value) != this->value.end();
     }
 }
-#endif

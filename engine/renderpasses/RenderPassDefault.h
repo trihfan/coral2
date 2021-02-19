@@ -1,5 +1,4 @@
-#ifndef RENDERPASSDEFAULT_H
-#define RENDERPASSDEFAULT_H
+#pragma once
 
 #include "RenderPass.h"
 
@@ -14,4 +13,3 @@ namespace coral
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) override;
     };
 }
-#endif

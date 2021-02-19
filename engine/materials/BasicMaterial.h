@@ -1,5 +1,4 @@
-#ifndef BASIC_MATERIAL_H
-#define BASIC_MATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "Property.h"
@@ -15,10 +14,10 @@ namespace coral
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
+        virtual void setNode(Handle<Node> node) override;
 
         // uniforms
         Property<glm::vec3> color;
         Property<float> shininess;
     };
 }
-#endif

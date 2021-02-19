@@ -43,7 +43,7 @@ enum BackendType
 
 int main()
 {
-    BackendType type = opengl;
+    BackendType type = vulkan;
 
     // glfw: initialize and configure
     // ------------------------------0
@@ -66,11 +66,6 @@ int main()
             return -1;
         }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-        VulkanBackend* test = new VulkanBackend();
-        test->init();
-        test->destroy();
-        return 0;
     }
 
     // glfw window creation
@@ -88,10 +83,24 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
+    std::unique_ptr<Backend> backend;
+    if (type == opengl)
+    {
+        backend = std::make_unique<OpenGLBackend>();
+    }
+    else if (type == vulkan)
+    {
+        backend = std::make_unique<VulkanBackend>(window);
+        backend->init();
+        backend->resize(SCR_WIDTH, SCR_HEIGHT);
+        backend->destroy();
+        return 0;
+    }
+
     // setup engine
     // ------------------------------
     ShaderManager::addShaderPath("resources/shaders");
-    Engine::create(std::make_unique<OpenGLBackend>());
+    Engine::create(std::move(backend));
     Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
 
     // scene

@@ -1,5 +1,4 @@
-#ifndef OPENGLBACKEND_H
-#define OPENGLBACKEND_H
+#pragma once
 
 #include "backend/interfaces/Backend.h"
 #include <GL/glew.h>
@@ -11,7 +10,6 @@ namespace coral
     public:
         bool init() override;
         bool destroy() override;
+        bool resize(int width, int height) override;
     };
 }
-
-#endif

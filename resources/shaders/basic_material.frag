@@ -42,8 +42,8 @@ void main()
     vec3 normal = normalize(fNormal);
     vec3 viewDirection = normalize(viewPosition - fPosition);
 
-    // Ambient
-    vec3 result = material.color * 0.1;
+    // Ambien4
+    vec3 result = vec3(0.3, 0.3, 0.3);
 
     // Point lights
     for (int i = 0; i < pointLightCount; i++)

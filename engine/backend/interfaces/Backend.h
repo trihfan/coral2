@@ -1,5 +1,4 @@
-#ifndef BACKEND_H
-#define BACKEND_H
+#pragma once
 
 namespace coral
 {
@@ -11,7 +10,6 @@ namespace coral
 
         virtual bool init() = 0;
         virtual bool destroy() = 0;
+        virtual bool resize(int width, int height) = 0;
     };
 }
-
-#endif

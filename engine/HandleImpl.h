@@ -1,5 +1,4 @@
-#ifndef HANDLEIMPL_H
-#define HANDLEIMPL_H
+#pragma once
 
 #include "MemoryResource.h"
 #include "ObjectFactoryData.h"
@@ -165,4 +164,3 @@ namespace coral
         return nullptr;
     }
 }
-#endif

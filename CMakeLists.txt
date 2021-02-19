@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # unity build
-#set(CMAKE_UNITY_BUILD ON)
+set(CMAKE_UNITY_BUILD ON)
 
 # project
 set(version "1.0.0")
@@ -25,6 +25,13 @@ find_package(Python3 REQUIRED)
 # Options
 option(ENABLE_OPENGL "enable opengl backend" ON)
 option(ENABLE_VULKAN "enable vulkan backend" ON)
+
+if(ENABLE_OPENGL)
+    add_definitions(-DENABLE_OPENGL)
+endif()
+if(ENABLE_VULKAN)
+    add_definitions(-DENABLE_VULKAN)
+endif()
 
 # Emscripten
 if(EMSCRIPTEN)

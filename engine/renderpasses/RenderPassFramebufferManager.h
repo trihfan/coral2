@@ -1,5 +1,4 @@
-#ifndef RENDERPASSFRAMEBUFFERMANAGER_H
-#define RENDERPASSFRAMEBUFFERMANAGER_H
+#pragma once
 
 #include "resources/Framebuffer.h"
 #include "utils/Singleton.h"
@@ -24,4 +23,3 @@ namespace coral
         std::vector<Handle<Framebuffer>> framebuffers;
     };
 }
-#endif

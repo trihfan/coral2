@@ -16,3 +16,7 @@ PresentationMaterial::PresentationMaterial()
 void PresentationMaterial::use(const RenderParameters& parameters)
 {
 }
+
+void PresentationMaterial::setNode(Handle<Node> node)
+{
+}

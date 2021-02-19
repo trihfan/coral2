@@ -1,5 +1,4 @@
-#ifndef RENDERPARAMETERS_H
-#define RENDERPARAMETERS_H
+#pragma once
 
 #include "scene/light/AreaLight.h"
 #include "scene/light/DirectionalLight.h"
@@ -44,4 +43,3 @@ namespace coral
         void clear();
     };
 }
-#endif

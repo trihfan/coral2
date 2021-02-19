@@ -33,6 +33,7 @@ void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameter
             // draw each node
             for (auto node : queue.materialMap[material])
             {
+                material->setNode(node);
                 node->draw(parameters);
             }
         }

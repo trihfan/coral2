@@ -22,11 +22,17 @@ endif()
 # Vulkan
 if(ENABLE_VULKAN AND NOT EMSCRIPTEN)
     find_package(Vulkan REQUIRED)
+
+    find_package(glfw3 CONFIG REQUIRED)
+    add_definitions(-DGLFW_INCLUDE_VULKAN)
+
     option(USE_VALIDATION_LAYERS "use vulkan validation layers" OFF)
     if (USE_VALIDATION_LAYERS)
         add_definitions(-DUSE_VALIDATION_LAYERS)
     endif()
+
     target_link_libraries(engine PUBLIC Vulkan::Vulkan)
+    target_link_libraries(engine PUBLIC glfw)
 endif()
 
 # glm

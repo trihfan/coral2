@@ -21,3 +21,8 @@ bool OpenGLBackend::destroy()
 {
     return true;
 }
+
+bool OpenGLBackend::resize(int width, int height)
+{
+    return true;
+}

@@ -1,5 +1,4 @@
-#ifndef DRAWABLENODE_H
-#define DRAWABLENODE_H
+#pragma once
 
 #include "Node.h"
 #include "renderpasses/RenderPassManager.h"
@@ -39,4 +38,3 @@ namespace coral
         std::vector<std::string> renderQueueTags;
     };
 }
-#endif

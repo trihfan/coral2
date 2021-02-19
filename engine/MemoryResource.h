@@ -1,5 +1,4 @@
-#ifndef MEMORYRESOURCE_H
-#define MEMORYRESOURCE_H
+#pragma once
 
 #if defined(__APPLE__) || defined(__EMSCRIPTEN__)
 #include <experimental/memory_resource>
@@ -22,4 +21,3 @@ namespace coral
         bool do_is_equal(const memory_resource& other) const noexcept override;
     };
 }
-#endif

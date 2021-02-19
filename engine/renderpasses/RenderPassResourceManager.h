@@ -1,5 +1,4 @@
-#ifndef RENDERPASSRESOURCEMANAGER_H
-#define RENDERPASSRESOURCEMANAGER_H
+#pragma once
 
 #include "resources/Resource.h"
 #include "utils/Singleton.h"
@@ -27,4 +26,3 @@ namespace coral
         std::unordered_map<std::string, Handle<Resource>> resourceByName;
     };
 }
-#endif

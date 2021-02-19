@@ -1,5 +1,4 @@
-#ifndef ENCODER_MATERIAL_H
-#define ENCODER_MATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "Property.h"
@@ -22,4 +21,3 @@ namespace coral
         Property<GLuint> colorBuffer;
     };
 }
-#endif

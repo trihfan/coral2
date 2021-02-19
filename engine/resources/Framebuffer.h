@@ -1,5 +1,4 @@
-#ifndef FRAMEBUFFER_H
-#define FRAMEBUFFER_H
+#pragma once
 
 #include "Object.h"
 #include <vector>
@@ -48,4 +47,3 @@ namespace coral
         std::vector<FramebufferResource> resources;
     };
 }
-#endif

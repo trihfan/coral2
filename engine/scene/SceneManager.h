@@ -1,5 +1,4 @@
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
+#pragma once
 
 #include "Object.h"
 #include "utils/Singleton.h"
@@ -77,4 +76,3 @@ namespace coral
         std::vector<Handle<Light>> lights;
     };
 }
-#endif

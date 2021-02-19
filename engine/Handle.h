@@ -1,5 +1,4 @@
-#ifndef HANDLE_H
-#define HANDLE_H
+#pragma once
 
 #include <atomic>
 #include <string>
@@ -87,4 +86,3 @@ namespace coral
 }
 
 #include "HandleImpl.h"
-#endif

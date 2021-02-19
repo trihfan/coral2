@@ -1,5 +1,4 @@
-#ifndef RENDERPASSMANAGER_H
-#define RENDERPASSMANAGER_H
+#pragma once
 
 #include "Object.h"
 #include "utils/Singleton.h"
@@ -69,4 +68,3 @@ namespace coral
         std::vector<Handle<RenderPass>> orderedRenderPasses;
     };
 }
-#endif

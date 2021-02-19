@@ -8,6 +8,7 @@ Node::Node(Handle<Node> parent)
 {
     this->parent = parent;
     enabled = true;
+    matrix = glm::mat4(1);
     connect<&Node::updateWorldPosition>(position.changed, this);
     connect<&Node::updateWorldRotation>(rotation.changed, this);
     connect<&Node::updateWorldScale>(scale.changed, this);
@@ -68,4 +69,9 @@ const glm::vec3& Node::getWorldRotation() const
 const glm::vec3& Node::getWorldScale() const
 {
     return worldScale;
+}
+
+const glm::mat4& Node::getWorldMatrix() const
+{
+    return matrix;
 }

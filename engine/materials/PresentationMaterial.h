@@ -1,5 +1,4 @@
-#ifndef PRESENTATIONMATERIAL_H
-#define PRESENTATIONMATERIAL_H
+#pragma once
 
 #include "Material.h"
 
@@ -15,6 +14,6 @@ namespace coral
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
+        virtual void setNode(Handle<Node> node) override;
     };
 }
-#endif

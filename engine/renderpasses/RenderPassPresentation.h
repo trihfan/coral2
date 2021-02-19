@@ -1,5 +1,4 @@
-#ifndef RENDERPASSPRESENTATION_H
-#define RENDERPASSPRESENTATION_H
+#pragma once
 
 #include "RenderPass.h"
 #include "scene/mesh/Mesh.h"
@@ -25,4 +24,3 @@ namespace coral
         Handle<PresentationMaterial> presentationMaterial;
     };
 }
-#endif

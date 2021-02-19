@@ -1,5 +1,4 @@
-#ifndef SIGNAL_H
-#define SIGNAL_H
+#pragma once
 
 #include <algorithm>
 #include <list>
@@ -171,4 +170,3 @@ namespace coral
         connection.disconnect();
     }
 }
-#endif

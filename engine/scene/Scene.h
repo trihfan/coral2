@@ -1,5 +1,4 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
 
 #include "Object.h"
 
@@ -24,4 +23,3 @@ namespace coral
         Handle<Node> top_node;
     };
 }
-#endif

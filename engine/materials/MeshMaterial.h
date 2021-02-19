@@ -1,5 +1,4 @@
-#ifndef MESH_MATERIAL_H
-#define MESH_MATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include <memory>
@@ -31,4 +30,3 @@ namespace coral
         Handle<Shader> shader;
     };
 }
-#endif
