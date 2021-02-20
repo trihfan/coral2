@@ -4,6 +4,9 @@ project (web)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(glfw3 CONFIG REQUIRED)
 
+# Websocketpp
+find_package(websocketpp CONFIG REQUIRED)
+
 # nvidia encode
 find_library(NVENCODEAPI_LIB nvidia-encode)
 
@@ -14,7 +17,7 @@ set_folder_structure("${sources}" ${web_path})
 add_executable(web ${sources})
 
 # dependencies
-target_link_libraries(web PRIVATE engine glfw opengl_backend ${NVENCODEAPI_LIB})
+target_link_libraries(web PRIVATE engine glfw opengl_backend ${NVENCODEAPI_LIB} websocketpp::websocketpp)
 
 # set output directories
 set_target_properties(web PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
