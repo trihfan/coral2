@@ -2,7 +2,6 @@ project(engine)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
-set_folder_structure("${sources}" ${engine_path})
 
 # Make lib
 add_library(engine STATIC ${sources})

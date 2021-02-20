@@ -2,7 +2,6 @@ project(backend_interfaces)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
-set_folder_structure("${sources}" ${backend_interfaces_path})
 
 # Make lib
 add_library(backend_interfaces STATIC ${sources})

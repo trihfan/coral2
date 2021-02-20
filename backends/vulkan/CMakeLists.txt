@@ -2,7 +2,6 @@ project(vulkan_backend)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
-set_folder_structure("${sources}" ${backend_vulkan_path})
 
 # Make lib
 add_library(vulkan_backend STATIC ${sources})

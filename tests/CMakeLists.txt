@@ -1,10 +1,10 @@
 project(tests)
 
 # directories
-set(viewer_path ${PROJECT_SOURCE_DIR}/tests/viewer)
-set(signals_path ${PROJECT_SOURCE_DIR}/tests/signals)
-set(web_path ${PROJECT_SOURCE_DIR}/tests/web)
-set(emscripten_viewer_path ${PROJECT_SOURCE_DIR}/tests/emscripten-viewer)
+set(viewer_path ${test_path}/viewer)
+set(signals_path ${test_path}/signals)
+set(web_path ${test_path}/web)
+set(emscripten_viewer_path ${test_path}/emscripten-viewer)
 
 # emscripten
 if(EMSCRIPTEN)

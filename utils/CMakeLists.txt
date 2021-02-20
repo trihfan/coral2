@@ -2,7 +2,6 @@ project(utils)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
-set_folder_structure("${sources}" ${utils_path})
 
 # Make lib
 add_library(utils STATIC ${sources})

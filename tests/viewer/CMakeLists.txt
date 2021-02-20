@@ -9,7 +9,6 @@ link_directories(viewer ${lib_output_directory})
 
 # make lib
 file(GLOB_RECURSE sources *.h *.cpp)
-set_folder_structure("${sources}" ${viewer_path})
 add_executable(viewer ${sources})
 
 # dependencies

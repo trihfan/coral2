@@ -8,7 +8,6 @@ link_directories(emscripten_viewer ${lib_output_directory})
 
 # make lib
 file(GLOB_RECURSE sources *.h *.cpp)
-set_folder_structure("${sources}" ${web_path})
 add_executable(emscripten_viewer ${sources})
 
 # includes

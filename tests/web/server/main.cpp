@@ -32,8 +32,8 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 // screen
-int width = 100;
-int height = 100;
+int width = 400;
+int height = 300;
 GLFWwindow* window;
 
 // encoder
@@ -115,10 +115,15 @@ void do_session(tcp::socket socket)
 
         GLuint framebuffer;
         glCreateFramebuffers(1, &framebuffer);
+        ws.binary(true);
 
-        // Main loop=
+        // Main loop
+        std::vector<std::vector<uint8_t>> packet;
         while (!glfwWindowShouldClose(window))
         {
+            // This buffer will hold the incoming message
+            beast::flat_buffer buffer;
+
             // Start
             auto start = std::chrono::steady_clock::now();
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -142,39 +147,17 @@ void do_session(tcp::socket socket)
             glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
             
             // encode frame
-            std::vector<std::vector<uint8_t>> packet1;
-            std::vector<std::vector<uint8_t>> packet2;
-            encoder->EncodeFrame(packet1);
-            encoder->EndEncode(packet2);
+            encoder->EncodeFrame(packet);
 
             // send frame
-            size_t size1 = 0;
-            for (const auto& p : packet1)
+            for (std::vector<uint8_t>& packet : packet)
             {
-                size1 += p.size();
+                Logs(info) << ws.write(net::buffer(packet.data(), packet.size()));
             }
-            size_t size2 = 0;
-            for (const auto& p : packet2)
-            {
-                size2 += p.size();
-            }
-
-            std::string data;
-            data.resize(size1 + size2 + 4);
-            uint8_t duration = 10;
-            uint8_t audioLength = 0;
-
-            std::memcpy(data.data(), &duration, 2);
-            std::memcpy(data.data(), &audioLength, 2);
-
-            std::memcpy(data.data() + 4, packet1.data(), size1);
-            std::memcpy(data.data() + 4 + size1, packet2.data(), size2);
-
-            Logs(info) << ws.write(net::buffer(data));
 
             // Swap
-            //glfwSwapBuffers(window);
-            //glfwPollEvents();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
 
             // limit to 60 fps
             auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
@@ -182,6 +165,15 @@ void do_session(tcp::socket socket)
             std::this_thread::sleep_for(std::chrono::microseconds(remaining > 0 ? remaining : 0));
         }
 
+        // Finalize
+        encoder->EndEncode(packet);
+        for (std::vector<uint8_t>& packet : packet)
+        {
+            Logs(info) << ws.write(net::buffer(packet.data(), packet.size()));
+        }
+
+        // clean
+        ws.close(websocket::close_code::normal);
         delete encoder;
         glfwTerminate();
         Engine::destroy();
@@ -198,6 +190,8 @@ void do_session(tcp::socket socket)
     {
         Logs(error) << "Error: " << e.what() << std::endl;
     }
+
+    exit(0);
 }
 
 bool createWindow()

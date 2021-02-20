@@ -2,7 +2,6 @@ project(opengl_backend)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
-set_folder_structure("${sources}" ${backend_opengl_path})
 
 # Make lib
 add_library(opengl_backend STATIC ${sources})
