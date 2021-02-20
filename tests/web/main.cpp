@@ -11,29 +11,26 @@
 #include "scene/mesh/Mesh.h"
 #include <chrono>
 #include <fstream>
-<<<<<<< HEAD
-#include <gl/glew.h>
-#include <iostream>
-=======
 #include <GL/glew.h>
->>>>>>> 9efcda3ace24ab8d5ce22fd4a26d5d4032f7b874
+#include <iostream>
+
 #include <numeric>
 #include <thread>
 #include <vector>
 
 #include <GLFW/glfw3.h>
-//#include <websocketpp/config/asio_no_tls.hpp>
-//#include <websocketpp/server.hpp>
+#include <websocketpp/config/asio_no_tls.hpp>
+#include <websocketpp/server.hpp>
 
 using namespace coral;
 
-/*typedef websocketpp::server<websocketpp::config::asio> server;
+typedef websocketpp::server<websocketpp::config::asio> server;
 using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;*/
+using websocketpp::lib::placeholders::_2;
 
 // pull out the type of messages sent by our config
-/*typedef server::message_ptr message_ptr;
+typedef server::message_ptr message_ptr;
 
 // Define a callback to handle incoming messages
 void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg)
@@ -58,7 +55,7 @@ void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg)
         Logs(error) << "Echo failed because: "
                     << "(" << e.what() << ")";
     }
-}*/
+}
 
 // screen
 int width = 800;
@@ -88,13 +85,13 @@ int main(int argc, char** argv)
     }
 
     // encoder
-    /* if (!initializeEncoder())
+    if (!initializeEncoder())
     {
         return 1;
-    }*/
+    }
 
     // Create a server endpoint
-    /* server echo_server;
+    server echo_server;
     try
     {
         // Set logging settings
@@ -107,8 +104,8 @@ int main(int argc, char** argv)
         // Register our message handler
         echo_server.set_message_handler(bind(&on_message, &echo_server, ::_1, ::_2));
 
-        // Listen on port 9002
-        echo_server.listen(9002);
+        // Listen on port 8080
+        echo_server.listen(8080);
 
         // Start the server accept loop
         echo_server.start_accept();
@@ -123,7 +120,7 @@ int main(int argc, char** argv)
     catch (...)
     {
         std::cout << "other exception" << std::endl;
-    }*/
+    }
 
     GLuint framebuffer;
     glCreateFramebuffers(1, &framebuffer);

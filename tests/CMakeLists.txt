@@ -15,7 +15,7 @@ else()
     add_subdirectory(signals)
 
     # server side render on linux
-    if(NOT APPLE)
+    if(NOT APPLE AND UNIX)
         add_subdirectory(web)
     endif()
 endif()
