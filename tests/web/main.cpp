@@ -11,8 +11,12 @@
 #include "scene/mesh/Mesh.h"
 #include <chrono>
 #include <fstream>
+<<<<<<< HEAD
 #include <gl/glew.h>
 #include <iostream>
+=======
+#include <GL/glew.h>
+>>>>>>> 9efcda3ace24ab8d5ce22fd4a26d5d4032f7b874
 #include <numeric>
 #include <thread>
 #include <vector>
@@ -121,6 +125,9 @@ int main(int argc, char** argv)
         std::cout << "other exception" << std::endl;
     }*/
 
+    GLuint framebuffer;
+    glCreateFramebuffers(1, &framebuffer);
+
     // Main loop
     std::ofstream output("output.h264");
     while (!glfwWindowShouldClose(window))
@@ -133,15 +140,20 @@ int main(int argc, char** argv)
         }
 
         // Render frame
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         Engine::frame();
 
         // Get next buffer
         const NvEncInputFrame* encoderInputFrame = encoder->GetNextInputFrame();
         NV_ENC_INPUT_RESOURCE_OPENGL_TEX* resource = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(encoderInputFrame->inputPtr);
 
-        //glBindTexture(resource->target, resource->texture);
-        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resource->target, resource->texture, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        glBindTexture(resource->target, resource->texture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resource->target, resource->texture, 0);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        
         // encode frame
         std::vector<std::vector<uint8_t>> packet;
         encoder->EncodeFrame(packet);
@@ -203,24 +215,24 @@ bool initializeEncoder()
 
 bool setupEngine()
 {
-    // setup engine
     ShaderManager::addShaderPath("resources/shaders");
-    Engine::create(std::make_unique<OpenGLBackend>());
+    Engine::create(std::make_unique<OpenglBackend>());
+    Engine::resize(width, height);
 
     // scene
-    auto scene = ObjectFactory::createWithName<Scene>("scene");
+    static auto scene = ObjectFactory::createWithName<Scene>("scene");
     SceneManager::setCurrentScene(scene);
 
     // camera
-    auto camera = ObjectFactory::createWithName<Camera>("camera");
-    camera->setPerspective(45.f, glm::vec4(0, 0, 800, 600), glm::vec2(0.1f, 100.f));
+    static auto camera = ObjectFactory::createWithName<Camera>("camera");
+    camera->setPerspective(45.f, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100.f));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
     scene->add(camera);
 
     // material
-    auto material = ObjectFactory::createWithName<BasicMaterial>("material");
-    material->color = glm::vec3(0.1, 0.1, 0.1);
+    static auto material = ObjectFactory::createWithName<BasicMaterial>("material");
+    material->color = glm::vec3(0.1, 0.8, 0.3);
     material->shininess = 128;
 
     // vertices
@@ -237,8 +249,25 @@ bool setupEngine()
     std::iota(indices.begin(), indices.end(), 0);
 
     // mesh
-    auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
+    static auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
     mesh->setMaterial(material);
     scene->add(mesh);
+
+    // Lights
+    static auto light1 = ObjectFactory::create<PointLight>();
+    light1->position = glm::vec3(0, -0.5, 3);
+    light1->color = glm::vec3(1, 1, 1);
+    light1->constant = 1;
+    light1->linear = 0.09f;
+    light1->quadratic = 0.032f;
+    scene->add(light1);
+
+    static auto light2 = ObjectFactory::create<PointLight>();
+    light2->position = glm::vec3(0, 0.5, 3);
+    light2->color = glm::vec3(1, 1, 1);
+    light2->constant = 1;
+    light2->linear = 0.09f;
+    light2->quadratic = 0.032f;
+    scene->add(light2);
     return true;
 }

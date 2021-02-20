@@ -5,7 +5,7 @@
 
 namespace coral
 {
-    class OpenGLBackend : public Backend
+    class OpenglBackend : public Backend
     {
     public:
         bool init() override;

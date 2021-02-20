@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "backend/opengl/OpenGLBackend.h"
+#include "backend/opengl/OpenglBackend.h"
 #include "scene/camera/Camera.h"
 
 #include <emscripten.h>
