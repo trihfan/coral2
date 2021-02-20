@@ -73,6 +73,7 @@ void Engine::frame()
     // Update managers
     SceneManager::update();
     RenderPassManager::update(currentParameters);
+    //PipelineManager::update();
     ObjectFactory::update(); // finish with object manager update to allocate the gl data
 
     // Draw
