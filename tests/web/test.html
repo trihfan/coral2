@@ -4,12 +4,12 @@
    <video id="player"></video>
    
    <script>
-		var socketURL = 'ws://localhost:8080';
+		var socketURL = 'ws://localhost:9090';
 		var jmuxer = new JMuxer({
 			node: 'player',
 			mode: 'video',
 			flushingTime: 1000,
-			fps: 30,
+			fps: 60,
 			debug: true
 		});
 

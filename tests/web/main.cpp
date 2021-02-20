@@ -19,162 +19,185 @@
 #include <vector>
 
 #include <GLFW/glfw3.h>
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 using namespace coral;
 
-typedef websocketpp::server<websocketpp::config::asio> server;
-using websocketpp::lib::bind;
-using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;
-
-// pull out the type of messages sent by our config
-typedef server::message_ptr message_ptr;
-
-// Define a callback to handle incoming messages
-void on_message(server* s, websocketpp::connection_hdl hdl, message_ptr msg)
-{
-    Logs(info) << "on_message called with hdl: " << hdl.lock().get()
-               << " and message: " << msg->get_payload();
-
-    // check for a special command to instruct the server to stop listening so
-    // it can be cleanly exited.
-    if (msg->get_payload() == "stop-listening")
-    {
-        s->stop_listening();
-        return;
-    }
-
-    try
-    {
-        s->send(hdl, msg->get_payload(), msg->get_opcode());
-    }
-    catch (websocketpp::exception const& e)
-    {
-        Logs(error) << "Echo failed because: "
-                    << "(" << e.what() << ")";
-    }
-}
+namespace beast = boost::beast;         // from <boost/beast.hpp>
+namespace http = beast::http;           // from <boost/beast/http.hpp>
+namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
+namespace net = boost::asio;            // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 // screen
-int width = 800;
-int height = 600;
+int width = 100;
+int height = 100;
 GLFWwindow* window;
 
 // encoder
 NvEncoderGL* encoder;
 
 // functions
+void do_session(tcp::socket socket);
 bool createWindow();
 bool setupEngine();
 bool initializeEncoder();
 
 int main(int argc, char** argv)
 {
-    // Create window
-    if (!createWindow())
-    {
-        return 1;
-    }
-
-    // engine
-    if (!setupEngine())
-    {
-        return 1;
-    }
-
-    // encoder
-    if (!initializeEncoder())
-    {
-        return 1;
-    }
-
-    // Create a server endpoint
-    server echo_server;
     try
     {
-        // Set logging settings
-        echo_server.set_access_channels(websocketpp::log::alevel::all);
-        echo_server.clear_access_channels(websocketpp::log::alevel::frame_payload);
+        auto const address = net::ip::address_v4::from_string("127.0.0.1");
+        auto const port = static_cast<unsigned short>(9090);
 
-        // Initialize Asio
-        echo_server.init_asio();
+        // The io_context is required for all I/O
+        net::io_context ioc{1};
 
-        // Register our message handler
-        echo_server.set_message_handler(bind(&on_message, &echo_server, ::_1, ::_2));
-
-        // Listen on port 8080
-        echo_server.listen(8080);
-
-        // Start the server accept loop
-        echo_server.start_accept();
-
-        // Start the ASIO io_service run loop
-        echo_server.run();
-    }
-    catch (websocketpp::exception const& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "other exception" << std::endl;
-    }
-
-    GLuint framebuffer;
-    glCreateFramebuffers(1, &framebuffer);
-
-    // Main loop
-    std::ofstream output("output.h264");
-    while (!glfwWindowShouldClose(window))
-    {
-        // Start
-        auto start = std::chrono::steady_clock::now();
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        // The acceptor receives incoming connections
+        tcp::acceptor acceptor{ioc, {address, port}};
+        for(;;)
         {
-            glfwSetWindowShouldClose(window, true);
+            // This will receive the new connection
+            tcp::socket socket{ioc};
+
+            // Block until we get a connection
+            acceptor.accept(socket);
+
+            // Launch the session, transferring ownership of the socket
+            std::thread(&do_session, std::move(socket)).detach();
         }
-
-        // Render frame
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        Engine::frame();
-
-        // Get next buffer
-        const NvEncInputFrame* encoderInputFrame = encoder->GetNextInputFrame();
-        NV_ENC_INPUT_RESOURCE_OPENGL_TEX* resource = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(encoderInputFrame->inputPtr);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glBindTexture(resource->target, resource->texture);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resource->target, resource->texture, 0);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        
-        // encode frame
-        std::vector<std::vector<uint8_t>> packet;
-        encoder->EncodeFrame(packet);
-
-        // send frame
-        for (std::vector<uint8_t>& packet : packet)
-        {
-            output.write(reinterpret_cast<char*>(packet.data()), packet.size());
-        }
-
-        // Swap
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
-        // limit to 60 fps
-        auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
-        auto remaining = 1000 * 16 - elapsed;
-        std::this_thread::sleep_for(std::chrono::microseconds(remaining > 0 ? remaining : 0));
+    }
+    catch (const std::exception& e)
+    {
+        Logs(error) << "Error: " << e.what();
+        return 1;
     }
 
-    delete encoder;
-    glfwTerminate();
-    Engine::destroy();
     return 0;
+}
+
+void do_session(tcp::socket socket)
+{
+    Logs(success) << "connection";
+
+    try
+    {
+        // Construct the stream by moving in the socket
+        websocket::stream<tcp::socket> ws{std::move(socket)};
+
+        // Set a decorator to change the Server of the handshake
+        ws.set_option(websocket::stream_base::decorator([](websocket::response_type& res){
+                res.set(http::field::server, std::string(BOOST_BEAST_VERSION_STRING) + " websocket-server-sync");
+        }));
+
+        // Accept the websocket handshake
+        ws.accept();
+
+        // Create window
+        if (!createWindow())
+        {
+            return;
+        }
+
+        // engine
+        if (!setupEngine())
+        {
+            return;
+        }
+
+        // encoder
+        if (!initializeEncoder())
+        {
+            return;
+        }
+
+        GLuint framebuffer;
+        glCreateFramebuffers(1, &framebuffer);
+
+        // Main loop=
+        while (!glfwWindowShouldClose(window))
+        {
+            // Start
+            auto start = std::chrono::steady_clock::now();
+            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            {
+                glfwSetWindowShouldClose(window, true);
+            }
+
+            // Render frame
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            Engine::frame();
+
+            // Get next buffer
+            const NvEncInputFrame* encoderInputFrame = encoder->GetNextInputFrame();
+            NV_ENC_INPUT_RESOURCE_OPENGL_TEX* resource = static_cast<NV_ENC_INPUT_RESOURCE_OPENGL_TEX*>(encoderInputFrame->inputPtr);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+            glBindTexture(resource->target, resource->texture);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resource->target, resource->texture, 0);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+            glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            
+            // encode frame
+            std::vector<std::vector<uint8_t>> packet1;
+            std::vector<std::vector<uint8_t>> packet2;
+            encoder->EncodeFrame(packet1);
+            encoder->EndEncode(packet2);
+
+            // send frame
+            size_t size1 = 0;
+            for (const auto& p : packet1)
+            {
+                size1 += p.size();
+            }
+            size_t size2 = 0;
+            for (const auto& p : packet2)
+            {
+                size2 += p.size();
+            }
+
+            std::string data;
+            data.resize(size1 + size2 + 4);
+            uint8_t duration = 10;
+            uint8_t audioLength = 0;
+
+            std::memcpy(data.data(), &duration, 2);
+            std::memcpy(data.data(), &audioLength, 2);
+
+            std::memcpy(data.data() + 4, packet1.data(), size1);
+            std::memcpy(data.data() + 4 + size1, packet2.data(), size2);
+
+            Logs(info) << ws.write(net::buffer(data));
+
+            // Swap
+            //glfwSwapBuffers(window);
+            //glfwPollEvents();
+
+            // limit to 60 fps
+            auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
+            auto remaining = 1000 * 16 - elapsed;
+            std::this_thread::sleep_for(std::chrono::microseconds(remaining > 0 ? remaining : 0));
+        }
+
+        delete encoder;
+        glfwTerminate();
+        Engine::destroy();
+    }
+    catch(beast::system_error const& se)
+    {
+        // This indicates that the session was closed
+        if(se.code() != websocket::error::closed)
+        {
+            Logs(error) << "Error: " << se.code().message() << std::endl;
+        }
+    }
+    catch(std::exception const& e)
+    {
+        Logs(error) << "Error: " << e.what() << std::endl;
+    }
 }
 
 bool createWindow()
