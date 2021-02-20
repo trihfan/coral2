@@ -13,10 +13,6 @@ else()
 # default
     add_subdirectory(viewer)
     add_subdirectory(signals)
-
-    # server side render on linux
-    if(NOT APPLE AND UNIX)
-        add_subdirectory(web)
-    endif()
+    add_subdirectory(web)
 endif()
 
