@@ -11,5 +11,7 @@ namespace coral
         bool init() override;
         bool destroy() override;
         bool resize(int width, int height) override;
+
+        std::unique_ptr<BackendPipeline> createPipeline(const BackendPipelineParams& params) const override;
     };
 }

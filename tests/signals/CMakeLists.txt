@@ -6,6 +6,7 @@ link_directories(signals ${lib_output_directory})
 # make lib
 file(GLOB_RECURSE sources *.h *.cpp)
 add_executable(signals ${sources})
+set_folder_structure("${sources}" ${signals_path})
 
 # dependencies
 target_link_libraries(signals engine)

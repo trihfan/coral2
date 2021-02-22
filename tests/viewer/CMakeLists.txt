@@ -10,6 +10,7 @@ link_directories(viewer ${lib_output_directory})
 # make lib
 file(GLOB_RECURSE sources *.h *.cpp)
 add_executable(viewer ${sources})
+set_folder_structure("${sources}" ${viewer_path})
 
 # dependencies
 target_link_libraries(viewer engine glfw opengl_backend vulkan_backend)

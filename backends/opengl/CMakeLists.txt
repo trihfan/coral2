@@ -8,6 +8,7 @@ add_library(opengl_backend STATIC ${sources})
 target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}")
 target_include_directories(opengl_backend PUBLIC "${utils_path}")
 target_link_libraries(opengl_backend PUBLIC utils)
+set_folder_structure("${sources}" ${backend_opengl_path})
 
 # Interfaces
 target_include_directories(opengl_backend PUBLIC "${backend_interfaces_path}")

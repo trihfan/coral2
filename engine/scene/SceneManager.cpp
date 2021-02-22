@@ -76,7 +76,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
             {
                 auto& render_queue = queues[id];
                 render_queue.nodes.push_back(drawableNode);
-                render_queue.shaderMap[drawableNode->getMaterial()->getShader()].insert(drawableNode->getMaterial());
+                render_queue.pipelineMap[*drawableNode->getMaterial()->pipeline].insert(drawableNode->getMaterial());
                 render_queue.materialMap[drawableNode->getMaterial()].push_back(drawableNode);
             }
         }

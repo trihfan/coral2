@@ -16,7 +16,7 @@ namespace coral
     class DrawableNode;
     class Camera;
     class Material;
-    class Shader;
+    class Pipeline;
     class Light;
     struct RenderParameters;
 
@@ -26,7 +26,7 @@ namespace coral
     struct RenderQueue
     {
         std::vector<Handle<DrawableNode>> nodes;
-        std::map<Handle<Shader>, std::set<Handle<Material>>> shaderMap;
+        std::map<Handle<Pipeline>, std::set<Handle<Material>>> pipelineMap;
         std::map<Handle<Material>, std::vector<Handle<DrawableNode>>> materialMap;
     };
 

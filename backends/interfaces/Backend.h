@@ -1,7 +1,10 @@
 #pragma once
+#include <memory>
 
 namespace coral
 {
+    class BackendPipeline;
+    struct BackendPipelineParams;
     class Backend
     {
     public:
@@ -11,5 +14,8 @@ namespace coral
         virtual bool init() = 0;
         virtual bool destroy() = 0;
         virtual bool resize(int width, int height) = 0;
+
+        // Creation
+        virtual std::unique_ptr<BackendPipeline> createPipeline(const BackendPipelineParams& params) const = 0;
     };
 }

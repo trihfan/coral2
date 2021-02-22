@@ -1,8 +1,8 @@
 #include "RenderPassDefault.h"
 #include "Engine.h"
 #include "materials/Material.h"
+#include "resources/Pipeline.h"
 #include "resources/Resource.h"
-#include "resources/Shader.h"
 #include "scene/DrawableNode.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
@@ -20,13 +20,13 @@ void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameter
     CHECK_OPENGL_ERROR
 
     // for each shader
-    for (auto& shader_pair : queue.shaderMap)
+    for (auto& pipelinePair : queue.pipelineMap)
     {
         // Set up shader
-        shader_pair.first->use();
+        pipelinePair.first->use();
 
         // for each material
-        for (auto material : shader_pair.second)
+        for (auto material : pipelinePair.second)
         {
             // Set up material
             material->use(parameters);

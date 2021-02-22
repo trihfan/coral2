@@ -7,7 +7,8 @@
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
-#include "resources/Shader.h"
+#include "resources/PipelineManager.h"
+#include "resources/ResourceManager.h"
 #include "scene/DrawableNode.h"
 #include "scene/Node.h"
 #include "scene/Scene.h"
@@ -29,13 +30,14 @@ Engine::Engine(std::shared_ptr<Backend> backend)
     : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
+    ResourceManager::init();
 
     // Create backend
     this->backend->init();
 
     // create instances
     ObjectFactory::create();
-    ShaderManager::create();
+    PipelineManager::create();
     SceneManager::create();
     RenderPassManager::create();
     RenderPassFramebufferManager::create();
@@ -47,8 +49,12 @@ Engine::Engine(std::shared_ptr<Backend> backend)
 
 void Engine::release()
 {
+    // Destroy instances
+    RenderPassResourceManager::destroy();
+    RenderPassFramebufferManager::destroy();
+    RenderPassManager::destroy();
     SceneManager::destroy();
-    ShaderManager::destroy();
+    PipelineManager::destroy();
     ObjectFactory::destroy();
 
     backend->destroy();
@@ -58,7 +64,13 @@ void Engine::resize(int width, int height)
 {
     instance->currentParameters.width = width;
     instance->currentParameters.height = height;
-    RenderPassManager::invalidate();
+    RenderPassManager::resize(width, height);
+    PipelineManager::resize(width, height);
+}
+
+Backend& Engine::getBackend()
+{
+    return *instance->backend;
 }
 
 void Engine::frame()
@@ -67,16 +79,23 @@ void Engine::frame()
 
     // Update time
     double lastTime = currentParameters.time;
-    currentParameters.time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count() / 1e6;
+    currentParameters.time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count()) / 1e6;
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
-    // Update managers
+    // Update the scene, lists cameras, lights, ...
     SceneManager::update();
-    RenderPassManager::update(currentParameters);
-    //PipelineManager::update();
-    ObjectFactory::update(); // finish with object manager update to allocate the gl data
 
-    // Draw
+    // Bake the render graph when invalidated
+    RenderPassManager::update(currentParameters);
+
+    // Bind pipeline to the render passes
+    PipelineManager::update();
+
+    // Initialize / release all objects
+    // This allocate and deallocate gpu data
+    ObjectFactory::update();
+
+    // Render each renderpasses
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
     {
         currentParameters.camera = SceneManager::getCameras()[i];

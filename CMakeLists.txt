@@ -49,7 +49,7 @@ set(glm_path ${PROJECT_SOURCE_DIR}/glm)
 set(backends_path ${PROJECT_SOURCE_DIR}/backends)
 set(engine_path ${PROJECT_SOURCE_DIR}/engine)
 set(utils_path ${PROJECT_SOURCE_DIR}/utils)
-set(test_path ${PROJECT_SOURCE_DIR}/test)
+set(test_path ${PROJECT_SOURCE_DIR}/tests)
 
 # subdirectories
 add_subdirectory(glm)

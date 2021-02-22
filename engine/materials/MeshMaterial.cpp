@@ -1,5 +1,4 @@
 #include "MeshMaterial.h"
-#include "resources/Shader.h"
 #include "scene/camera/Camera.h"
 #include <glm/gtx/transform.hpp>
 #include <unordered_map>
@@ -13,8 +12,7 @@ const unsigned int SCR_HEIGHT = 600;
 static std::unordered_map<std::string, GLuint> sLoadedTextures;
 
 MeshMaterial::MeshMaterial(const std::vector<Texture>& textures)
-    : Material("")
-    , textures(textures)
+    : textures(textures)
 {
     texture_ids.resize(textures.size(), 0);
     //shader = std::make_shared<Shader>("resources/shaders/1.model_loading.vs", "resources/shaders/1.model_loading.fs");
@@ -31,7 +29,7 @@ MeshMaterial::MeshMaterial(const std::vector<Texture>& textures)
         // load
         else
         {
-            texture_ids[i] = textureFromFile(textures[i].path);
+            //texture_ids[i] = textureFromFile(textures[i].path);
         }
     }
 }
@@ -61,7 +59,7 @@ void MeshMaterial::use(const RenderParameters& parameters)
             number = std::to_string(heightNr++); // transfer unsigned int to stream
 
         // now set the sampler to the correct texture unit
-        glUniform1i(glGetUniformLocation(shader->getId(), (name + number).c_str()), i);
+        //glUniform1i(glGetUniformLocation(shader->getId(), (name + number).c_str()), i);
 
         // and finally bind the texture
         glBindTexture(GL_TEXTURE_2D, texture_ids[i]);
@@ -77,5 +75,5 @@ void MeshMaterial::use(const RenderParameters& parameters)
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f)); // it's a bit too big for our scene, so scale it down
-    shader->setMat4("model", model);
+    //shader->setMat4("model", model);
 }

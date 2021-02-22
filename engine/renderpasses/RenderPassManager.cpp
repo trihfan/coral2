@@ -8,6 +8,10 @@ using namespace coral;
 
 DEFINE_SINGLETON(RenderPassManager)
 
+void RenderPassManager::release()
+{
+}
+
 void RenderPassManager::addRenderPass(Handle<RenderPass> renderPass)
 {
     instance->renderPasses.push_back(renderPass);
@@ -24,7 +28,7 @@ void RenderPassManager::removeRenderPass(const std::string& name)
     }
 }
 
-Handle<RenderPass> RenderPassManager::getRenderPass(const std::string& name)
+Handle<RenderPass> RenderPassManager::getRenderPassByName(const std::string& name)
 {
     auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const Handle<RenderPass> renderpass) { return renderpass->getName() == name; });
     if (it != instance->renderPasses.end())
@@ -60,6 +64,11 @@ void RenderPassManager::bake(const RenderParameters& parameters)
 void RenderPassManager::invalidate()
 {
     instance->orderedRenderPasses.clear();
+}
+
+void RenderPassManager::resize(int width, int height)
+{
+    invalidate();
 }
 
 const std::vector<Handle<RenderPass>>& RenderPassManager::getOrderedRenderPasses()

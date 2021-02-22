@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Object.h"
-#include "resources/Shader.h"
+#include "Property.h"
+#include "resources/Pipeline.h"
 #include <memory>
 #include <string>
 
@@ -14,21 +15,11 @@ namespace coral
     class Material : public Object
     {
     public:
-        // the material shader
-        Handle<Shader> shader;
-
-        // return the material shader
-        Handle<Shader> getShader() const;
+        // The material pipeline
+        Property<Handle<Pipeline>> pipeline;
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) = 0;
         virtual void setNode(Handle<Node> node) = 0;
-
-    protected:
-        // constructor
-        Material(const std::string& shader_name);
-
-        // tmp
-        unsigned int textureFromFile(const std::string& path, bool gamma = false);
     };
 }

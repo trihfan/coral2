@@ -33,6 +33,11 @@ namespace coral
         static void update(const RenderParameters& parameters);
 
         /**
+         * @brief Resize the viewport
+         */
+        static void resize(int width, int height);
+
+        /**
          * @brief Add a render pass
          */
         static void addRenderPass(Handle<RenderPass> renderPass);
@@ -45,7 +50,7 @@ namespace coral
         /**
          * @brief Return the renderpass for the given id
          */
-        static Handle<RenderPass> getRenderPass(const std::string& name);
+        static Handle<RenderPass> getRenderPassByName(const std::string& name);
 
         /**
          * @brief Return the renderpasses ordered by render order

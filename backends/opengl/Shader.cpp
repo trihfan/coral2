@@ -1,17 +1,7 @@
 #include "Shader.h"
-#include "ObjectFactory.h"
-#include "utils/FileUtils.h"
 #include "Logs.h"
 
 using namespace coral;
-
-//*********************************************************************************
-// Shader
-Shader::Shader()
-{
-    connect<&Shader::init>(Object::init, this);
-    connect<&Shader::release>(Object::release, this);
-}
 
 void Shader::addShaderData(ShaderType type, const std::string& data)
 {
@@ -74,7 +64,7 @@ void Shader::init()
     shader_data = {};
 }
 
-void Shader::release()
+Shader::~Shader()
 {
     glDeleteProgram(id);
     id = 0;
@@ -159,92 +149,4 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
                         << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
-}
-
-//*********************************************************************************
-// ShaderManager
-
-DEFINE_SINGLETON(ShaderManager)
-std::vector<std::filesystem::path> ShaderManager::paths;
-
-void ShaderManager::release()
-{
-}
-
-void ShaderManager::addShaderPath(const std::filesystem::path& path)
-{
-    paths.push_back(path);
-}
-
-Handle<Shader> ShaderManager::getShader(const std::string& name)
-{
-    auto it = instance->shaders.find(name);
-    if (it != instance->shaders.end())
-    {
-        return it->second;
-    }
-
-    Logs(error) << "unknown shader " << name;
-    return nullptr;
-}
-
-ShaderManager::ShaderManager()
-{
-    // load shaders
-    for (const std::filesystem::path& path : paths)
-    {
-        iterateFolder(path.is_relative() ? FileUtils::getAbsolutePath(path) : path);
-    }
-}
-
-void ShaderManager::iterateFolder(const std::filesystem::path& path)
-{
-    // list shaders in folder
-    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(path))
-    {
-        if (std::filesystem::is_directory(entry))
-        {
-            iterateFolder(entry.path());
-        }
-        else if (std::filesystem::is_regular_file(entry))
-        {
-            int shader_type = getShaderType(entry.path().extension());
-            if (shader_type == -1)
-            {
-                Logs(warning) << "unknown shader type " << entry.path();
-            }
-            else
-            {
-                std::string name = entry.path().stem().string();
-                if (!shaders[name])
-                {
-                    shaders[name] = ObjectFactory::createWithName<Shader>(name);
-                }
-                shaders[name]->addShaderData(static_cast<Shader::ShaderType>(shader_type), FileUtils::readAll(entry.path()));
-            }
-        }
-    }
-}
-
-int ShaderManager::getShaderType(const std::filesystem::path& extension) const
-{
-    // vertex
-    if (extension == ".vert" || extension == ".vs" || extension == ".vs.glsl")
-    {
-        return Shader::vertex;
-    }
-
-    // fragment
-    if (extension == ".frag" || extension == ".fs" || extension == ".fs.glsl")
-    {
-        return Shader::fragment;
-    }
-
-    // geometry
-    if (extension == ".geom" || extension == ".gs" || extension == ".gs.glsl")
-    {
-        return Shader::geometry;
-    }
-
-    return -1;
 }

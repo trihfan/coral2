@@ -27,6 +27,5 @@ namespace coral
     protected:
         std::vector<Texture> textures;
         std::vector<GLuint> texture_ids;
-        Handle<Shader> shader;
     };
 }

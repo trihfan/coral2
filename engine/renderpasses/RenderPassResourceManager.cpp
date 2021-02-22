@@ -4,6 +4,10 @@ using namespace coral;
 
 DEFINE_SINGLETON(RenderPassResourceManager)
 
+void RenderPassResourceManager::release()
+{
+}
+
 void RenderPassResourceManager::clear()
 {
     instance->resourceByName.clear();

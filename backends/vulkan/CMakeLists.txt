@@ -8,6 +8,7 @@ add_library(vulkan_backend STATIC ${sources})
 target_include_directories(vulkan_backend PUBLIC "${backend_vulkan_path}")
 target_include_directories(vulkan_backend PUBLIC "${utils_path}")
 target_link_libraries(vulkan_backend PUBLIC utils)
+set_folder_structure("${sources}" ${backend_vulkan_path})
 
 # Interfaces
 target_include_directories(vulkan_backend PUBLIC "${backend_interfaces_path}")

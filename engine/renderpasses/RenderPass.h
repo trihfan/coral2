@@ -6,6 +6,7 @@
 namespace coral
 {
     class Resource;
+    class Pipeline;
     struct RenderQueue;
     struct RenderParameters;
 
@@ -25,7 +26,7 @@ namespace coral
         void invalidate();
         void prepare(const RenderParameters& parameters);
 
-        // render the content
+        // Render the content
         void render(RenderQueue& queue, const RenderParameters& parameters);
 
         // Inputs by name
@@ -47,9 +48,12 @@ namespace coral
         Handle<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
 
     private:
-        // render pass resources
+        // Render pass resources
         std::vector<RenderPassResource> inputs;
         std::vector<RenderPassResource> outputs;
+
+        // Pipelines
+        std::vector<Handle<Pipeline>> pipelines;
 
         // The output framebuffer
         Handle<Framebuffer> framebuffer;

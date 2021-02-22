@@ -1,6 +1,8 @@
 #include "BasicMaterial.h"
 #include "Engine.h"
-#include "resources/Shader.h"
+#include "renderpasses/RenderPassManager.h"
+#include "resources/PipelineManager.h"
+#include "resources/ResourceManager.h"
 #include "scene/Node.h"
 #include "scene/camera/Camera.h"
 #include <glm/gtx/transform.hpp>
@@ -8,27 +10,34 @@
 using namespace coral;
 
 BasicMaterial::BasicMaterial()
-    : Material("basic_material")
 {
+    PipelineParams params;
+    params.renderpass = defaultRenderPassName;
+
+    auto shader = ResourceManager::getShader("basic_material");
+    params.vertexShaderFile = shader.vertexFile;
+    params.fragmentShaderFile = shader.fragmentFile;
+
+    pipeline = PipelineManager::getPipeline(params);
 }
 
 void BasicMaterial::use(const RenderParameters& parameters)
 {
-    shader->setMat4("view", parameters.camera->getViewProjectionMatrix());
-    shader->setVec3("viewPosition", parameters.camera->getWorldPosition());
+    pipeline->setUniform("view", parameters.camera->getViewProjectionMatrix());
+    pipeline->setUniform("viewPosition", parameters.camera->getWorldPosition());
 
     // Point lights
     size_t lightCount = std::min(parameters.lights.pointLights.size(), static_cast<size_t>(32));
-    shader->setInt("pointLightCount", static_cast<int>(lightCount));
+    pipeline->setUniform("pointLightCount", static_cast<int>(lightCount));
     for (size_t i = 0; i < lightCount; i++)
     {
         const auto& light = parameters.lights.pointLights[i];
         std::string lightStr = "pointLights[" + std::to_string(i) + "]";
-        shader->setVec3(lightStr + ".position", *light->position);
-        shader->setVec3(lightStr + ".color", *light->color);
-        shader->setFloat(lightStr + ".constant", *light->constant);
-        shader->setFloat(lightStr + ".linear", *light->linear);
-        shader->setFloat(lightStr + ".quadratic", *light->quadratic);
+        pipeline->setUniform(lightStr + ".position", *light->position);
+        pipeline->setUniform(lightStr + ".color", *light->color);
+        pipeline->setUniform(lightStr + ".constant", *light->constant);
+        pipeline->setUniform(lightStr + ".linear", *light->linear);
+        pipeline->setUniform(lightStr + ".quadratic", *light->quadratic);
     }
 
     // Ambient light
@@ -37,12 +46,12 @@ void BasicMaterial::use(const RenderParameters& parameters)
     }
 
     // Material
-    shader->setVec3("material.color", *color);
-    shader->setFloat("material.shininess", *shininess);
+    pipeline->setUniform("material.color", *color);
+    pipeline->setUniform("material.shininess", *shininess);
 }
 
 void BasicMaterial::setNode(Handle<Node> node)
 {
     // Matrix
-    shader->setMat4("model", node->getWorldMatrix());
+    pipeline->setUniform("model", node->getWorldMatrix());
 }

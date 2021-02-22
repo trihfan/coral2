@@ -1,5 +1,6 @@
 #include "OpenglBackend.h"
 #include "Logs.h"
+#include "OpenglPipeline.h"
 
 using namespace coral;
 
@@ -25,4 +26,9 @@ bool OpenglBackend::destroy()
 bool OpenglBackend::resize(int width, int height)
 {
     return true;
+}
+
+std::unique_ptr<BackendPipeline> OpenglBackend::createPipeline(const BackendPipelineParams& params) const
+{
+    return std::make_unique<OpenglPipeline>(params);
 }

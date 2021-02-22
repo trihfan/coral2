@@ -1,19 +1,14 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "OpenglBackend.h"
 
-#include "Object.h"
-#include "utils/Singleton.h"
 #include <array>
-#include <filesystem>
 #include <glm/glm.hpp>
 #include <string>
-#include <unordered_map>
-#include <variant>
 
 namespace coral
 {
-    class Shader : public Object
+    class Shader
     {
     public:
         // supported shader types
@@ -24,11 +19,12 @@ namespace coral
             geometry
         };
 
-        // Construction
-        Shader();
-
         // add a shader data
         void addShaderData(ShaderType type, const std::string& data);
+
+        // initialization
+        void init();
+        ~Shader();
 
         // use the shader
         // ------------------------------------------------------------------------
@@ -54,30 +50,5 @@ namespace coral
         // utility function for checking shader compilation/linking errors.
         // ------------------------------------------------------------------------
         void checkCompileErrors(GLuint shader, std::string type);
-
-        // initialization
-        void init();
-        void release();
-    };
-
-    // The shader manager
-    class ShaderManager
-    {
-        MAKE_SINGLETON(ShaderManager)
-    public:
-        // add a path to looks for loading shaders
-        static void addShaderPath(const std::filesystem::path& path);
-
-        // get the shader of the given name
-        static Handle<Shader> getShader(const std::string& name);
-
-    private:
-        ShaderManager();
-        void iterateFolder(const std::filesystem::path& path);
-        int getShaderType(const std::filesystem::path& extension) const;
-
-    private:
-        static std::vector<std::filesystem::path> paths;
-        std::unordered_map<std::string, Handle<Shader>> shaders;
     };
 }

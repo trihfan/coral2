@@ -7,6 +7,10 @@ using namespace coral;
 
 DEFINE_SINGLETON(RenderPassFramebufferManager)
 
+void RenderPassFramebufferManager::release()
+{
+}
+
 bool operator==(std::vector<FramebufferResource> a, const std::vector<FramebufferResource>& b)
 {
     if (a.size() == b.size())

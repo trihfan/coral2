@@ -4,7 +4,6 @@
 #include "OpenglError.h"
 #include "materials/PresentationMaterial.h"
 #include "resources/Resource.h"
-#include "resources/Shader.h"
 #include "scene/mesh/Mesh.h"
 #include <numeric>
 
@@ -38,8 +37,8 @@ void RenderPassPresentation::internalRender(RenderQueue& queue, const RenderPara
     glActiveTexture(GL_TEXTURE0);
     inputResources[0]->bind();
 
-    presentationMaterial->getShader()->use();
-    presentationMaterial->getShader()->setInt("backbuffer", 0);
+    presentationMaterial->pipeline->use();
+    presentationMaterial->pipeline->setUniform("backbuffer", 0);
 
     screenQuad->draw(parameters);
 

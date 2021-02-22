@@ -8,9 +8,10 @@ add_library(engine STATIC ${sources})
 target_include_directories(engine PUBLIC "${engine_path}")
 target_include_directories(engine PUBLIC "${utils_path}")
 target_link_libraries(engine PUBLIC utils)
+set_folder_structure("${sources}" ${engine_path})
 
 # Backends
-target_include_directories(engine PUBLIC "${backend_interfaces_path}")
+target_include_directories(engine PUBLIC "${backends_path}/interfaces")
 target_link_libraries(engine PUBLIC backend_interfaces)
 
 # glm

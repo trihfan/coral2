@@ -6,6 +6,7 @@ file(GLOB_RECURSE sources *.h *.cpp *.c)
 # Make lib
 add_library(utils STATIC ${sources})
 target_include_directories(utils PUBLIC "${utils_path}")
+set_folder_structure("${sources}" ${utils_path})
 
 # Set output directories
 set_target_properties(utils PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

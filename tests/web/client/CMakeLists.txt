@@ -14,6 +14,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 link_directories(client ${lib_output_directory})
 file(GLOB_RECURSE sources *.h *.cpp *.c)
 add_executable(client ${sources})
+set_folder_structure("${sources}" ${client_path})
 
 # dependencies
 target_link_libraries(client PRIVATE engine glfw opengl_backend GLEW::GLEW)
