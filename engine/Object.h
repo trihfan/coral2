@@ -17,7 +17,7 @@ namespace coral
     public:
         // construction
         Object();
-        virtual ~Object();
+        virtual ~Object() override;
 
         // type
         template <typename Type>

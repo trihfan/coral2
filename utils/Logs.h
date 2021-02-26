@@ -2,9 +2,10 @@
 #define LOGS_H
 
 #include <array>
+#include <glm/gtx/io.hpp>
+#include <iostream>
 #include <string>
 #include <string_view>
-#include <iostream>
 
 namespace coral
 {

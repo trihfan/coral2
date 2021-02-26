@@ -15,9 +15,11 @@ namespace coral
         static Handle<Pipeline> getPipeline(const PipelineParams& params);
 
     protected:
-        PipelineManager() = default;
+        PipelineManager();
 
         std::vector<std::pair<PipelineParams, Handle<Pipeline>>> pipelines;
         std::vector<Handle<Pipeline>> pipelinesToAssign;
+        int width;
+        int height;
     };
 }

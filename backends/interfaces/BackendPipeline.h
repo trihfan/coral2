@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
-namespace coral
+namespace backend
 {
     struct BackendPipelineParams
     {
@@ -14,6 +14,7 @@ namespace coral
     {
     public:
         virtual void use() = 0;
+        virtual void resize(int width, int height) = 0;
 
         virtual void setUniform(const std::string& name, bool value) const = 0;
         virtual void setUniform(const std::string& name, int value) const = 0;

@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include "scene/Node.h"
 #include <glm/glm.hpp>
@@ -12,7 +11,7 @@ namespace coral
     public:
         // Construction
         Camera();
-        virtual ~Camera() = default;
+        virtual ~Camera() override = default;
 
         // Signals
         Signal<const glm::mat4&> viewProjectionChanged;
@@ -30,6 +29,9 @@ namespace coral
         // Get view center
         const glm::vec3& getViewCenter() const;
 
+        // Get up
+        const glm::vec3& getUp() const;
+
         // Get the projection view matrix
         const glm::mat4& getViewProjectionMatrix() const;
 
@@ -45,4 +47,3 @@ namespace coral
         void updateMatrix();
     };
 }
-#endif

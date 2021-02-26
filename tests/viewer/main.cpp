@@ -7,7 +7,7 @@
 #include "resources/ResourceManager.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
-#include "scene/camera/Camera.h"
+#include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
 #include "scene/mesh/Mesh.h"
 #include <GLFW/glfw3.h>
@@ -16,17 +16,13 @@
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 600;
-const unsigned int SCR_HEIGHT = 400;
-double lastX = SCR_WIDTH / 2.0f;
-double lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-bool mousePressed = false;
-Handle<Camera> camera;
-
-// timing todo timemanager
-double deltaTime = 0;
-double lastFrame = 0;
+const unsigned int SCR_WIDTH = 1200;
+const unsigned int SCR_HEIGHT = 720;
+static double lastX = SCR_WIDTH / 2.;
+static double lastY = SCR_HEIGHT / 2.;
+static bool firstMouse = true;
+static bool mousePressed = false;
+static Handle<OrbitCamera> camera;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -83,14 +79,14 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    std::unique_ptr<Backend> backend;
+    std::unique_ptr<backend::Backend> backend;
     if (type == opengl)
     {
-        backend = std::make_unique<OpenglBackend>();
+        backend = std::make_unique<backend::opengl::OpenglBackend>();
     }
     else if (type == vulkan)
     {
-        backend = std::make_unique<VulkanBackend>(window);
+        backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
         backend->init();
         backend->resize(SCR_WIDTH, SCR_HEIGHT);
         backend->destroy();
@@ -108,10 +104,11 @@ int main()
     SceneManager::setCurrentScene(scene);
 
     // camera
-    camera = ObjectFactory::createWithName<Camera>("camera");
-    camera->setPerspective(45.f, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100.f));
+    camera = ObjectFactory::createWithName<OrbitCamera>("camera");
+    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
+    camera->setDistanceMinMax(0.3f, 10);
     scene->add(camera);
 
     // material
@@ -121,12 +118,35 @@ int main()
 
     // vertices
     std::vector<Vertex> vertices {
-        Vertex { glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        Vertex { glm::vec3(-0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f, 0.5f, 0.f), glm::vec3(0.0f, 0.0f, 1.0f) },
+        // front
+        Vertex { glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+
+        // back
+        Vertex { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex { glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+
+        // right
+        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+
+        // left
+
+        // top
+
+        // bottom
     };
 
     std::vector<unsigned int> indices(vertices.size());
@@ -147,7 +167,7 @@ int main()
     scene->add(light1);
 
     auto light2 = ObjectFactory::create<PointLight>();
-    light2->position = glm::vec3(0, 0.5, 3);
+    light2->position = glm::vec3(0, 0.5, -3);
     light2->color = glm::vec3(1, 1, 1);
     light2->constant = 1;
     light2->linear = 0.09f;
@@ -183,16 +203,16 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow*, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-    camera->setPerspective(45.f, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100.f));
+    camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width * 2, height * 2);
 }
 
-void mouse_button(GLFWwindow* window, int button, int action, int mods)
+void mouse_button(GLFWwindow*, int button, int action, int mods)
 {
     if (button == 0)
     {
@@ -201,7 +221,7 @@ void mouse_button(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback(GLFWwindow*, double xpos, double ypos)
 {
     if (!mousePressed)
     {
@@ -216,20 +236,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     }
 
     double xoffset = xpos - lastX;
-    double yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    double yoffset = lastY - ypos;
 
     lastX = xpos;
     lastY = ypos;
 
-    // update camera
-    auto distance = (camera->getViewCenter() - *camera->position).length();
+    // update camera.
+    camera->move(static_cast<float>(xoffset) * 0.1f, static_cast<float>(yoffset) * 0.1f);
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scroll_callback(GLFWwindow*, double, double yoffset)
 {
-    glm::vec3 view = camera->getViewCenter() - *camera->position;
-    float distance = float(view.length());
-    float movement = std::min(distance, float(yoffset) * 0.1f);
-    glm::vec3 direction = view / distance;
-    camera->position = *camera->position + movement * direction;
+    camera->zoom(static_cast<float>(yoffset) * 0.3f);
 }

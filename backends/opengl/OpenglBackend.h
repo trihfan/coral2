@@ -3,9 +3,9 @@
 #include "Backend.h"
 #include <GL/glew.h>
 
-namespace coral
+namespace backend::opengl
 {
-    class OpenglBackend : public Backend
+    class OpenglBackend : public backend::Backend
     {
     public:
         bool init() override;

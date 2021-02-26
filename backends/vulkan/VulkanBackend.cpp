@@ -2,12 +2,14 @@
 #include "CoralException.h"
 #include "Logs.h"
 #include "VulkanError.h"
+#include "VulkanPipeline.h"
 #include "VulkanValidation.h"
 #include <algorithm>
-#include <set>
 #include <cstring>
+#include <set>
 
 using namespace coral;
+using namespace backend::vulkan;
 
 VulkanBackend::VulkanBackend(GLFWwindow* window)
     : window(window)
@@ -61,6 +63,11 @@ bool VulkanBackend::destroy()
     vkDestroyDevice(mainDevice.logicalDevice, nullptr);
     vkDestroyInstance(instance, nullptr);
     return true;
+}
+
+std::unique_ptr<backend::BackendPipeline> VulkanBackend::createPipeline(const BackendPipelineParams& params) const
+{
+    return std::make_unique<VulkanPipeline>(params, mainDevice);
 }
 
 void VulkanBackend::createInstance()

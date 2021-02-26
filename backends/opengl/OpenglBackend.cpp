@@ -3,6 +3,7 @@
 #include "OpenglPipeline.h"
 
 using namespace coral;
+using namespace backend::opengl;
 
 bool OpenglBackend::init()
 {
@@ -28,7 +29,7 @@ bool OpenglBackend::resize(int width, int height)
     return true;
 }
 
-std::unique_ptr<BackendPipeline> OpenglBackend::createPipeline(const BackendPipelineParams& params) const
+std::unique_ptr<backend::BackendPipeline> OpenglBackend::createPipeline(const BackendPipelineParams& params) const
 {
     return std::make_unique<OpenglPipeline>(params);
 }

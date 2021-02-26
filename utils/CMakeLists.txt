@@ -8,6 +8,10 @@ add_library(utils STATIC ${sources})
 target_include_directories(utils PUBLIC "${utils_path}")
 set_folder_structure("${sources}" ${utils_path})
 
+# glm
+target_include_directories(utils PUBLIC "${glm_path}")
+add_dependencies(utils glm)
+
 # Set output directories
 set_target_properties(utils PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
 set_target_properties(utils PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})

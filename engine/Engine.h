@@ -6,10 +6,13 @@
 #include <chrono>
 #include <memory>
 
-namespace coral
+namespace backend
 {
     class Backend;
+}
 
+namespace coral
+{
     /**
      * @brief Main class of the engine
      */
@@ -30,21 +33,21 @@ namespace coral
         /**
          * @brief Return the backend
          */
-        static Backend& getBackend();
+        static backend::Backend& getBackend();
 
     private:
         /**
          * @brief Constructor
          * @param config The engine config used to create the render graph
          */
-        Engine(std::shared_ptr<Backend> backend);
+        Engine(std::shared_ptr<backend::Backend> backend);
 
     private:
         // Time point of engine start
         std::chrono::steady_clock::time_point startTime;
 
         // Renderer backend
-        std::shared_ptr<Backend> backend;
+        std::shared_ptr<backend::Backend> backend;
 
         // Current render parameters
         RenderParameters currentParameters;

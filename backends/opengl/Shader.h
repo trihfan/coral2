@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
-namespace coral
+namespace backend::opengl
 {
     class Shader
     {

@@ -15,6 +15,7 @@ namespace coral
     public:
         // construction
         Node(Handle<Node> parent = nullptr);
+        virtual ~Node() override = default;
 
         // meta
         virtual bool isDrawable() const;

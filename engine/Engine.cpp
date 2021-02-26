@@ -26,7 +26,7 @@ void RenderParameters::clear()
 
 DEFINE_SINGLETON(Engine)
 
-Engine::Engine(std::shared_ptr<Backend> backend)
+Engine::Engine(std::shared_ptr<backend::Backend> backend)
     : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
@@ -57,6 +57,7 @@ void Engine::release()
     PipelineManager::destroy();
     ObjectFactory::destroy();
 
+    // Destroy backend
     backend->destroy();
 }
 
@@ -68,7 +69,7 @@ void Engine::resize(int width, int height)
     PipelineManager::resize(width, height);
 }
 
-Backend& Engine::getBackend()
+backend::Backend& Engine::getBackend()
 {
     return *instance->backend;
 }
@@ -95,15 +96,15 @@ void Engine::frame()
     // This allocate and deallocate gpu data
     ObjectFactory::update();
 
-    // Render each renderpasses
+    // Render for each active camera
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
     {
         currentParameters.camera = SceneManager::getCameras()[i];
 
-        // Cull
+        // Cull for current camera
         auto queues = SceneManager::buildRenderQueuesFor(currentParameters);
 
-        // Draw
+        // Render each renderpasses
         for (auto& renderpass : RenderPassManager::getOrderedRenderPasses())
         {
             auto it = queues.find(renderpass->getName());

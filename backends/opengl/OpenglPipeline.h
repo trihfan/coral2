@@ -1,15 +1,16 @@
 #pragma once
 #include "BackendPipeline.h"
 
-namespace coral
+namespace backend::opengl
 {
     class Shader;
 
-    class OpenglPipeline : public BackendPipeline
+    class OpenglPipeline : public backend::BackendPipeline
     {
     public:
         OpenglPipeline(const BackendPipelineParams& params);
         void use() override;
+        void resize(int width, int height) override { }
 
         void setUniform(const std::string& name, bool value) const override;
         void setUniform(const std::string& name, int value) const override;

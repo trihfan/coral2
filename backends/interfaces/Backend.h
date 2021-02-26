@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-namespace coral
+namespace backend
 {
     class BackendPipeline;
     struct BackendPipelineParams;

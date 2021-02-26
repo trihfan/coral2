@@ -49,3 +49,8 @@ const glm::vec3& Camera::getViewCenter() const
 {
     return center;
 }
+
+const glm::vec3& Camera::getUp() const
+{
+    return up;
+}
