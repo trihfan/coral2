@@ -4,6 +4,7 @@
 #include "Signal.h"
 #include <memory>
 #include <string>
+#include <string_view>
 
 namespace coral
 {
@@ -21,7 +22,7 @@ namespace coral
 
         // type
         template <typename Type>
-        bool isA() const { return dynamic_cast<const Type*>(this) != nullptr; }
+        bool isA() const;
 
         // name
         void setName(const std::string& name);
@@ -45,4 +46,10 @@ namespace coral
     private:
         std::string name;
     };
+
+    template <typename Type>
+    bool Object::isA() const
+    {
+        return dynamic_cast<const Type*>(this) != nullptr;
+    }
 }

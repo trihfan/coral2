@@ -1,9 +1,12 @@
-#include "Signal.h"
+#include "Logs.h"
 #include "Property.h"
+#include "Signal.h"
+#include <chrono>
 #include <iostream>
 #include <vector>
 
 using namespace coral;
+using namespace std::chrono;
 
 class my_class
 {
