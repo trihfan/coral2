@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "VulkanShader.h"
 #include "CoralException.h"
 #include "Logs.h"
 #include "VulkanError.h"
@@ -8,8 +8,9 @@
 
 using namespace backend::vulkan;
 
-Shader::Shader(const std::string& filename, VkDevice device) :
-    shaderModule(nullptr), device(device)
+VulkanShader::VulkanShader(const std::string& filename, VkDevice device)
+    : shaderModule(nullptr)
+    , device(device)
 {
     // Load code
     std::vector<char> code = read(filename);
@@ -26,12 +27,13 @@ Shader::Shader(const std::string& filename, VkDevice device) :
     }
 }
 
-Shader::Shader(const Shader& other) :
-    shaderModule(other.shaderModule), device(other.device)
+VulkanShader::VulkanShader(const VulkanShader& other)
+    : shaderModule(other.shaderModule)
+    , device(other.device)
 {
 }
 
-Shader::~Shader()
+VulkanShader::~VulkanShader()
 {
     if (shaderModule)
     {
@@ -39,12 +41,12 @@ Shader::~Shader()
     }
 }
 
-Shader::operator VkShaderModule() const
+VulkanShader::operator VkShaderModule() const
 {
     return shaderModule;
 }
 
-std::vector<char> Shader::read(const std::string& filename) const
+std::vector<char> VulkanShader::read(const std::string& filename) const
 {
     // Open stream from given file
     // std::ios::binary tells stream to read file as binary
@@ -73,7 +75,7 @@ std::vector<char> Shader::read(const std::string& filename) const
     return fileBuffer;
 }
 
-Shader Shader::fromGlsl(const std::string& filename, VkDevice device)
+VulkanShader VulkanShader::fromGlsl(const std::string& filename, VkDevice device)
 {
     // Convert
     std::string tempFile = std::filesystem::temp_directory_path().string() + "temp.spv";
@@ -83,7 +85,7 @@ Shader Shader::fromGlsl(const std::string& filename, VkDevice device)
     system(commandStr.c_str());
 
     // Load
-    Shader shader(tempFile, device);
+    VulkanShader shader(tempFile, device);
 
     // Clean up
     std::filesystem::remove(std::filesystem::path(tempFile));

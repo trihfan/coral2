@@ -8,7 +8,9 @@ bool PipelineParams::operator==(const PipelineParams& other) const
 {
     return renderpass == other.renderpass
         && vertexShaderFile == other.vertexShaderFile
-        && fragmentShaderFile == other.fragmentShaderFile;
+        && fragmentShaderFile == other.fragmentShaderFile
+        && depthTest == other.depthTest
+        && cullFace == other.cullFace;
 }
 
 Pipeline::Pipeline(const PipelineParams& params)
@@ -42,10 +44,8 @@ void Pipeline::resize(int width, int height)
 
 void Pipeline::init()
 {
-    backend::BackendPipelineParams params;
-    params.vertexShaderFile = this->params.vertexShaderFile;
-    params.fragmentShaderFile = this->params.fragmentShaderFile;
-    backendPipeline = Engine::getBackend().createPipeline(params);
+    backend::BackendPipelineParams bParams = params;
+    backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(bParams);
 }
 
 void Pipeline::release()

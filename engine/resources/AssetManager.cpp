@@ -1,18 +1,19 @@
-#include "ResourceManager.h"
+#include "AssetManager.h"
 #include "FileUtils.h"
 #include "Logs.h"
+#include <filesystem>
 
 using namespace coral;
 
-std::vector<std::filesystem::path> ResourceManager::paths;
-std::unordered_map<std::string, ShaderFiles> ResourceManager::shaders;
+std::vector<std::filesystem::path> AssetManager::paths;
+std::unordered_map<std::string, ShaderFiles> AssetManager::shaders;
 
-void ResourceManager::addFolder(const std::filesystem::path& folder)
+void AssetManager::addFolder(const std::filesystem::path& folder)
 {
     paths.push_back(folder);
 }
 
-void ResourceManager::init()
+void AssetManager::init()
 {
     // list resources
     for (const std::filesystem::path& path : paths)
@@ -21,7 +22,7 @@ void ResourceManager::init()
     }
 }
 
-ShaderFiles ResourceManager::getShader(const std::string& name)
+ShaderFiles AssetManager::getShader(const std::string& name)
 {
     auto it = shaders.find(name);
     if (it != shaders.end())
@@ -33,7 +34,7 @@ ShaderFiles ResourceManager::getShader(const std::string& name)
     return ShaderFiles();
 }
 
-void ResourceManager::iterateFolder(const std::filesystem::path& path)
+void AssetManager::iterateFolder(const std::filesystem::path& path)
 {
     listShaders(path);
 
@@ -50,7 +51,7 @@ void ResourceManager::iterateFolder(const std::filesystem::path& path)
 static bool isVertex(const std::string& extension) { return extension == ".vert" || extension == ".vs" || extension == ".vs.glsl"; }
 static bool isFragment(const std::string& extension) { return extension == ".frag" || extension == ".fs" || extension == ".fs.glsl"; }
 
-void ResourceManager::listShaders(const std::filesystem::path& path)
+void AssetManager::listShaders(const std::filesystem::path& path)
 {
     // list shaders in folder
     for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(path))

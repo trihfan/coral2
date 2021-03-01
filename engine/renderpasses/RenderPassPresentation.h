@@ -22,5 +22,9 @@ namespace coral
     private:
         Handle<Mesh> screenQuad;
         Handle<PresentationMaterial> presentationMaterial;
+        std::unique_ptr<backend::BackendDefaultFramebuffer> defaultFramebuffer;
+
+        void init();
+        void release();
     };
 }

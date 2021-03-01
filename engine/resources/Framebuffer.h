@@ -1,49 +1,49 @@
 #pragma once
 
-#include <GL/glew.h>
-
+#include "BackendFramebuffer.h"
 #include "Object.h"
+#include "Resource.h"
+#include <memory>
 #include <vector>
 
 namespace coral
 {
-    class Engine;
-    class Resource;
-
-    enum class ResourceRole
-    {
-        color,
-        depth,
-        stencil
-    };
     struct FramebufferResource
     {
+        backend::BackendFramebufferResourceRole role;
         Handle<Resource> resource;
-        ResourceRole role;
     };
 
-    //
     class Framebuffer : public Object
     {
     public:
         Framebuffer();
 
-        /// Custom framebuffer
-        Framebuffer(GLuint id);
-
-        //
         void addResource(const FramebufferResource& resource);
         const std::vector<FramebufferResource>& getResources() const;
 
-        void bind(GLenum target = GL_DRAW_FRAMEBUFFER);
+        void bind(backend::BackendFramebufferUsage usage);
 
     private:
         // initialization
-        void init();
-        void release();
+        virtual void init();
+        virtual void release();
 
-    private:
-        GLuint framebufferId;
+        std::unique_ptr<backend::BackendFramebuffer> backendFramebuffer;
         std::vector<FramebufferResource> resources;
+    };
+
+    class DefaultFramebuffer : public Object
+    {
+    public:
+        DefaultFramebuffer();
+        void bind(backend::BackendFramebufferUsage usage);
+
+    protected:
+        std::unique_ptr<backend::BackendDefaultFramebuffer> defaultFramebuffer;
+
+        // initialization
+        virtual void init();
+        virtual void release();
     };
 }

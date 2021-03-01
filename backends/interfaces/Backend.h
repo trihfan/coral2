@@ -1,4 +1,6 @@
 #pragma once
+#include "BackendCapabilities.h"
+#include "BackendObjectFactory.h"
 #include <memory>
 
 namespace backend
@@ -14,8 +16,14 @@ namespace backend
         virtual bool init() = 0;
         virtual bool destroy() = 0;
         virtual bool resize(int width, int height) = 0;
+        virtual BackendCapabilities capabilities() const = 0;
 
-        // Creation
-        virtual std::unique_ptr<BackendPipeline> createPipeline(const BackendPipelineParams& params) const = 0;
+        static Backend* current();
+
+    protected:
+        static void setCurrent(Backend* backend);
+
+    private:
+        static Backend* currentBackend;
     };
 }

@@ -1,18 +1,14 @@
 #include "Framebuffer.h"
+#include "Engine.h"
+#include "ObjectFactory.h"
 #include "Resource.h"
-
-#include "OpenglError.h"
 
 using namespace coral;
 
-Framebuffer::Framebuffer() : framebufferId(0)
+Framebuffer::Framebuffer()
 {
     connect<&Framebuffer::init>(Object::init, this);
     connect<&Framebuffer::release>(Object::release, this);
-}
-
-Framebuffer::Framebuffer(GLuint id) : framebufferId(id)
-{
 }
 
 void Framebuffer::addResource(const FramebufferResource& resource)
@@ -25,47 +21,44 @@ const std::vector<FramebufferResource>& Framebuffer::getResources() const
     return resources;
 }
 
-void Framebuffer::bind(GLenum target)
+void Framebuffer::bind(backend::BackendFramebufferUsage usage)
 {
-    glBindFramebuffer(target, framebufferId);
-    CHECK_OPENGL_ERROR
+    backendFramebuffer->bind(usage);
 }
 
 void Framebuffer::init()
 {
-    glGenFramebuffers(1, &framebufferId);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
-
-    // add resources
-    int colorCount = 0;
+    std::vector<backend::BackendFramebufferResource> backendResources;
     for (const auto& resource : resources)
     {
-        resource.resource->bind();
-        
-        GLenum type;
-        switch (resource.role)
-        {
-        case ResourceRole::color:
-            type = GL_COLOR_ATTACHMENT0 + colorCount++;
-            break;
-
-        case ResourceRole::depth:
-            type = GL_DEPTH_ATTACHMENT;
-            break;
-
-        case ResourceRole::stencil:
-            type = GL_STENCIL_ATTACHMENT;
-            break;
-        }
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, type, *resource.resource->sampleCount == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, resource.resource->getId(), 0);
+        backendResources.push_back(backend::BackendFramebufferResource { resource.role, resource.resource->getBackendResource() });
     }
 
-    CHECK_OPENGL_ERROR
+    backendFramebuffer = backend::BackendObjectFactory<backend::BackendFramebuffer>::create(backendResources);
 }
 
 void Framebuffer::release()
 {
-    glDeleteFramebuffers(1, &framebufferId);
-    CHECK_OPENGL_ERROR
+    backendFramebuffer = nullptr;
+}
+
+DefaultFramebuffer::DefaultFramebuffer()
+{
+    connect<&DefaultFramebuffer::init>(Object::init, this);
+    connect<&DefaultFramebuffer::release>(Object::release, this);
+}
+
+void DefaultFramebuffer::bind(backend::BackendFramebufferUsage usage)
+{
+    defaultFramebuffer->bind(usage);
+}
+
+void DefaultFramebuffer::init()
+{
+    defaultFramebuffer = backend::BackendObjectFactory<backend::BackendDefaultFramebuffer>::create();
+}
+
+void DefaultFramebuffer::release()
+{
+    defaultFramebuffer = nullptr;
 }

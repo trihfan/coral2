@@ -5,15 +5,18 @@
 #include "renderpasses/RenderPassDefault.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassPresentation.h"
+#include "resources/Pipeline.h"
 #include "resources/Resource.h"
 
 using namespace coral;
 
+EngineParameters EngineConfig::parameters;
+
 void EngineConfig::setup()
 {
-    RenderPassResource backbuffer { "backbuffer", ResourceRole::color, GL_RGBA, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, 1 };
-    RenderPassResource depth { "depth", ResourceRole::depth, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1 };
-    RenderPassResource stencil { "depth", ResourceRole::stencil, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 1 };
+    RenderPassResource backbuffer { "backbuffer", backend::BackendFramebufferResourceRole::color, backend::BackendResourceFormat::r8g8b8a8u, 1 };
+    RenderPassResource depth { "depth", backend::BackendFramebufferResourceRole::depth, backend::BackendResourceFormat::depth24_pencil8, 1 };
+    RenderPassResource stencil { "depth", backend::BackendFramebufferResourceRole::stencil, backend::BackendResourceFormat::depth24_pencil8, 1 };
 
     // default
     auto defaultRenderPass = ObjectFactory::createWithName<RenderPassDefault>(coral::defaultRenderPassName);

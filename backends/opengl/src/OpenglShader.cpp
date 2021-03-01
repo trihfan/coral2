@@ -1,14 +1,15 @@
-#include "Shader.h"
+#include "OpenglShader.h"
 #include "Logs.h"
 
+using namespace backend::opengl;
 using namespace coral;
 
-void Shader::addShaderData(ShaderType type, const std::string& data)
+void OpenglShader::addShaderData(ShaderType type, const std::string& data)
 {
     shader_data[static_cast<size_t>(type)] = data;
 }
 
-void Shader::init()
+void OpenglShader::init()
 {
     // 1. check shader data
     bool has_geometry = !shader_data[geometry].empty();
@@ -64,68 +65,68 @@ void Shader::init()
     shader_data = {};
 }
 
-Shader::~Shader()
+OpenglShader::~OpenglShader()
 {
     glDeleteProgram(id);
     id = 0;
 }
 
-void Shader::use()
+void OpenglShader::use()
 {
     glUseProgram(id);
 }
 
-GLuint Shader::getId() const
+GLuint OpenglShader::getId() const
 {
     return id;
 }
 
-void Shader::setUniform(const std::string& name, bool value) const
+void OpenglShader::setUniform(const std::string& name, bool value) const
 {
     glUniform1i(glGetUniformLocation(id, name.c_str()), value ? 1 : 0);
 }
 
-void Shader::setUniform(const std::string& name, int value) const
+void OpenglShader::setUniform(const std::string& name, int value) const
 {
     glUniform1i(glGetUniformLocation(id, name.c_str()), value);
 }
 
-void Shader::setUniform(const std::string& name, float value) const
+void OpenglShader::setUniform(const std::string& name, float value) const
 {
     glUniform1f(glGetUniformLocation(id, name.c_str()), value);
 }
 
-void Shader::setUniform(const std::string& name, const glm::vec2& value) const
+void OpenglShader::setUniform(const std::string& name, const glm::vec2& value) const
 {
     glUniform2fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::setUniform(const std::string& name, const glm::vec3& value) const
+void OpenglShader::setUniform(const std::string& name, const glm::vec3& value) const
 {
     glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::setUniform(const std::string& name, const glm::vec4& value) const
+void OpenglShader::setUniform(const std::string& name, const glm::vec4& value) const
 {
     glUniform4fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void Shader::setUniform(const std::string& name, const glm::mat2& mat) const
+void OpenglShader::setUniform(const std::string& name, const glm::mat2& mat) const
 {
     glUniformMatrix2fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setUniform(const std::string& name, const glm::mat3& mat) const
+void OpenglShader::setUniform(const std::string& name, const glm::mat3& mat) const
 {
     glUniformMatrix3fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setUniform(const std::string& name, const glm::mat4& mat) const
+void OpenglShader::setUniform(const std::string& name, const glm::mat4& mat) const
 {
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::checkCompileErrors(GLuint shader, std::string type)
+void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
 {
     GLint success;
     GLchar infoLog[1024];

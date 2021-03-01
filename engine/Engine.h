@@ -30,11 +30,6 @@ namespace coral
          */
         static void frame();
 
-        /**
-         * @brief Return the backend
-         */
-        static backend::Backend& getBackend();
-
     private:
         /**
          * @brief Constructor

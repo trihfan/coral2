@@ -10,14 +10,10 @@ namespace coral
      * @brief The PipelineParams contains the creation parameters 
      * for the pipeline
      */
-    struct PipelineParams
+    struct PipelineParams : backend::BackendPipelineParams
     {
         // Corresponding renderpass
         std::string renderpass;
-
-        // Shader
-        std::string vertexShaderFile;
-        std::string fragmentShaderFile;
 
         // Comparison
         bool operator==(const PipelineParams& other) const;

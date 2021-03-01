@@ -32,6 +32,8 @@ bool VulkanBackend::init()
     {
         return false;
     }
+
+    Backend::setCurrent(this);
     return true;
 }
 
@@ -65,9 +67,11 @@ bool VulkanBackend::destroy()
     return true;
 }
 
-std::unique_ptr<backend::BackendPipeline> VulkanBackend::createPipeline(const BackendPipelineParams& params) const
+backend::BackendCapabilities VulkanBackend::capabilities() const
 {
-    return std::make_unique<VulkanPipeline>(params, mainDevice);
+    BackendCapabilities capabilities;
+    capabilities.multithreadCapable = true;
+    return capabilities;
 }
 
 void VulkanBackend::createInstance()

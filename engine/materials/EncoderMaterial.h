@@ -1,7 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
-
 #include "Material.h"
 #include "Property.h"
 #include <glm/glm.hpp>
@@ -18,6 +16,6 @@ namespace coral
         virtual void use(const RenderParameters& parameters) override;
 
         // uniforms
-        Property<GLuint> colorBuffer;
+        //Property<GLuint> colorBuffer;
     };
 }

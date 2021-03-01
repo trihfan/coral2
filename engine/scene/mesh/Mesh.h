@@ -1,8 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <GL/glew.h>
-
 #include "scene/DrawableNode.h"
 #include <glm/glm.hpp>
 #include <memory>
@@ -33,10 +31,10 @@ namespace coral
         // mesh Data
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        GLuint VAO;
+        //GLuint VAO;
 
         // render data
-        GLuint VBO, EBO;
+        //GLuint VBO, EBO;
 
         // initializes all the buffer objects/arrays
         void setupMesh();

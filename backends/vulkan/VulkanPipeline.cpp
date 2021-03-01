@@ -1,17 +1,18 @@
 #include "VulkanPipeline.h"
 #include "Logs.h"
-#include "Shader.h"
 #include "VulkanBackend.h"
+#include "VulkanShader.h"
 
 using namespace coral;
 using namespace backend::vulkan;
 
 VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, VulkanDevice device)
-    : device(device)
+    : BackendPipeline(params)
+    , device(device)
 {
     // Create Shader Modules
-    Shader vertexShaderModule(params.vertexShaderFile, device.logicalDevice);
-    Shader fragmentShaderModule(params.fragmentShaderFile, device.logicalDevice);
+    VulkanShader vertexShaderModule(params.vertexShaderFile, device.logicalDevice);
+    VulkanShader fragmentShaderModule(params.fragmentShaderFile, device.logicalDevice);
 
     // Vertex Stage creation information
     VkPipelineShaderStageCreateInfo vertexShaderCreateInfo = {};

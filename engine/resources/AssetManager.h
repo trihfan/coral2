@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace coral
 {
@@ -16,9 +17,9 @@ namespace coral
     };
 
     /**
-     * @brief The ResourceManager class handle resources filepaths
+     * @brief The AssetManager class handle resources filepaths
      */
-    class ResourceManager
+    class AssetManager
     {
     public:
         /**

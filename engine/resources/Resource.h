@@ -1,37 +1,33 @@
 #pragma once
 
-#include <GL/glew.h>
-
+#include "BackendResource.h"
 #include "Object.h"
 #include "Property.h"
+#include <memory>
 
 namespace coral
 {
     class Engine;
 
-    //
+    /**
+     * @brief The Resource class represent a gpu resource
+     * It encapsulate the BackendResource
+     */
     class Resource : public Object
     {
     public:
         Resource();
-
         void bind();
-        GLuint getId() const;
+        backend::BackendResource* getBackendResource() const;
 
         // Properties
-        Property<int> sampleCount;
-        Property<int> width;
-        Property<int> height;
-        Property<GLint> internalFormat;
-        Property<GLenum> format;
-        Property<GLenum> type;
+        Property<backend::BackendResourceParams> params;
 
     private:
+        std::unique_ptr<backend::BackendResource> backendResource;
+
         // initialization
         void init();
         void release();
-
-    private:
-        GLuint id;
     };
 }

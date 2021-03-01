@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "CommandBufferManager.h"
 #include "EngineConfig.h"
 #include "Object.h"
 #include "ObjectFactory.h"
@@ -7,8 +8,8 @@
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
+#include "resources/AssetManager.h"
 #include "resources/PipelineManager.h"
-#include "resources/ResourceManager.h"
 #include "scene/DrawableNode.h"
 #include "scene/Node.h"
 #include "scene/Scene.h"
@@ -30,7 +31,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
-    ResourceManager::init();
+    AssetManager::init();
 
     // Create backend
     this->backend->init();
@@ -42,6 +43,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     RenderPassManager::create();
     RenderPassFramebufferManager::create();
     RenderPassResourceManager::create();
+    CommandBufferManager::create();
 
     // Setup engine
     EngineConfig::setup();
@@ -50,6 +52,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
 void Engine::release()
 {
     // Destroy instances
+    CommandBufferManager::destroy();
     RenderPassResourceManager::destroy();
     RenderPassFramebufferManager::destroy();
     RenderPassManager::destroy();
@@ -67,11 +70,6 @@ void Engine::resize(int width, int height)
     instance->currentParameters.height = height;
     RenderPassManager::resize(width, height);
     PipelineManager::resize(width, height);
-}
-
-backend::Backend& Engine::getBackend()
-{
-    return *instance->backend;
 }
 
 void Engine::frame()
@@ -96,6 +94,9 @@ void Engine::frame()
     // This allocate and deallocate gpu data
     ObjectFactory::update();
 
+    // Submit objects updates
+    CommandBufferManager::submit(CommandBufferStage::update);
+
     // Render for each active camera
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
     {
@@ -113,4 +114,6 @@ void Engine::frame()
 
         currentParameters.clear();
     }
+
+    CommandBufferManager::submit(CommandBufferStage::draw);
 }

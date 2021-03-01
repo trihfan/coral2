@@ -1,36 +1,32 @@
-/**
- *
- */
-
+#pragma once
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
-#pragma once
 
 namespace backend::vulkan
 {
-    class Shader
+    class VulkanShader
     {
     public:
         /**
          * @brief Read and load from a glsl shader
          */
-        static Shader fromGlsl(const std::string& filename, VkDevice device);
+        static VulkanShader fromGlsl(const std::string& filename, VkDevice device);
 
         /**
          * Constructor
          */
-        Shader(const std::string& filename, VkDevice device);
+        VulkanShader(const std::string& filename, VkDevice device);
 
         /**
          * @brief Copy constructor
          */
-        Shader(const Shader& other);
+        VulkanShader(const VulkanShader& other);
 
         /**
          * Destructor
          */
-        ~Shader();
+        ~VulkanShader();
 
         /**
          * Return the vulkan handle

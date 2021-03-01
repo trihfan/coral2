@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
 # unity build
-set(CMAKE_UNITY_BUILD ON)
+if(NOT EMSCRIPTEN)
+    #set(CMAKE_UNITY_BUILD ON)
+endif()
 
 # project
 set(version "1.0.0")
@@ -37,7 +39,7 @@ endif()
 # Emscripten
 if(EMSCRIPTEN)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_WEBGL2=1 -s WASM=1 -s USE_PTHREADS=1")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s WASM=1 -s USE_PTHREADS=1")
 endif()
 
 # define output directories

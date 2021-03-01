@@ -1,16 +1,17 @@
 #pragma once
 #include "BackendPipeline.h"
+#include <memory>
 
 namespace backend::opengl
 {
-    class Shader;
+    class OpenglShader;
 
-    class OpenglPipeline : public backend::BackendPipeline
+    class OpenglPipeline : public BackendPipeline
     {
     public:
         OpenglPipeline(const BackendPipelineParams& params);
         void use() override;
-        void resize(int width, int height) override { }
+        void resize(int width, int height) override;
 
         void setUniform(const std::string& name, bool value) const override;
         void setUniform(const std::string& name, int value) const override;
@@ -23,7 +24,7 @@ namespace backend::opengl
         void setUniform(const std::string& name, const glm::mat4& mat) const override;
 
     private:
-        std::unique_ptr<Shader> shader;
+        std::unique_ptr<OpenglShader> shader;
     };
 }
 #pragma once

@@ -2,9 +2,9 @@
 #include "Object.h"
 #include "ObjectFactory.h"
 #include "OpenglBackend.h"
-#include "VulkanBackend.h"
+//#include "VulkanBackend.h"
 #include "materials/BasicMaterial.h"
-#include "resources/ResourceManager.h"
+#include "resources/AssetManager.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/OrbitCamera.h"
@@ -86,16 +86,16 @@ int main()
     }
     else if (type == vulkan)
     {
-        backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
+        /* backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
         backend->init();
         backend->resize(SCR_WIDTH, SCR_HEIGHT);
-        backend->destroy();
+        backend->destroy();*/
         return 0;
     }
 
     // setup engine
     // ------------------------------
-    ResourceManager::addFolder("resources/shaders");
+    AssetManager::addFolder("resources/shaders");
     Engine::create(std::move(backend));
     Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
 

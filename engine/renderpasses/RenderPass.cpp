@@ -12,7 +12,7 @@ void RenderPass::render(RenderQueue& queue, const RenderParameters& parameters)
 {
     if (framebuffer)
     {
-        framebuffer->bind();
+        framebuffer->bind(backend::BackendFramebufferUsage::write);
     }
     internalRender(queue, parameters);
 }
@@ -54,7 +54,7 @@ void RenderPass::prepare(const RenderParameters& parameters)
     for (size_t i = 0; i < outputs.size(); i++)
     {
         outputResources[i] = getResource(outputs[i], parameters);
-        framebufferResources.push_back(FramebufferResource { outputResources[i], outputs[i].role });
+        framebufferResources.push_back(FramebufferResource { outputs[i].role, outputResources[i] });
     }
 
     // Get the framebuffer
@@ -77,12 +77,12 @@ Handle<Resource> RenderPass::getResource(const RenderPassResource& resource, con
         RenderPassResourceManager::registerResource(allocatedResource);
 
         // Configure resource
-        allocatedResource->width = parameters.width;
-        allocatedResource->height = parameters.height;
-        allocatedResource->internalFormat = resource.internalFormat;
-        allocatedResource->format = resource.format;
-        allocatedResource->type = resource.type;
-        allocatedResource->sampleCount = resource.sampleCount;
+        backend::BackendResourceParams params;
+        params.width = parameters.width;
+        params.height = parameters.height;
+        params.format = resource.format;
+        params.samples = resource.sampleCount;
+        allocatedResource->params = params;
     }
     return allocatedResource;
 }

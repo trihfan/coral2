@@ -13,10 +13,8 @@ namespace coral
     struct RenderPassResource
     {
         std::string name;
-        ResourceRole role;
-        GLint internalFormat;
-        GLenum format;
-        GLenum type;
+        backend::BackendFramebufferResourceRole role;
+        backend::BackendResourceFormat format;
         int sampleCount;
     };
 
@@ -51,9 +49,6 @@ namespace coral
         // Render pass resources
         std::vector<RenderPassResource> inputs;
         std::vector<RenderPassResource> outputs;
-
-        // Pipelines
-        std::vector<Handle<Pipeline>> pipelines;
 
         // The output framebuffer
         Handle<Framebuffer> framebuffer;

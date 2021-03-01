@@ -1,7 +1,6 @@
 #include "RenderPassPresentation.h"
 #include "Engine.h"
 #include "ObjectFactory.h"
-#include "OpenglError.h"
 #include "materials/PresentationMaterial.h"
 #include "resources/Resource.h"
 #include "scene/mesh/Mesh.h"
@@ -27,21 +26,29 @@ RenderPassPresentation::RenderPassPresentation()
 
     screenQuad = ObjectFactory::create<Mesh>(vertices, indices);
     screenQuad->setMaterial(presentationMaterial);
+
+    connect<&RenderPassPresentation::init>(Object::init, this);
+    connect<&RenderPassPresentation::release>(Object::release, this);
 }
 
 void RenderPassPresentation::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
-    glDisable(GL_DEPTH_TEST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    defaultFramebuffer->bind(backend::BackendFramebufferUsage::write);
 
-    glActiveTexture(GL_TEXTURE0);
     inputResources[0]->bind();
 
     presentationMaterial->pipeline->use();
     presentationMaterial->pipeline->setUniform("backbuffer", 0);
 
     screenQuad->draw(parameters);
+}
 
-    glEnable(GL_DEPTH_TEST);
-    CHECK_OPENGL_ERROR
+void RenderPassPresentation::init()
+{
+    defaultFramebuffer = backend::BackendObjectFactory<backend::BackendDefaultFramebuffer>::create();
+}
+
+void RenderPassPresentation::release()
+{
+    defaultFramebuffer = nullptr;
 }

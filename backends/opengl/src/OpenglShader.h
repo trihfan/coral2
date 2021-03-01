@@ -1,14 +1,13 @@
 #pragma once
 
-#include "OpenglBackend.h"
-
 #include <array>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
 
 namespace backend::opengl
 {
-    class Shader
+    class OpenglShader
     {
     public:
         // supported shader types
@@ -24,7 +23,7 @@ namespace backend::opengl
 
         // initialization
         void init();
-        ~Shader();
+        ~OpenglShader();
 
         // use the shader
         // ------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #include "Mesh.h"
-#include "materials/Material.h"
 #include "Logs.h"
+#include "materials/Material.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -8,8 +8,9 @@
 
 using namespace coral;
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) :
-    vertices(vertices), indices(indices)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
+    : vertices(vertices)
+    , indices(indices)
 {
     connect<&Mesh::init>(Object::init, this);
     connect<&Mesh::release>(Object::release, this);
@@ -17,15 +18,15 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 
 void Mesh::draw(const RenderParameters& parameters)
 {
-    glBindVertexArray(VAO);
+    /*glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 }
 
 void Mesh::init()
 {
     // create buffers/arrays
-    glGenVertexArrays(1, &VAO);
+    /*glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
@@ -63,10 +64,9 @@ void Mesh::init()
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bit_tangent));
 
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 }
 
 void Mesh::release()
 {
-
 }

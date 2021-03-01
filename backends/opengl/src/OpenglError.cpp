@@ -1,7 +1,9 @@
 #include "OpenglError.h"
 #include "Logs.h"
+#include <glad/glad.h>
 
 using namespace coral;
+using namespace backend::opengl;
 
 const char* getGLErrorStr(GLenum err)
 {

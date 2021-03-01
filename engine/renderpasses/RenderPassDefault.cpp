@@ -1,4 +1,5 @@
 #include "RenderPassDefault.h"
+#include "CommandBufferManager.h"
 #include "Engine.h"
 #include "materials/Material.h"
 #include "resources/Pipeline.h"
@@ -7,18 +8,16 @@
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 
-#include "OpenglError.h"
-
 using namespace coral;
 
 void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
-    // setup rendering
-    glClearColor(0.1f, 0.1f, 0.1f, 1.f);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
-    CHECK_OPENGL_ERROR
+    auto commandBuffer = CommandBufferManager::getCommandBuffer();
 
+    // setup rendering
+    commandBuffer->clearColor(0.1f, 0.1f, 0.1f, 1.f);
+    commandBuffer->clearDepth();
+    return;
     // for each shader
     for (auto& pipelinePair : queue.pipelineMap)
     {
