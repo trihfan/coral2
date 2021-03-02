@@ -13,12 +13,13 @@ RenderPassPresentation::RenderPassPresentation()
     presentationMaterial = ObjectFactory::create<PresentationMaterial>();
 
     std::vector<Vertex> vertices {
-        Vertex { glm::vec3(-1, -1, 0), glm::vec3(0, 0, 1) },
-        Vertex { glm::vec3(1, -1, 0), glm::vec3(0, 0, 1) },
-        Vertex { glm::vec3(-1, 1, 0), glm::vec3(0, 0, 1) },
-        Vertex { glm::vec3(-1, 1, 0), glm::vec3(0, 0, 1) },
-        Vertex { glm::vec3(1, -1, 0), glm::vec3(0, 0, 1) },
-        Vertex { glm::vec3(1, 1, 0), glm::vec3(0, 0, 1) },
+        Vertex(glm::vec3(-1, -1, 0), glm::vec3(0, 0, 1)),
+        Vertex(glm::vec3(1, 1, 0), glm::vec3(0, 0, 1)),
+        Vertex(glm::vec3(1, -1, 0), glm::vec3(0, 0, 1)),
+
+        Vertex(glm::vec3(-1, -1, 0), glm::vec3(0, 0, 1)),
+        Vertex(glm::vec3(-1, 1, 0), glm::vec3(0, 0, 1)),
+        Vertex(glm::vec3(1, 1, 0), glm::vec3(0, 0, 1)),
     };
 
     std::vector<unsigned int> indices(vertices.size());
@@ -31,14 +32,13 @@ RenderPassPresentation::RenderPassPresentation()
     connect<&RenderPassPresentation::release>(Object::release, this);
 }
 
-void RenderPassPresentation::internalRender(RenderQueue& queue, const RenderParameters& parameters)
+void RenderPassPresentation::internalRender(RenderQueue&, const RenderParameters& parameters)
 {
     defaultFramebuffer->bind(backend::BackendFramebufferUsage::write);
 
     inputResources[0]->bind();
-
     presentationMaterial->pipeline->use();
-    presentationMaterial->pipeline->setUniform("backbuffer", 0);
+    presentationMaterial->use(parameters);
 
     screenQuad->draw(parameters);
 }

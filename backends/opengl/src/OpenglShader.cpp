@@ -1,5 +1,6 @@
 #include "OpenglShader.h"
 #include "Logs.h"
+#include "OpenglError.h"
 
 using namespace backend::opengl;
 using namespace coral;

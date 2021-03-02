@@ -15,6 +15,8 @@ namespace coral
         // Corresponding renderpass
         std::string renderpass;
 
+        backend::BackendPipelineParams params;
+
         // Comparison
         bool operator==(const PipelineParams& other) const;
     };
@@ -28,16 +30,12 @@ namespace coral
         Pipeline(const PipelineParams& params);
         const std::string& getRenderPassName() const;
         void use();
-        void resize(int width, int height);
 
         template <typename T>
         void setUniform(const std::string& name, const T& value) { backendPipeline->setUniform(name, value); }
 
     private:
-        PipelineParams params;
-        bool resized;
-        int width;
-        int height;
+        const PipelineParams params;
         std::unique_ptr<backend::BackendPipeline> backendPipeline;
 
         void init();

@@ -4,6 +4,8 @@
 
 namespace backend
 {
+    class BackendRenderPass;
+
     enum class CullFace
     {
         front,
@@ -13,11 +15,22 @@ namespace backend
 
     struct BackendPipelineParams
     {
-        std::string vertexShaderFile;
-        std::string fragmentShaderFile;
+        // Renderpass
+        backend::BackendRenderPass* renderpass;
 
+        // Rasterization
         bool depthTest = true;
         CullFace cullFace = CullFace::front;
+
+        // Multisampling
+
+        // Vertex input
+
+        // Blending
+
+        // Shader
+        std::string vertexShaderFile;
+        std::string fragmentShaderFile;
     };
 
     class BackendPipeline
@@ -25,6 +38,7 @@ namespace backend
     public:
         BackendPipeline(const BackendPipelineParams& params);
         virtual ~BackendPipeline() = default;
+
         virtual void use() = 0;
         virtual void resize(int width, int height) = 0; // todo remove
 

@@ -25,3 +25,8 @@ void OpenglCommandBuffer::clearDepth()
     glClear(GL_DEPTH_BUFFER_BIT);
     CHECK_OPENGL_ERROR
 }
+
+void OpenglCommandBuffer::draw(int indexCount)
+{
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, 0);
+}

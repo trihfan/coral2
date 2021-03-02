@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "BackendVertexBuffer.h"
 #include "scene/DrawableNode.h"
 #include <glm/glm.hpp>
 #include <memory>
@@ -13,9 +14,18 @@ namespace coral
     {
         glm::vec3 position;
         glm::vec3 normal;
-        glm::vec2 texture_coordinates;
+        glm::vec2 textCoords;
         glm::vec3 tangent;
-        glm::vec3 bit_tangent;
+        glm::vec3 bitTangent;
+
+        Vertex(const glm::vec3& position = glm::vec3(), const glm::vec3& normal = glm::vec3(), const glm::vec3& textCoords = glm::vec3(), const glm::vec3& tangent = glm::vec3(), const glm::vec3& bitTangent = glm::vec3())
+            : position(position)
+            , normal(normal)
+            , textCoords(textCoords)
+            , tangent(tangent)
+            , bitTangent(bitTangent)
+        {
+        }
     };
 
     class Mesh : public DrawableNode
@@ -28,13 +38,12 @@ namespace coral
         virtual void draw(const RenderParameters& parameters) override;
 
     private:
-        // mesh Data
+        // Data holders
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        //GLuint VAO;
 
-        // render data
-        //GLuint VBO, EBO;
+        // Buffers
+        std::unique_ptr<backend::BackendVertexBuffer> vertexBuffer;
 
         // initializes all the buffer objects/arrays
         void setupMesh();

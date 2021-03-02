@@ -11,7 +11,11 @@ namespace backend::opengl
         void begin() override;
         void end() override;
 
+        //
         void clearColor(float red, float green, float blue, float alpha) override;
         void clearDepth() override;
+
+        // Draw
+        void draw(int indexCount) override;
     };
 }

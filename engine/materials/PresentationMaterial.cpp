@@ -18,10 +18,11 @@ PresentationMaterial::PresentationMaterial()
     pipeline = PipelineManager::getPipeline(params);
 }
 
-void PresentationMaterial::use(const RenderParameters& parameters)
+void PresentationMaterial::use(const RenderParameters&)
 {
+    pipeline->setUniform("backbuffer", 0);
 }
 
-void PresentationMaterial::setNode(Handle<Node> node)
+void PresentationMaterial::setNode(Handle<Node>)
 {
 }

@@ -66,11 +66,6 @@ void RenderPassManager::invalidate()
     instance->orderedRenderPasses.clear();
 }
 
-void RenderPassManager::resize(int width, int height)
-{
-    invalidate();
-}
-
 const std::vector<Handle<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
 {
     return instance->orderedRenderPasses;

@@ -1,5 +1,5 @@
 #include "RenderPassDefault.h"
-#include "CommandBufferManager.h"
+#include "BackendCommandBuffer.h"
 #include "Engine.h"
 #include "materials/Material.h"
 #include "resources/Pipeline.h"
@@ -12,12 +12,12 @@ using namespace coral;
 
 void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
-    auto commandBuffer = CommandBufferManager::getCommandBuffer();
+    auto commandBuffer = backend::BackendCommandBuffer::getCommandBuffer();
 
     // setup rendering
     commandBuffer->clearColor(0.1f, 0.1f, 0.1f, 1.f);
     commandBuffer->clearDepth();
-    return;
+
     // for each shader
     for (auto& pipelinePair : queue.pipelineMap)
     {

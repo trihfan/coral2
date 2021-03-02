@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "CommandBufferManager.h"
+#include "BackendCommandBuffer.h"
 #include "EngineConfig.h"
 #include "Object.h"
 #include "ObjectFactory.h"
@@ -33,8 +33,10 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     startTime = std::chrono::steady_clock::now();
     AssetManager::init();
 
-    // Create backend
-    this->backend->init();
+    // Init backend
+    backend::BackendParams params;
+    params.threadCount = EngineConfig::parameters.threadCount;
+    this->backend->init(params);
 
     // create instances
     ObjectFactory::create();
@@ -43,7 +45,6 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     RenderPassManager::create();
     RenderPassFramebufferManager::create();
     RenderPassResourceManager::create();
-    CommandBufferManager::create();
 
     // Setup engine
     EngineConfig::setup();
@@ -52,7 +53,6 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
 void Engine::release()
 {
     // Destroy instances
-    CommandBufferManager::destroy();
     RenderPassResourceManager::destroy();
     RenderPassFramebufferManager::destroy();
     RenderPassManager::destroy();
@@ -60,16 +60,16 @@ void Engine::release()
     PipelineManager::destroy();
     ObjectFactory::destroy();
 
-    // Destroy backend
-    backend->destroy();
+    // Release backend
+    backend->release();
 }
 
 void Engine::resize(int width, int height)
 {
     instance->currentParameters.width = width;
     instance->currentParameters.height = height;
-    RenderPassManager::resize(width, height);
-    PipelineManager::resize(width, height);
+    RenderPassManager::invalidate();
+    PipelineManager::clear();
 }
 
 void Engine::frame()
@@ -95,7 +95,7 @@ void Engine::frame()
     ObjectFactory::update();
 
     // Submit objects updates
-    CommandBufferManager::submit(CommandBufferStage::update);
+    backend::BackendCommandBuffer::submit(backend::BackendCommandBufferStage::staging);
 
     // Render for each active camera
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
@@ -115,5 +115,5 @@ void Engine::frame()
         currentParameters.clear();
     }
 
-    CommandBufferManager::submit(CommandBufferStage::draw);
+    backend::BackendCommandBuffer::submit(backend::BackendCommandBufferStage::draw);
 }

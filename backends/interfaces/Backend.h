@@ -5,16 +5,20 @@
 
 namespace backend
 {
-    class BackendPipeline;
-    struct BackendPipelineParams;
+    struct BackendParams
+    {
+        int threadCount;
+    };
+
     class Backend
     {
     public:
         Backend() = default;
         virtual ~Backend() = default;
 
-        virtual bool init() = 0;
-        virtual bool destroy() = 0;
+        bool init(const BackendParams& params);
+        bool release();
+
         virtual bool resize(int width, int height) = 0;
         virtual BackendCapabilities capabilities() const = 0;
 
@@ -22,6 +26,8 @@ namespace backend
 
     protected:
         static void setCurrent(Backend* backend);
+        virtual bool internalInit() = 0;
+        virtual bool internalRelease() = 0;
 
     private:
         static Backend* currentBackend;

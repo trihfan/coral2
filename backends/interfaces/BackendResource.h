@@ -1,5 +1,4 @@
 #pragma once
-#include "BackendObjectFactory.h"
 
 namespace backend
 {
@@ -40,6 +39,7 @@ namespace backend
     public:
         BackendResource(const BackendResourceParams& params);
         virtual ~BackendResource() = default;
+
         virtual void bind() = 0;
 
         const BackendResourceParams& getParams() const;

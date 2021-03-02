@@ -1,4 +1,5 @@
 #include "Resource.h"
+#include "BackendObjectFactory.h"
 
 using namespace coral;
 

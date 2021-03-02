@@ -66,7 +66,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", nullptr, nullptr);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -119,28 +119,28 @@ int main()
     // vertices
     std::vector<Vertex> vertices {
         // front
-        Vertex { glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
-        Vertex { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
-        Vertex { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
-        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f) },
+        Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
+        Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
+        Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
+        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
 
         // back
-        Vertex { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
-        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
-        Vertex { glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
-        Vertex { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f) },
+        Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
+        Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
+        Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
+        Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
 
         // right
-        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
-        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
-        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
-        Vertex { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
-        Vertex { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f) },
+        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
+        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
+        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
+        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
+        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
 
         // left
 
@@ -212,7 +212,7 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     Engine::resize(width * 2, height * 2);
 }
 
-void mouse_button(GLFWwindow*, int button, int action, int mods)
+void mouse_button(GLFWwindow*, int button, int action, int)
 {
     if (button == 0)
     {

@@ -9,9 +9,6 @@ namespace backend::vulkan
     {
     public:
         VulkanBackend(GLFWwindow* window);
-
-        bool init() override;
-        bool destroy() override;
         bool resize(int width, int height) override;
         BackendCapabilities capabilities() const override;
 
@@ -32,6 +29,9 @@ namespace backend::vulkan
         VkExtent2D swapchainExtent;
 
         // Main functions
+        bool internalInit() override;
+        bool internalRelease() override;
+
         // Creation
         void createInstance();
         void createLogicalDevice();

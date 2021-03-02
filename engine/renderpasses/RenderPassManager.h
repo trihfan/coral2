@@ -33,11 +33,6 @@ namespace coral
         static void update(const RenderParameters& parameters);
 
         /**
-         * @brief Resize the viewport
-         */
-        static void resize(int width, int height);
-
-        /**
          * @brief Add a render pass
          */
         static void addRenderPass(Handle<RenderPass> renderPass);

@@ -5,12 +5,13 @@
 #include "OpenglPipeline.h"
 #include "OpenglResource.h"
 #include "OpenglShader.h"
+#include "OpenglVertexBuffer.h"
 #include <glad/glad.h>
 
 using namespace coral;
 using namespace backend::opengl;
 
-bool OpenglBackend::init()
+bool OpenglBackend::internalInit()
 {
     if (!gladLoadGL())
     {
@@ -26,12 +27,12 @@ bool OpenglBackend::init()
     creator<BackendPipeline, BackendPipelineParams> = [](const BackendPipelineParams& params) { return std::make_unique<OpenglPipeline>(params); };
     creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
     creator<BackendCommandBuffer> = []() { return std::make_unique<OpenglCommandBuffer>(); };
+    creator<BackendVertexBuffer, BackendVertexBufferParams, BackendVertexBufferData> = [](const BackendVertexBufferParams& params, const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(params, data); };
 
-    Backend::setCurrent(this);
     return true;
 }
 
-bool OpenglBackend::destroy()
+bool OpenglBackend::internalRelease()
 {
     return true;
 }

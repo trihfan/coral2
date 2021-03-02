@@ -1,6 +1,5 @@
 #pragma once
-#include "BackendObjectFactory.h"
-#include <memory>
+#include <vector>
 
 namespace backend
 {
@@ -31,6 +30,7 @@ namespace backend
     public:
         BackendFramebuffer(const std::vector<BackendFramebufferResource>& resources);
         virtual ~BackendFramebuffer() = default;
+
         virtual void bind(BackendFramebufferUsage usage) = 0;
     };
 

@@ -1,7 +1,7 @@
 #include "Mesh.h"
+#include "BackendObjectFactory.h"
 #include "Logs.h"
 #include "materials/Material.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,57 +16,43 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
     connect<&Mesh::release>(Object::release, this);
 }
 
-void Mesh::draw(const RenderParameters& parameters)
+void Mesh::draw(const RenderParameters&)
 {
-    /*glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);*/
+    vertexBuffer->draw();
 }
 
 void Mesh::init()
 {
-    // create buffers/arrays
-    /*glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    // Params
+    backend::BackendVertexBufferParams params;
 
-    glBindVertexArray(VAO);
+    // Data
+    backend::BackendVertexBufferData data;
+    data.verticesCount = static_cast<int>(vertices.size());
+    data.vertices = vertices.data();
+    data.indicesCount = static_cast<int>(indices.size());
+    data.indices = indices.data();
 
-    // load data into vertex buffers
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // Attributes
+    data.vertexSize = sizeof(Vertex);
+    std::vector<backend::BackendVertexAttribute> attributes {
+        backend::BackendVertexAttribute { 3 }, // Positions
+        backend::BackendVertexAttribute { 3 }, // Normals
+        backend::BackendVertexAttribute { 2 }, // Texture coords
+        backend::BackendVertexAttribute { 3 }, // Tangents
+        backend::BackendVertexAttribute { 3 } // Bittangents
+    };
+    data.vertexAttributes = attributes;
 
-    // A great thing about structs is that their memory layout is sequential for all its items.
-    // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
-    // again translates to 3/2 floats which translates to a byte array.
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    // Create buffer
+    vertexBuffer = backend::BackendObjectFactory<backend::BackendVertexBuffer>::create(params, data);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-    // set the vertex attribute pointers
-    // vertex Positions
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-    // vertex normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
-    // vertex texture coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texture_coordinates));
-
-    // vertex tangent
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
-
-    // vertex bitangent
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, bit_tangent));
-
-    glBindVertexArray(0);*/
+    // Clear data holders
+    vertices.clear();
+    indices.clear();
 }
 
 void Mesh::release()
 {
+    vertexBuffer = nullptr;
 }

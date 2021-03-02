@@ -17,7 +17,7 @@ VulkanBackend::VulkanBackend(GLFWwindow* window)
 {
 }
 
-bool VulkanBackend::init()
+bool VulkanBackend::internalInit()
 {
     try
     {
@@ -54,7 +54,7 @@ bool VulkanBackend::resize(int, int)
     return true;
 }
 
-bool VulkanBackend::destroy()
+bool VulkanBackend::internalRelease()
 {
     for (auto image : swapchainImages)
     {
