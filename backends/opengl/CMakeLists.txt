@@ -7,13 +7,13 @@ set_property(CACHE BACKEND_OPENGL_VERSION PROPERTY STRINGS gl gles)
 # Sources
 file(GLOB_RECURSE sources src/*.h src/*.cpp)
 if(NOT EMSCRIPTEN)
-    list(APPEND ${sources} "${BACKEND_OPENGL_VERSION}/src/glad.c")
+    set(sources "${sources};${backend_opengl_path}/${BACKEND_OPENGL_VERSION}/src/glad.c")
+    message("${sources}")
 endif()
 
 # Make lib
 add_library(opengl_backend STATIC ${sources})
-target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/src")
-target_include_directories(opengl_backend PUBLIC "${utils_path}")
+target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/src" "${utils_path}")
 target_link_libraries(opengl_backend PUBLIC utils)
 set_folder_structure("${sources}" ${backend_opengl_path})
 

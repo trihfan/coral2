@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "AssetManager.h"
 #include "BackendCommandBuffer.h"
 #include "EngineConfig.h"
 #include "Object.h"
@@ -8,7 +9,6 @@
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
-#include "resources/AssetManager.h"
 #include "resources/PipelineManager.h"
 #include "scene/DrawableNode.h"
 #include "scene/Node.h"

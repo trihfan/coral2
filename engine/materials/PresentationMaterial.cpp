@@ -1,5 +1,5 @@
 #include "PresentationMaterial.h"
-#include "resources/AssetManager.h"
+#include "AssetManager.h"
 #include "resources/PipelineManager.h"
 
 using namespace coral;
@@ -9,9 +9,8 @@ PresentationMaterial::PresentationMaterial()
     PipelineParams params;
     params.renderpass = "presentationRenderPass";
 
-    auto shader = AssetManager::getShader("presentation_material");
-    params.vertexShaderFile = shader.vertexFile;
-    params.fragmentShaderFile = shader.fragmentFile;
+    params.vertexShaderFile = AssetManager::getAsset("presentation_material.vert").url;
+    params.fragmentShaderFile = AssetManager::getAsset("presentation_material.frag").url;
 
     params.depthTest = false;
 

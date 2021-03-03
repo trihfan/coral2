@@ -1,7 +1,7 @@
 #include "BasicMaterial.h"
+#include "AssetManager.h"
 #include "Engine.h"
 #include "renderpasses/RenderPassManager.h"
-#include "resources/AssetManager.h"
 #include "resources/PipelineManager.h"
 #include "scene/Node.h"
 #include "scene/camera/Camera.h"
@@ -14,9 +14,8 @@ BasicMaterial::BasicMaterial()
     PipelineParams params;
     params.renderpass = defaultRenderPassName;
 
-    auto shader = AssetManager::getShader("basic_material");
-    params.vertexShaderFile = shader.vertexFile;
-    params.fragmentShaderFile = shader.fragmentFile;
+    params.vertexShaderFile = AssetManager::getAsset("basic_material.vert").url;
+    params.fragmentShaderFile = AssetManager::getAsset("basic_material.frag").url;
 
     pipeline = PipelineManager::getPipeline(params);
 }

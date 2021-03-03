@@ -1,6 +1,0 @@
-file(WRITE ${PROJECT_SOURCE_DIR}/last_copy.h "")
-add_custom_target(copy_resources ALL DEPENDS ${PROJECT_SOURCE_DIR}/last_copy.h)
-add_custom_command(TARGET copy_resources PRE_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources")
-add_custom_command(TARGET copy_resources PRE_BUILD COMMAND ${Python3_EXECUTABLE} copy.py "${PROJECT_SOURCE_DIR}/resources" "${bin_output_directory}/${CMAKE_CFG_INTDIR}/resources" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-add_dependencies(engine copy_resources)
-set_target_properties(copy_resources PROPERTIES FOLDER "coral/utils")

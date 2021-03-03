@@ -4,7 +4,6 @@
 #include "OpenglBackend.h"
 //#include "VulkanBackend.h"
 #include "materials/BasicMaterial.h"
-#include "resources/AssetManager.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/OrbitCamera.h"
@@ -127,8 +126,6 @@ int main()
     }
 
     // setup engine
-    // ------------------------------
-    AssetManager::addFolder("resources/shaders");
     Engine::create(std::move(backend));
     Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
 
