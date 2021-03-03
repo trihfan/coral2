@@ -1,6 +1,7 @@
 #include "OpenglShader.h"
 #include "Logs.h"
 #include "OpenglError.h"
+#include "gl.h"
 
 using namespace backend::opengl;
 using namespace coral;
@@ -38,10 +39,12 @@ void OpenglShader::init()
     unsigned int geometry;
     if (has_geometry)
     {
+#ifdef GL_GEOMETRY_SHADER
         geometry = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geometry, 1, &gShaderCode, nullptr);
         glCompileShader(geometry);
         checkCompileErrors(geometry, "GEOMETRY");
+#endif
     }
 
     // shader Program

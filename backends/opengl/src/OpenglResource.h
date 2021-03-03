@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BackendResource.h"
-#include <glad/glad.h>
+#include "gl.h"
 
 namespace backend::opengl
 {

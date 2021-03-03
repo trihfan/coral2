@@ -19,8 +19,8 @@ find_package(Vulkan REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 add_definitions(-DGLFW_INCLUDE_VULKAN)
 
-option(USE_VALIDATION_LAYERS "use vulkan validation layers" OFF)
-if (USE_VALIDATION_LAYERS)
+option(BACKEND_VULKAN_DEBUG "use vulkan validation layers" OFF)
+if (BACKEND_VULKAN_DEBUG)
 	add_definitions(-DUSE_VALIDATION_LAYERS)
 endif()
 

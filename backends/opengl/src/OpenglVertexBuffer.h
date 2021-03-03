@@ -1,6 +1,6 @@
 #pragma once
 #include "BackendVertexBuffer.h"
-#include "glad/glad.h"
+#include "gl.h"
 
 namespace backend::opengl
 {

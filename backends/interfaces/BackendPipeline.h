@@ -20,7 +20,7 @@ namespace backend
 
         // Rasterization
         bool depthTest = true;
-        CullFace cullFace = CullFace::front;
+        CullFace cullFace = CullFace::back;
 
         // Multisampling
 

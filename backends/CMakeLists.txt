@@ -8,11 +8,11 @@ set(backend_vulkan_path ${backends_path}/vulkan)
 add_subdirectory(interfaces)
 
 # OpenGL
-if(ENABLE_OPENGL)
-	add_subdirectory(opengl)
+if(BACKEND_OPENGL_ENABLED)
+    add_subdirectory(opengl)
 endif()
 
 # Vulkan
-if(ENABLE_VULKAN)
+if(BACKEND_VULKAN_ENABLED)
     add_subdirectory(vulkan)
 endif()

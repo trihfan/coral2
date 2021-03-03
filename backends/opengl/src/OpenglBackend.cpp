@@ -6,13 +6,14 @@
 #include "OpenglResource.h"
 #include "OpenglShader.h"
 #include "OpenglVertexBuffer.h"
-#include <glad/glad.h>
+#include "gl.h"
 
 using namespace coral;
 using namespace backend::opengl;
 
 bool OpenglBackend::internalInit()
 {
+#ifndef __EMSCRIPTEN__
     if (!gladLoadGL())
     {
         Logs(error) << "Glad init error ";
@@ -20,6 +21,7 @@ bool OpenglBackend::internalInit()
     }
 
     Logs(success) << "OpenGL " << GLVersion.major << "." << GLVersion.minor;
+#endif
 
     // Set creators
     creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };

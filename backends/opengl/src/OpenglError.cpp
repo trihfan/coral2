@@ -1,6 +1,6 @@
 #include "OpenglError.h"
 #include "Logs.h"
-#include <glad/glad.h>
+#include "gl.h"
 
 using namespace coral;
 using namespace backend::opengl;
@@ -17,10 +17,14 @@ const char* getGLErrorStr(GLenum err)
         return "Invalid value";
     case GL_INVALID_OPERATION:
         return "Invalid operation";
+#ifdef GL_STACK_OVERFLOW
     case GL_STACK_OVERFLOW:
         return "Stack overflow";
+#endif
+#ifdef GL_STACK_UNDERFLOW
     case GL_STACK_UNDERFLOW:
         return "Stack underflow";
+#endif
     case GL_OUT_OF_MEMORY:
         return "Out of memory";
     default:

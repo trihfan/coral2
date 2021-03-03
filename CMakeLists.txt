@@ -26,17 +26,17 @@ find_package(Python3 REQUIRED)
 # Options
 find_package(OpenGL)
 find_package(Vulkan)
-option(ENABLE_OPENGL "enable opengl backend" ${OPENGL_FOUND})
-option(ENABLE_VULKAN "enable vulkan backend" ${VULKAN_FOUND})
+option(BACKEND_OPENGL_ENABLED "enable opengl backend" ${OPENGL_FOUND})
+option(BACKEND_VULKAN_ENABLED "enable vulkan backend" ${VULKAN_FOUND})
 
-if(ENABLE_OPENGL)
+if(BACKEND_OPENGL_ENABLED)
     add_definitions(-DENABLE_OPENGL)
 endif()
-if(ENABLE_VULKAN)
+if(BACKEND_VULKAN_ENABLED)
     add_definitions(-DENABLE_VULKAN)
 endif()
 
-# Emscripten
+# Emscripten config
 if(EMSCRIPTEN)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s WASM=1 -s USE_PTHREADS=1")

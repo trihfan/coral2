@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BackendCommandBuffer.h"
-#include <glad/glad.h>
+#include "gl.h"
 
 namespace backend::opengl
 {

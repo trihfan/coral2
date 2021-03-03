@@ -10,8 +10,19 @@
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
 #include "scene/mesh/Mesh.h"
-#include <GLFW/glfw3.h>
 #include <numeric>
+
+#ifdef EMSCRIPTEN
+#define GLFW_INCLUDE_GLEXT
+#include <GLFW/glfw3.h>
+
+#include <GLES2/gl2ext.h>
+#include <GLES3/gl3.h>
+
+#include <emscripten.h>
+#else
+#include <GLFW/glfw3.h>
+#endif
 
 using namespace coral;
 
@@ -22,6 +33,7 @@ static double lastX = SCR_WIDTH / 2.;
 static double lastY = SCR_HEIGHT / 2.;
 static bool firstMouse = true;
 static bool mousePressed = false;
+GLFWwindow* window;
 static Handle<OrbitCamera> camera;
 
 // callback
@@ -37,6 +49,22 @@ enum BackendType
     vulkan
 };
 
+void mainloop()
+{
+    // input
+    // -----
+    processInput(window);
+
+    // render
+    // ------
+    Engine::frame();
+
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+    // -------------------------------------------------------------------------------
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
 int main()
 {
     BackendType type = opengl;
@@ -46,9 +74,14 @@ int main()
     glfwInit();
     if (type == opengl)
     {
+#ifdef EMSCRIPTEN
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#else
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
 
 #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -66,7 +99,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", nullptr, nullptr);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", nullptr, nullptr);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -175,22 +208,14 @@ int main()
     scene->add(light2);
 
     // main loop
-    // ------------------------------
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop(mainloop, 0, true);
+#else
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        // -----
-        processInput(window);
-
-        // render
-        // ------
-        Engine::frame();
-
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        mainloop();
     }
+#endif
 
     glfwTerminate();
     Engine::destroy();
