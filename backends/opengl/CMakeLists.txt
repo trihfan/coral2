@@ -1,37 +1,46 @@
 project(opengl_backend)
 
-# Opengl version
-set(BACKEND_OPENGL_VERSION "gl" CACHE STRING "Backend OpenGL version")
-set_property(CACHE BACKEND_OPENGL_VERSION PROPERTY STRINGS gl gles)
+# Opengl
+find_package(OpenGL REQUIRED)
+set(backend_opengl_version "gl")
+if(EMSCRIPTEN)
+    set(backend_opengl_version "gles")
+endif()
+
+if (${backend_opengl_version} STREQUAL "gl")
+    add_definitions(-DOPENGL_CORE)
+elseif (${backend_opengl_version} STREQUAL "gles")
+    add_definitions(-DOPENGL_ES)
+endif()
+
+option(BACKEND_OPENGL_DEBUG "enable Opengl debug" OFF)
+if (BACKEND_OPENGL_DEBUG)
+        add_definitions(-DENABLE_OPENGL_DEBUG)
+endif()
 
 # Sources
-file(GLOB_RECURSE sources src/*.h src/*.cpp)
-if(NOT EMSCRIPTEN)
-    set(sources "${sources};${backend_opengl_path}/${BACKEND_OPENGL_VERSION}/src/glad.c")
-    message("${sources}")
+file(GLOB_RECURSE sources Opengl*.h Opengl*.cpp)
+
+if(backend_opengl_version STREQUAL "gl")
+    set(sources "${sources};${backend_opengl_path}/glad/glad.c" "${sources};${backend_opengl_path}/glad/glad/glad.h")
 endif()
 
 # Make lib
 add_library(opengl_backend STATIC ${sources})
-target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/src" "${utils_path}")
-target_link_libraries(opengl_backend PUBLIC utils)
 set_folder_structure("${sources}" ${backend_opengl_path})
 
-if(NOT EMSCRIPTEN)
-    target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/${BACKEND_OPENGL_VERSION}/include")
+# Includes
+target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}" "${utils_path}" "${backend_interfaces_path}" "${glm_path}")
+
+if(backend_opengl_version STREQUAL "gl")
+    target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/glad")
 endif()
 
-# Interfaces
-target_include_directories(opengl_backend PUBLIC "${backend_interfaces_path}")
+# Libraries
+target_link_libraries(opengl_backend PUBLIC utils)
 
-# OpenGL
-find_package(OpenGL REQUIRED)
 if(NOT EMSCRIPTEN)
     target_link_libraries(opengl_backend PUBLIC OpenGL::GL)
-endif()
-option(BACKEND_OPENGL_DEBUG "enable Opengl debug" OFF)
-if (BACKEND_OPENGL_DEBUG)
-        add_definitions(-DENABLE_OPENGL_DEBUG)
 endif()
 
 # glm

@@ -5,10 +5,23 @@
 
 namespace coral
 {
+    enum class ShaderType
+    {
+        vertex,
+        fragment
+    };
+
     struct Asset
     {
         std::string name;
         std::string url;
+    };
+
+    struct ShaderAsset
+    {
+        Asset asset;
+        ShaderType type;
+        std::string backend;
     };
 
     class AssetManager
@@ -16,10 +29,10 @@ namespace coral
     public:
         static void init();
 
-        static void addAsset(const std::string& name, const Asset& asset);
-        static Asset getAsset(const std::string& name);
+        //
+        static ShaderAsset getShader(const std::string& name, ShaderType type);
 
     private:
-        static std::unordered_map<std::string, Asset> assets;
+        static std::unordered_map<std::string, std::vector<ShaderAsset>> shaders;
     };
 }

@@ -19,6 +19,7 @@ namespace backend
         bool init(const BackendParams& params);
         bool release();
 
+        virtual std::string getName() const = 0;
         virtual bool resize(int width, int height) = 0;
         virtual BackendCapabilities capabilities() const = 0;
 

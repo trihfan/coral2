@@ -1,34 +1,57 @@
 #include "AssetManager.h"
+#include "Backend.h"
 #include "Logs.h"
-#include "assets.h"
+//#include "assets.h"
 #include <vector>
 
 using namespace coral;
 
-std::unordered_map<std::string, Asset> AssetManager::assets;
+std::unordered_map<std::string, std::vector<ShaderAsset>> AssetManager::shaders;
 
 void AssetManager::init()
 {
-    for (Asset asset : ASSETS_LIST)
+    /*for (const ShaderAsset& shaderAsset : SHADER_ASSETS_LIST)
     {
+        // Update relative url
         //asset.url = asset.url;
-        assets[asset.name] = asset;
-    }
+
+        shaders[shaderAsset.asset.name] = shaderAsset;
+    }*/
 }
 
-void AssetManager::addAsset(const std::string& name, const Asset& asset)
+ShaderAsset AssetManager::getShader(const std::string& name, ShaderType type)
 {
-    assets[name] = asset;
-}
+    ShaderAsset asset;
+    asset.backend = backend::Backend::current()->getName();
+    asset.type = type;
 
-Asset AssetManager::getAsset(const std::string& name)
-{
-    auto it = assets.find(name);
-    if (it != assets.end())
+    asset.asset.name = name;
+    asset.asset.url = "assets/shaders/" + backend::Backend::current()->getName() + "/" + name;
+
+    switch (type)
     {
-        return it->second;
+    case ShaderType::vertex:
+        asset.asset.url += ".vert";
+        break;
+
+    case ShaderType::fragment:
+        asset.asset.url += ".frag";
+        break;
     }
 
-    Logs(error) << "asset " << name << " is not registred";
-    return Asset();
+    return asset;
+    /*auto it = shaders.find(name);
+    if (it != shaders.end())
+    {
+        for (const ShaderAsset& shaderAsset : it->second)
+        {
+            if (shaderAsset.type == type && shaderAsset.backend == backend::Backend::currentBackend()->getname())
+            {
+                return shaderAsset;
+            }
+        }
+    }
+
+    Logs(error) << "shader asset " << name << " not found";
+    return ShaderAsset();*/
 }

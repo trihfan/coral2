@@ -19,7 +19,7 @@ using namespace coral;
 OpenglPipeline::OpenglPipeline(const BackendPipelineParams& params)
     : BackendPipeline(params)
 {
-    shader = std::make_unique<OpenglShader>();
+    shader = std::make_unique<OpenglShader>(params.name);
     shader->addShaderData(OpenglShader::vertex, FileUtils::readAll(params.vertexShaderFile));
     shader->addShaderData(OpenglShader::fragment, FileUtils::readAll(params.fragmentShaderFile));
     shader->init();

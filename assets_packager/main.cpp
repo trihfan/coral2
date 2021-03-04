@@ -39,6 +39,15 @@ bool OpenglBackend::internalRelease()
     return true;
 }
 
+std::string OpenglBackend::getName() const
+{
+#ifdef OPENGL_ES
+    return "gles";
+#else
+    return "gl";
+#endif
+}
+
 bool OpenglBackend::resize(int, int)
 {
     return true;

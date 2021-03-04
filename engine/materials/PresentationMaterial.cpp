@@ -6,11 +6,11 @@ using namespace coral;
 
 PresentationMaterial::PresentationMaterial()
 {
-    PipelineParams params;
+    PipelineParams params { "presentation_material" };
     params.renderpass = "presentationRenderPass";
 
-    params.vertexShaderFile = AssetManager::getAsset("presentation_material.vert").url;
-    params.fragmentShaderFile = AssetManager::getAsset("presentation_material.frag").url;
+    params.vertexShaderFile = AssetManager::getShader("presentation_material", ShaderType::vertex).asset.url;
+    params.fragmentShaderFile = AssetManager::getShader("presentation_material", ShaderType::fragment).asset.url;
 
     params.depthTest = false;
 

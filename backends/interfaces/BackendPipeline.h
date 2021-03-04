@@ -15,6 +15,8 @@ namespace backend
 
     struct BackendPipelineParams
     {
+        std::string name;
+
         // Renderpass
         backend::BackendRenderPass* renderpass;
 

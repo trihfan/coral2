@@ -11,11 +11,11 @@ using namespace coral;
 
 BasicMaterial::BasicMaterial()
 {
-    PipelineParams params;
+    PipelineParams params { "basic_material" };
     params.renderpass = defaultRenderPassName;
 
-    params.vertexShaderFile = AssetManager::getAsset("basic_material.vert").url;
-    params.fragmentShaderFile = AssetManager::getAsset("basic_material.frag").url;
+    params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
+    params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
 
     pipeline = PipelineManager::getPipeline(params);
 }

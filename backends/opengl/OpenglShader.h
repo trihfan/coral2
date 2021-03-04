@@ -22,8 +22,9 @@ namespace backend::opengl
         void addShaderData(ShaderType type, const std::string& data);
 
         // initialization
-        void init();
+        OpenglShader(const std::string& name);
         ~OpenglShader();
+        void init();
 
         // use the shader
         // ------------------------------------------------------------------------
@@ -43,6 +44,7 @@ namespace backend::opengl
         void setUniform(const std::string& name, const glm::mat4& mat) const;
 
     private:
+        std::string name;
         std::array<std::string, 3> shader_data;
         GLuint id = 0;
 

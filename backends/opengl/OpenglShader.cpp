@@ -6,6 +6,11 @@
 using namespace backend::opengl;
 using namespace coral;
 
+OpenglShader::OpenglShader(const std::string& name)
+    : name(name)
+{
+}
+
 void OpenglShader::addShaderData(ShaderType type, const std::string& data)
 {
     shader_data[static_cast<size_t>(type)] = data;
@@ -140,8 +145,8 @@ void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
-                        << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "Error compiling " << type << " shader " << name << "\n";
+            Logs(error) << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
     else
@@ -150,8 +155,8 @@ void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
-                        << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "Error linking " << type << " " << name << "\n";
+            Logs(error) << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
         }
     }
 }

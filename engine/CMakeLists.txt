@@ -5,7 +5,7 @@ file(GLOB_RECURSE sources *.h *.cpp *.c)
 
 # Make lib
 add_library(engine STATIC ${sources})
-target_include_directories(engine PUBLIC "${engine_path}" "${utils_path}" "${backends_path}/interfaces" "${glm_path}" "${CMAKE_BINARY_DIR}")
+target_include_directories(engine PUBLIC "${engine_path}" "${utils_path}" "${backends_path}/interfaces" "${glm_path}")
 target_link_libraries(engine PUBLIC utils backend_interfaces glm)
 set_folder_structure("${sources}" ${engine_path})
 
