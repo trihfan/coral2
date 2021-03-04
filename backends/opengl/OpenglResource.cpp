@@ -42,7 +42,7 @@ GLint OpenglResource::getInternalFormatFrom(backend::BackendResourceFormat forma
         return GL_RGBA;
 
     case backend::BackendResourceFormat::depth24_pencil8:
-        return GL_DEPTH_STENCIL;
+        return GL_DEPTH24_STENCIL8;
 
     default:
         Logs(error) << "Unimplemented format";
@@ -70,7 +70,7 @@ GLenum OpenglResource::getTypeFrom(backend::BackendResourceFormat format)
     switch (format)
     {
     case backend::BackendResourceFormat::r8g8b8a8u:
-        return GL_UNSIGNED_INT;
+        return GL_UNSIGNED_BYTE;
 
     case backend::BackendResourceFormat::depth24_pencil8:
         return GL_UNSIGNED_INT_24_8;

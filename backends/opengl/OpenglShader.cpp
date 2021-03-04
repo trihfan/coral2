@@ -145,8 +145,9 @@ void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "Error compiling " << type << " shader " << name << "\n";
-            Logs(error) << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "Error compiling " << type << " shader " << name;
+            Logs(error) << infoLog;
+            Logs(error) << "-----------------------------------------------------";
         }
     }
     else
@@ -155,8 +156,9 @@ void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
-            Logs(error) << "Error linking " << type << " " << name << "\n";
-            Logs(error) << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+            Logs(error) << "Error linking " << type << " " << name;
+            Logs(error) << infoLog;
+            Logs(error) << "-----------------------------------------------------";
         }
     }
 }

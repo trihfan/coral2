@@ -1,25 +1,26 @@
 #version 300 es
+precision highp float;
 
 #define LIGHT_MAX 32
 
 struct Material
 {
-    mediump vec3 color;
-    mediump float shininess;
+    vec3 color;
+    float shininess;
 };
 
 struct PointLight
 {
-    mediump vec3 position;
-    mediump vec3 color;
-    mediump float constant;
-    mediump float linear;
-    mediump float quadratic;
+    vec3 position;
+    vec3 color;
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 struct AmbientLight
 {
-    mediump float t;
+    float t;
 };
 
 in vec3 fPosition;
@@ -51,15 +52,15 @@ void main()
         vec3 lightDir = normalize(pointLights[i].position - fPosition);
 
         // diffuse
-        float diff = max(dot(normal, lightDir), 0);
+        float diff = max(dot(normal, lightDir), 0.);
 
         // specular shading
         vec3 reflectDir = reflect(-lightDir, normal);
-        float spec = pow(max(dot(viewDirection, reflectDir), 0.0), material.shininess);
+        float spec = pow(max(dot(viewDirection, reflectDir), 0.), material.shininess);
 
         // attenuation
         float distance = length(pointLights[i].position - fPosition);
-        float attenuation = 1.0 / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
+        float attenuation = 1. / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
 
         vec3 diffuse = pointLights[i].color * diff;
         vec3 specular = pointLights[i].color * spec;
