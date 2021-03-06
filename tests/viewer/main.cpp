@@ -143,7 +143,7 @@ int main()
     scene->add(camera);
 
     // model
-    auto model = ObjectFactory::create<Model>("assets/models/droid/droid.dae");
+    auto model = ObjectFactory::create<Model>("assets/models/droid/Droid.dae");
     model->rotation = glm::vec3(0, 0, 90);
     scene->add(model);
 

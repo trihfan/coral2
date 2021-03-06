@@ -21,5 +21,9 @@ namespace coral
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) = 0;
         virtual void setNode(Handle<Node> node) = 0;
+
+    protected:
+        // Bind the lights
+        void setupLights(const RenderParameters& parameters);
     };
 }

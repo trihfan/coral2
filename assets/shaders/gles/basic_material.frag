@@ -5,7 +5,9 @@ precision highp float;
 
 struct Material
 {
-    vec3 color;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
     float shininess;
 };
 
@@ -44,7 +46,7 @@ void main()
     vec3 viewDirection = normalize(viewPosition - fPosition);
 
     // Ambien4
-    vec3 result = vec3(0.3, 0.3, 0.3);
+    vec3 result = material.ambient;
 
     // Point lights
     for (int i = 0; i < pointLightCount; i++)
@@ -65,7 +67,7 @@ void main()
         vec3 diffuse = pointLights[i].color * diff;
         vec3 specular = pointLights[i].color * spec;
 
-        result += (diffuse + specular) * material.color * attenuation;
+        result += diffuse * material.diffuse  + specular * material.specular * attenuation;
     }
 
     fColor = vec4(result, 1);

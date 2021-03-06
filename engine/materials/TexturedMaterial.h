@@ -6,16 +6,19 @@
 
 namespace coral
 {
-    class MeshMaterial : public Material
+    class TexturedMaterial : public Material
     {
     public:
-        MeshMaterial();
+        TexturedMaterial();
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
         virtual void setNode(Handle<Node> node) override;
 
         // uniforms
-        Property<Handle<Resource>> textureDiffuse;
+        PropertyArray<Handle<Resource>> diffuseTextures;
+        PropertyArray<Handle<Resource>> specularTextures;
+        PropertyArray<Handle<Resource>> normalTextures;
+        PropertyArray<Handle<Resource>> heightTextures;
     };
 }

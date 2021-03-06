@@ -17,7 +17,9 @@ namespace coral
         virtual void setNode(Handle<Node> node) override;
 
         // uniforms
-        Property<glm::vec3> color;
+        Property<glm::vec3> ambient;
+        Property<glm::vec3> diffuse;
+        Property<glm::vec3> specular;
         Property<float> shininess;
     };
 }

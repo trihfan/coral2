@@ -70,6 +70,7 @@ void Engine::release()
 
 void Engine::resize(int width, int height)
 {
+    Logs(info) << "update size: " << width << ", " << height;
     instance->currentParameters.width = width;
     instance->currentParameters.height = height;
     RenderPassManager::invalidate();

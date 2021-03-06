@@ -11,9 +11,9 @@ using namespace coral;
 
 BasicMaterial::BasicMaterial()
 {
-    PipelineParams params { "basic_material" };
+    PipelineParams params;
+    params.name = "basic_material";
     params.renderpass = defaultRenderPassName;
-
     params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
     params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
 
@@ -22,30 +22,15 @@ BasicMaterial::BasicMaterial()
 
 void BasicMaterial::use(const RenderParameters& parameters)
 {
+    setupLights(parameters);
+
     pipeline->setUniform("view", parameters.camera->getViewProjectionMatrix());
     pipeline->setUniform("viewPosition", parameters.camera->getWorldPosition());
 
-    // Point lights
-    size_t lightCount = std::min(parameters.lights.pointLights.size(), static_cast<size_t>(32));
-    pipeline->setUniform("pointLightCount", static_cast<int>(lightCount));
-    for (size_t i = 0; i < lightCount; i++)
-    {
-        const auto& light = parameters.lights.pointLights[i];
-        std::string lightStr = "pointLights[" + std::to_string(i) + "]";
-        pipeline->setUniform(lightStr + ".position", *light->position);
-        pipeline->setUniform(lightStr + ".color", *light->color);
-        pipeline->setUniform(lightStr + ".constant", *light->constant);
-        pipeline->setUniform(lightStr + ".linear", *light->linear);
-        pipeline->setUniform(lightStr + ".quadratic", *light->quadratic);
-    }
-
-    // Ambient light
-    if (!parameters.lights.areaLights.empty())
-    {
-    }
-
     // Material
-    pipeline->setUniform("material.color", *color);
+    pipeline->setUniform("material.ambient", *ambient);
+    pipeline->setUniform("material.diffuse", *diffuse);
+    pipeline->setUniform("material.specular", *specular);
     pipeline->setUniform("material.shininess", *shininess);
 }
 

@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include "Mesh.h"
+#include "materials/Material.h"
 #include "resources/Resource.h"
 #include "scene/Node.h"
 #include <assimp/material.h>
@@ -22,14 +23,14 @@ namespace coral
     private:
         std::string path;
         std::string directory;
-        std::unordered_map<std::string, Handle<Resource>> texturesByName;
+        std::unordered_map<std::string, Handle<Material>> materialByName;
 
         void init();
         void release();
 
-        void processNode(aiNode* node, const aiScene* scene);
-        Handle<Mesh> processMesh(aiMesh* mesh, const aiScene* scene);
-        std::vector<Handle<Resource>> loadMaterialTextures(aiMaterial* mat, aiTextureType type);
+        void loadNode(aiNode* node, const aiScene* scene);
+        Handle<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
+        Handle<Material> loadMaterial(aiMaterial* mat);
     };
 }
 #endif
