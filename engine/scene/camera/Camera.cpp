@@ -5,6 +5,7 @@ using namespace coral;
 
 Camera::Camera()
 {
+    backgroundColor = glm::vec4(0.1, 0.1, 0.1, 0);
     connect<&Camera::updateMatrix>(position.changed, this);
 }
 

@@ -19,7 +19,7 @@ OpenglFramebuffer::OpenglFramebuffer(const std::vector<BackendFramebufferResourc
     int colorCount = 0;
     for (const auto& resource : resources)
     {
-        resource.resource->bind();
+        resource.resource->bind(0);
 
         GLenum type;
         switch (resource.role)

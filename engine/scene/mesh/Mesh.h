@@ -10,24 +10,25 @@
 
 namespace coral
 {
+    /**
+     * @brief The Vertex struct
+     */
     struct Vertex
     {
+        // Data
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec2 textCoords;
         glm::vec3 tangent;
-        glm::vec3 bitTangent;
+        glm::vec3 bitangent;
 
-        Vertex(const glm::vec3& position = glm::vec3(), const glm::vec3& normal = glm::vec3(), const glm::vec3& textCoords = glm::vec3(), const glm::vec3& tangent = glm::vec3(), const glm::vec3& bitTangent = glm::vec3())
-            : position(position)
-            , normal(normal)
-            , textCoords(textCoords)
-            , tangent(tangent)
-            , bitTangent(bitTangent)
-        {
-        }
+        // Constructor
+        Vertex(const glm::vec3& position = glm::vec3(), const glm::vec3& normal = glm::vec3(), const glm::vec3& textCoords = glm::vec3(), const glm::vec3& tangent = glm::vec3(), const glm::vec3& bitangent = glm::vec3());
     };
 
+    /**
+     * @brief A mesh drawable node using vertices and indices
+     */
     class Mesh : public DrawableNode
     {
     public:

@@ -17,9 +17,11 @@ namespace coral
     public:
         static void clear();
         static Handle<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
+        static Handle<Framebuffer> getBackbuffer();
 
     private:
-        RenderPassFramebufferManager() = default;
+        RenderPassFramebufferManager();
         std::vector<Handle<Framebuffer>> framebuffers;
+        Handle<Framebuffer> defaultFramebuffer;
     };
 }

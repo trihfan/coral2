@@ -1,10 +1,6 @@
 project(backends)
 
-# directories
-set(backend_interfaces_path ${backends_path}/interfaces)
-set(backend_opengl_path ${backends_path}/opengl)
-set(backend_vulkan_path ${backends_path}/vulkan)
-
+# Interface backend
 add_subdirectory(interfaces)
 
 # OpenGL

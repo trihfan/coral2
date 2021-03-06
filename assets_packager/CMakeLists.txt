@@ -2,7 +2,7 @@ project(assets_packager)
 
 # List of assets directory
 set(external_asset_directories "" CACHE STRING "Add assets directories to package with the engine")
-set(asset_directories "${assets_path}" ${external_asset_directories})
+set(asset_directories "${CMAKE_SOURCE_DIR}/assets" ${external_asset_directories})
 set(asset_binary_dir "${bin_output_directory}/${CMAKE_CFG_INTDIR}/assets")
 
 # Prepare index
@@ -11,6 +11,7 @@ set(asset_binary_dir "${bin_output_directory}/${CMAKE_CFG_INTDIR}/assets")
 # Package shaders
 #file(APPEND ${CMAKE_BINARY_DIR}/assets.h "#define SHADER_ASSETS_LIST std::vector<ShaderAsset>{\\\n")
 
+# for now only copy files
 foreach(asset_directory ${asset_directories})
     #if (asset_directories STREQUAL "shaders")
     #endif()

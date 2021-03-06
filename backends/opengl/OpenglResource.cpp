@@ -11,7 +11,7 @@ OpenglResource::OpenglResource(const backend::BackendResourceParams& params)
 {
     glGenTextures(1, &id);
     glBindTexture(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
-    glTexImage2D(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, 0, getInternalFormatFrom(params.format), params.width, params.height, 0, getFormatFrom(params.format), getTypeFrom(params.format), nullptr);
+    glTexImage2D(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, 0, getInternalFormatFrom(params.format), params.width, params.height, 0, getFormatFrom(params.format), getTypeFrom(params.format), params.data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     CHECK_OPENGL_ERROR
@@ -23,9 +23,9 @@ OpenglResource::~OpenglResource()
     CHECK_OPENGL_ERROR
 }
 
-void OpenglResource::bind()
+void OpenglResource::bind(int index)
 {
-    glActiveTexture(GL_TEXTURE0); // tmp texture id is always 0
+    glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + index));
     glBindTexture(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
 }
 
@@ -38,7 +38,16 @@ GLint OpenglResource::getInternalFormatFrom(backend::BackendResourceFormat forma
 {
     switch (format)
     {
-    case backend::BackendResourceFormat::r8g8b8a8u:
+    case backend::BackendResourceFormat::r8:
+        return GL_RED;
+
+    case backend::BackendResourceFormat::r8g8:
+        return GL_RG;
+
+    case backend::BackendResourceFormat::r8g8b8:
+        return GL_RGB;
+
+    case backend::BackendResourceFormat::r8g8b8a8:
         return GL_RGBA;
 
     case backend::BackendResourceFormat::depth24_pencil8:
@@ -54,7 +63,16 @@ GLenum OpenglResource::getFormatFrom(backend::BackendResourceFormat format)
 {
     switch (format)
     {
-    case backend::BackendResourceFormat::r8g8b8a8u:
+    case backend::BackendResourceFormat::r8:
+        return GL_RED;
+
+    case backend::BackendResourceFormat::r8g8:
+        return GL_RG;
+
+    case backend::BackendResourceFormat::r8g8b8:
+        return GL_RGB;
+
+    case backend::BackendResourceFormat::r8g8b8a8:
         return GL_RGBA;
 
     case backend::BackendResourceFormat::depth24_pencil8:
@@ -69,7 +87,16 @@ GLenum OpenglResource::getTypeFrom(backend::BackendResourceFormat format)
 {
     switch (format)
     {
-    case backend::BackendResourceFormat::r8g8b8a8u:
+    case backend::BackendResourceFormat::r8:
+        return GL_UNSIGNED_BYTE;
+
+    case backend::BackendResourceFormat::r8g8:
+        return GL_UNSIGNED_BYTE;
+
+    case backend::BackendResourceFormat::r8g8b8:
+        return GL_UNSIGNED_BYTE;
+
+    case backend::BackendResourceFormat::r8g8b8a8:
         return GL_UNSIGNED_BYTE;
 
     case backend::BackendResourceFormat::depth24_pencil8:

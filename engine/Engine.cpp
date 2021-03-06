@@ -10,6 +10,7 @@
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
 #include "resources/PipelineManager.h"
+#include "resources/stb_image.h"
 #include "scene/DrawableNode.h"
 #include "scene/Node.h"
 #include "scene/Scene.h"
@@ -32,6 +33,9 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
 {
     startTime = std::chrono::steady_clock::now();
     AssetManager::init();
+
+    // Setup stb image
+    stbi_set_flip_vertically_on_load(true);
 
     // Init backend
     backend::BackendParams params;

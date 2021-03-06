@@ -8,6 +8,15 @@
 
 using namespace coral;
 
+Vertex::Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec3& textCoords, const glm::vec3& tangent, const glm::vec3& bitangent)
+    : position(position)
+    , normal(normal)
+    , textCoords(textCoords)
+    , tangent(tangent)
+    , bitangent(bitangent)
+{
+}
+
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
     : vertices(vertices)
     , indices(indices)
@@ -18,6 +27,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>&
 
 void Mesh::draw(const RenderParameters&)
 {
+    // Draw
     vertexBuffer->draw();
 }
 
@@ -40,7 +50,7 @@ void Mesh::init()
         backend::BackendVertexAttribute { 3 }, // Normals
         backend::BackendVertexAttribute { 2 }, // Texture coords
         backend::BackendVertexAttribute { 3 }, // Tangents
-        backend::BackendVertexAttribute { 3 } // Bittangents
+        backend::BackendVertexAttribute { 3 } // Bitangents
     };
     data.vertexAttributes = attributes;
 

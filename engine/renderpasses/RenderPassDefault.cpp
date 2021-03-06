@@ -7,6 +7,7 @@
 #include "scene/DrawableNode.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
+#include "scene/camera/Camera.h"
 
 using namespace coral;
 
@@ -15,7 +16,8 @@ void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameter
     auto commandBuffer = backend::BackendCommandBuffer::getCommandBuffer();
 
     // setup rendering
-    commandBuffer->clearColor(0.1f, 0.1f, 0.1f, 1.f);
+    const glm::vec4 clearColor = *parameters.camera->backgroundColor;
+    commandBuffer->clearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
     commandBuffer->clearDepth();
 
     // for each shader

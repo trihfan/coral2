@@ -3,21 +3,21 @@
 #include "ObjectFactory.h"
 #include "OpenglBackend.h"
 //#include "VulkanBackend.h"
+#ifndef __EMSCRIPTEN__
+#include "glad/glad.h"
+#endif
 #include "materials/BasicMaterial.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
-#include "scene/mesh/Mesh.h"
+#include "scene/mesh/Model.h"
 #include <numeric>
 
+// Glfw3 include
 #ifdef EMSCRIPTEN
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
-
-#include <GLES2/gl2ext.h>
-#include <GLES3/gl3.h>
-
 #include <emscripten.h>
 #else
 #include <GLFW/glfw3.h>
@@ -32,7 +32,7 @@ static double lastX = SCR_WIDTH / 2.;
 static double lastY = SCR_HEIGHT / 2.;
 static bool firstMouse = true;
 static bool mousePressed = false;
-GLFWwindow* window;
+static GLFWwindow* window;
 static Handle<OrbitCamera> camera;
 
 // callback
@@ -99,7 +99,7 @@ int main()
     // glfw window creation
     // --------------------
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", nullptr, nullptr);
-    if (window == NULL)
+    if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -135,61 +135,21 @@ int main()
 
     // camera
     camera = ObjectFactory::createWithName<OrbitCamera>("camera");
+    camera->backgroundColor = glm::vec4(1, 1, 1, 1);
     camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->position = glm::vec3(0, 0, 3);
     camera->setDistanceMinMax(0.3f, 10);
     scene->add(camera);
 
-    // material
-    auto material = ObjectFactory::createWithName<BasicMaterial>("material");
-    material->color = glm::vec3(0.1, 0.8, 0.3);
-    material->shininess = 128;
-
-    // vertices
-    std::vector<Vertex> vertices {
-        // front
-        Vertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-        Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-        Vertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.f, 0.f, 1.f)),
-
-        // back
-        Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-        Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-        Vertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-        Vertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.f, 0.f, -1.f)),
-
-        // right
-        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-        Vertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-        Vertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(1.f, 0.f, 0.f)),
-
-        // left
-
-        // top
-
-        // bottom
-    };
-
-    std::vector<unsigned int> indices(vertices.size());
-    std::iota(indices.begin(), indices.end(), 0);
-
-    // mesh
-    auto mesh = ObjectFactory::createWithName<Mesh>("mesh", vertices, indices);
-    mesh->setMaterial(material);
-    scene->add(mesh);
+    // model
+    auto model = ObjectFactory::create<Model>("assets/models/droid/droid.dae");
+    model->rotation = glm::vec3(0, 0, 90);
+    scene->add(model);
 
     // Lights
     auto light1 = ObjectFactory::create<PointLight>();
-    light1->position = glm::vec3(0, -0.5, 3);
+    light1->position = glm::vec3(0, -0.5, 6);
     light1->color = glm::vec3(1, 1, 1);
     light1->constant = 1;
     light1->linear = 0.09f;
@@ -197,7 +157,7 @@ int main()
     scene->add(light1);
 
     auto light2 = ObjectFactory::create<PointLight>();
-    light2->position = glm::vec3(0, 0.5, -3);
+    light2->position = glm::vec3(0, 0.5, -7);
     light2->color = glm::vec3(1, 1, 1);
     light2->constant = 1;
     light2->linear = 0.09f;

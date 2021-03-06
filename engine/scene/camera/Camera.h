@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Property.h"
 #include "scene/Node.h"
 #include <glm/glm.hpp>
 #include <vector>
@@ -12,9 +13,6 @@ namespace coral
         // Construction
         Camera();
         virtual ~Camera() override = default;
-
-        // Signals
-        Signal<const glm::mat4&> viewProjectionChanged;
 
         // Set the projection
         void setPerspective(float fovy, const glm::vec4& viewport, const glm::vec2& zNearFar);
@@ -34,6 +32,12 @@ namespace coral
 
         // Get the projection view matrix
         const glm::mat4& getViewProjectionMatrix() const;
+
+        // Porperties
+        Property<glm::vec4> backgroundColor;
+
+        // Signals
+        Signal<const glm::mat4&> viewProjectionChanged;
 
     private:
         // View projection matrix

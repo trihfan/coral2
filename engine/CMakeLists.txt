@@ -1,13 +1,23 @@
 project(engine)
+set_property(GLOBAL PROPERTY engine_path ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Dependencies
+get_property(glm_path GLOBAL PROPERTY glm_path)
+get_property(utils_path GLOBAL PROPERTY utils_path)
+get_property(backend_interfaces_path GLOBAL PROPERTY backend_interfaces_path)
+get_property(assimp_path GLOBAL PROPERTY assimp_path)
+
+# Definitions
+add_definitions(-DSTB_IMAGE_STATIC -DSTB_IMAGE_IMPLEMENTATION)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)
 
 # Make lib
 add_library(engine STATIC ${sources})
-target_include_directories(engine PUBLIC "${engine_path}" "${utils_path}" "${backends_path}/interfaces" "${glm_path}")
-target_link_libraries(engine PUBLIC utils backend_interfaces glm)
-set_folder_structure("${sources}" ${engine_path})
+target_include_directories(engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${utils_path}" "${backend_interfaces_path}" "${glm_path}" "${assimp_path}")
+target_link_libraries(engine PUBLIC utils backend_interfaces glm assimp)
+set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set output directories
 set_target_properties(engine PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

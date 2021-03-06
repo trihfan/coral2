@@ -1,7 +1,13 @@
-project(opengl_backend)
+project(backend_opengl)
+set_property(GLOBAL PROPERTY backend_opengl_path ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Opengl
+# Dependencies
+get_property(glm_path GLOBAL PROPERTY glm_path)
+get_property(utils_path GLOBAL PROPERTY utils_path)
+get_property(backend_interfaces_path GLOBAL PROPERTY backend_interfaces_path)
 find_package(OpenGL REQUIRED)
+
+# Opengl version (gl, gles)
 set(backend_opengl_version "gl")
 if(EMSCRIPTEN)
     set(backend_opengl_version "gles")
@@ -20,35 +26,28 @@ endif()
 
 # Sources
 file(GLOB_RECURSE sources Opengl*.h Opengl*.cpp)
-
 if(backend_opengl_version STREQUAL "gl")
-    set(sources "${sources};${backend_opengl_path}/glad/glad.c" "${sources};${backend_opengl_path}/glad/glad/glad.h")
+    set(sources "${sources};${CMAKE_CURRENT_SOURCE_DIR}/glad/glad.c;${CMAKE_CURRENT_SOURCE_DIR}/glad/glad/glad.h")
 endif()
 
 # Make lib
-add_library(opengl_backend STATIC ${sources})
-set_folder_structure("${sources}" ${backend_opengl_path})
+add_library(backend_opengl STATIC ${sources})
+set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Includes
-target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}" "${utils_path}" "${backend_interfaces_path}" "${glm_path}")
-
+target_include_directories(backend_opengl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${utils_path}" "${backend_interfaces_path}" "${glm_path}")
 if(backend_opengl_version STREQUAL "gl")
-    target_include_directories(opengl_backend PUBLIC "${backend_opengl_path}/glad")
+    target_include_directories(backend_opengl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/glad")
 endif()
 
 # Libraries
-target_link_libraries(opengl_backend PUBLIC utils)
-
+target_link_libraries(backend_opengl PUBLIC utils glm)
 if(NOT EMSCRIPTEN)
-    target_link_libraries(opengl_backend PUBLIC OpenGL::GL)
+    target_link_libraries(backend_opengl PUBLIC OpenGL::GL)
 endif()
 
-# glm
-target_include_directories(opengl_backend PUBLIC "${glm_path}")
-add_dependencies(opengl_backend glm)
-
 # Set output directories
-set_target_properties(opengl_backend PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
-set_target_properties(opengl_backend PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})
-set_target_properties(opengl_backend PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${bin_output_directory})
-set_target_properties(opengl_backend PROPERTIES FOLDER "backends")
+set_target_properties(backend_opengl PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})
+set_target_properties(backend_opengl PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${lib_output_directory})
+set_target_properties(backend_opengl PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${bin_output_directory})
+set_target_properties(backend_opengl PROPERTIES FOLDER "backends")

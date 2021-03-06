@@ -54,3 +54,13 @@ Handle<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::v
     instance->framebuffers.push_back(framebuffer);
     return framebuffer;
 }
+
+Handle<Framebuffer> RenderPassFramebufferManager::getBackbuffer()
+{
+    return instance->defaultFramebuffer;
+}
+
+RenderPassFramebufferManager::RenderPassFramebufferManager()
+    : defaultFramebuffer(ObjectFactory::create<DefaultFramebuffer>())
+{
+}

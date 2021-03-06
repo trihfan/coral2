@@ -12,6 +12,8 @@ namespace coral
 
     struct RenderPassResource
     {
+        static const std::string& backbuffer;
+
         std::string name;
         backend::BackendFramebufferResourceRole role;
         backend::BackendResourceFormat format;

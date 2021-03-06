@@ -13,7 +13,7 @@ namespace backend::opengl
     public:
         OpenglResource(const BackendResourceParams& params);
         ~OpenglResource() override;
-        virtual void bind() override;
+        virtual void bind(int index) override;
 
         GLuint getId() const;
 
