@@ -58,10 +58,10 @@ void ObjectFactory::update()
     Handle<Object> object;
     while (internalData->initializeList.try_dequeue(object))
     {
-        if (object->state == Object::ObjectState::not_initialized)
+        if (object->state == ObjectState::not_initialized)
         {
             object->init();
-            object->state = Object::ObjectState::initialized;
+            object->state = ObjectState::initialized;
 
             // Add space in the objects pool
             if (internalData->freeIndex.empty())
@@ -80,10 +80,10 @@ void ObjectFactory::update()
     std::vector<std::pair<HandleSharedMemory*, Object*>> toDelete;
     while (internalData->releaseList.try_dequeue(object))
     {
-        if (object->state == Object::ObjectState::initialized)
+        if (object->state == ObjectState::initialized)
         {
             object->release();
-            object->state = Object::ObjectState::released;
+            object->state = ObjectState::released;
 
             // Unallocate
             toDelete.push_back(std::make_pair(object.sharedMemory, object.data));

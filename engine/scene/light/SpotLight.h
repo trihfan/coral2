@@ -1,5 +1,4 @@
-#ifndef SPOTLIGHT_H
-#define SPOTLIGHT_H
+#pragma once
 
 #include "Light.h"
 
@@ -11,4 +10,3 @@ namespace coral
     private:
     };
 }
-#endif

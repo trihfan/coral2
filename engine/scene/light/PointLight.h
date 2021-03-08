@@ -1,5 +1,4 @@
-#ifndef POINTLIGHT_H
-#define POINTLIGHT_H
+#pragma once
 
 #include "Light.h"
 
@@ -8,9 +7,8 @@ namespace coral
     class PointLight : public Light
     {
     public:
-        Property<float> constant;
-        Property<float> linear;
-        Property<float> quadratic;
+        float constant;
+        float linear;
+        float quadratic;
     };
 }
-#endif

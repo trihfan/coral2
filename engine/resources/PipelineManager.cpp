@@ -17,6 +17,10 @@ void PipelineManager::release()
 
 void PipelineManager::clear()
 {
+    for (const auto& pipeline : instance->pipelines)
+    {
+        pipeline.second->setDirty();
+    }
     instance->pipelines.clear();
 }
 
@@ -34,7 +38,7 @@ Handle<Pipeline> PipelineManager::getPipeline(const PipelineParams& params)
     }
 
     // Create new pipeline
-    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.renderpass, params);
+    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.name, params);
     instance->pipelines.push_back(std::make_pair(params, pipeline));
     return pipeline;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Material.h"
-#include "Property.h"
 #include <glm/glm.hpp>
 
 namespace coral
@@ -10,16 +9,19 @@ namespace coral
     class BasicMaterial : public Material
     {
     public:
-        BasicMaterial();
+        BasicMaterial(const std::vector<std::string>& renderQueueTags);
 
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
         virtual void setNode(Handle<Node> node) override;
 
         // uniforms
-        Property<glm::vec3> ambient;
-        Property<glm::vec3> diffuse;
-        Property<glm::vec3> specular;
-        Property<float> shininess;
+        glm::vec3 ambient;
+        glm::vec3 diffuse;
+        glm::vec3 specular;
+        float shininess;
+
+    protected:
+        virtual Handle<Pipeline> getPipelineFor(const std::string& renderpass) override;
     };
 }

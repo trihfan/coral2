@@ -12,6 +12,7 @@
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
 #include "scene/mesh/Model.h"
+#include "scene/text/Text.h"
 #include <numeric>
 
 // Glfw3 include
@@ -26,14 +27,16 @@
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 1200;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 static double lastX = SCR_WIDTH / 2.;
 static double lastY = SCR_HEIGHT / 2.;
 static bool firstMouse = true;
 static bool mousePressed = false;
 static GLFWwindow* window;
 static Handle<OrbitCamera> camera;
+
+void setupScene();
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -127,42 +130,8 @@ int main()
 
     // setup engine
     Engine::create(std::move(backend));
-    Engine::resize(SCR_WIDTH * 2, SCR_HEIGHT * 2);
-
-    // scene
-    auto scene = ObjectFactory::createWithName<Scene>("scene");
-    SceneManager::setCurrentScene(scene);
-
-    // camera
-    camera = ObjectFactory::createWithName<OrbitCamera>("camera");
-    camera->backgroundColor = glm::vec4(1, 1, 1, 1);
-    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
-    camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    camera->position = glm::vec3(0, 0, 3);
-    camera->setDistanceMinMax(0.3f, 10);
-    scene->add(camera);
-
-    // model
-    auto model = ObjectFactory::create<Model>("assets/models/droid/Droid.dae");
-    model->rotation = glm::vec3(0, 0, 90);
-    scene->add(model);
-
-    // Lights
-    auto light1 = ObjectFactory::create<PointLight>();
-    light1->position = glm::vec3(0, -0.5, 6);
-    light1->color = glm::vec3(1, 1, 1);
-    light1->constant = 1;
-    light1->linear = 0.09f;
-    light1->quadratic = 0.032f;
-    scene->add(light1);
-
-    auto light2 = ObjectFactory::create<PointLight>();
-    light2->position = glm::vec3(0, 0.5, -7);
-    light2->color = glm::vec3(1, 1, 1);
-    light2->constant = 1;
-    light2->linear = 0.09f;
-    light2->quadratic = 0.032f;
-    scene->add(light2);
+    Engine::resize(SCR_WIDTH, SCR_HEIGHT);
+    setupScene();
 
     // main loop
 #ifdef __EMSCRIPTEN__
@@ -179,10 +148,67 @@ int main()
     return 0;
 }
 
+void setupScene()
+{
+    // scene
+    auto scene = ObjectFactory::createWithName<Scene>("scene");
+    SceneManager::setCurrentScene(scene);
+
+    // camera
+    camera = ObjectFactory::createWithName<OrbitCamera>("camera");
+    camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
+    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
+    camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    camera->setTranslation(glm::vec3(0, 0, 3));
+    camera->setDistanceMinMax(0.3f, 10);
+    scene->add(camera);
+
+    // model
+    auto model = ObjectFactory::create<Model>("assets/models/droid/Droid.dae");
+    model->setRotation(glm::vec3(-90, 0, 180));
+    model->setTranslation(glm::vec3(0, -1, 0));
+    scene->add(model);
+
+    // Lights
+    auto light1 = ObjectFactory::create<PointLight>();
+    light1->setTranslation(glm::vec3(1, 1, 0.3));
+    light1->color = glm::vec3(1, 1, 1);
+    light1->constant = 1;
+    light1->linear = 0.09f;
+    light1->quadratic = 0.032f;
+    scene->add(light1);
+
+    auto light2 = ObjectFactory::create<PointLight>();
+    light2->setTranslation(glm::vec3(-0.8, 1, 0.2));
+    light2->color = glm::vec3(1, 1, 1);
+    light2->constant = 1;
+    light2->linear = 0.09f;
+    light2->quadratic = 0.032f;
+    scene->add(light2);
+
+    auto light3 = ObjectFactory::create<PointLight>();
+    light3->setTranslation(glm::vec3(-0.3, 1, -0.5));
+    light3->color = glm::vec3(1, 1, 1);
+    light3->constant = 1;
+    light3->linear = 0.09f;
+    light3->quadratic = 0.032f;
+    scene->add(light3);
+
+    // Text
+    auto text = ObjectFactory::create<Text>("assets/fonts/Locanita.ttf");
+    //text->setTranslation(glm::vec3(25, 25, 0));
+    text->setScale(glm::vec3(0.004, 0.004, 0.004));
+    text->setText("test");
+    text->setColor(glm::vec3(0, 0.9, 0.4));
+    scene->add(text);
+}
+
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
         glfwSetWindowShouldClose(window, true);
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow*, int width, int height)

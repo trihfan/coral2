@@ -11,12 +11,12 @@ Scene::Scene()
 
 void Scene::add(Handle<Node> node)
 {
-    top_node->children.add(node);
+    top_node->addChild(node);
 }
 
 void Scene::remove(Handle<Node> node)
 {
-    top_node->children.remove(node);
+    top_node->removeChild(node);
 }
 
 Handle<Node> Scene::getTopNode() const

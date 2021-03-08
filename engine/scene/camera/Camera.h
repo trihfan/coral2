@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Property.h"
 #include "scene/Node.h"
 #include <glm/glm.hpp>
 #include <vector>
@@ -30,14 +29,18 @@ namespace coral
         // Get up
         const glm::vec3& getUp() const;
 
+        // Get the projection matrix
+        const glm::mat4& getProjectionMatrix() const;
+
+        // Get the view matrix
+        const glm::mat4& getViewMatrix() const;
+
         // Get the projection view matrix
         const glm::mat4& getViewProjectionMatrix() const;
 
-        // Porperties
-        Property<glm::vec4> backgroundColor;
-
-        // Signals
-        Signal<const glm::mat4&> viewProjectionChanged;
+        // Background color
+        const glm::vec4& getBackgroundColor();
+        void setBackgroundColor(const glm::vec4& color);
 
     private:
         // View projection matrix
@@ -45,7 +48,11 @@ namespace coral
         glm::vec3 center;
         glm::vec3 up;
         glm::mat4 projection;
+        glm::mat4 view;
         glm::mat4 viewProjection;
+
+        // Background color
+        glm::vec4 backgroundColor;
 
         // Update the view projection matrix
         void updateMatrix();

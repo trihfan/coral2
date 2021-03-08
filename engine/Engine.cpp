@@ -16,6 +16,7 @@
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/Camera.h"
+#include "utils/Freetype.h"
 #include <new>
 
 using namespace coral;
@@ -51,6 +52,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     RenderPassResourceManager::create();
 
     // Setup engine
+    Freetype::init();
     EngineConfig::setup();
 }
 
@@ -65,6 +67,7 @@ void Engine::release()
     ObjectFactory::destroy();
 
     // Release backend
+    Freetype::release();
     backend->release();
 }
 

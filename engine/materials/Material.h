@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Object.h"
-#include "Property.h"
 #include "resources/Pipeline.h"
 #include <memory>
 #include <string>
@@ -15,15 +14,28 @@ namespace coral
     class Material : public Object
     {
     public:
-        // The material pipeline
-        Property<Handle<Pipeline>> pipeline;
+        Material(const std::vector<std::string>& renderQueueTags);
+
+        // Pipeline
+        Handle<Pipeline> getPipeline() const;
 
         // setup the shader and its parameters
+        virtual void init() override;
+        virtual void update() override;
         virtual void use(const RenderParameters& parameters) = 0;
         virtual void setNode(Handle<Node> node) = 0;
 
     protected:
         // Bind the lights
         void setupLights(const RenderParameters& parameters);
+
+        // Create the pipeline for the material compatible with the given renderpass
+        virtual Handle<Pipeline> getPipelineFor(const std::string& renderpass) = 0;
+
+    private:
+        std::vector<std::string> renderQueueTags;
+
+        // The material pipeline
+        Handle<Pipeline> pipeline;
     };
 }

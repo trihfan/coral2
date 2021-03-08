@@ -30,8 +30,12 @@ void OpenglPipeline::use()
     shader->use();
 
     GL_ENABLE_OR_DISABLE(GL_DEPTH_TEST, params.depthTest)
-    GL_ENABLE_OR_DISABLE(GL_CULL_FACE, params.cullFace != CullFace::none);
+
+    GL_ENABLE_OR_DISABLE(GL_CULL_FACE, params.cullFace != CullFace::none)
     glCullFace(params.cullFace == CullFace::front ? GL_FRONT : GL_BACK);
+
+    GL_ENABLE_OR_DISABLE(GL_BLEND, params.blending)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void OpenglPipeline::resize(int, int)

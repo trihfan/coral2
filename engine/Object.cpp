@@ -26,7 +26,19 @@ const std::string& Object::getName() const
     return name;
 }
 
-Object::ObjectState Object::getState() const
+ObjectState Object::getState() const
 {
     return state;
+}
+
+void Object::init()
+{
+}
+
+void Object::release()
+{
+}
+
+void Object::update()
+{
 }

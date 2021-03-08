@@ -4,9 +4,19 @@
 using namespace coral;
 
 Camera::Camera()
+    : backgroundColor(0.1f, 0.1f, 0.1f, 1.f)
 {
-    backgroundColor = glm::vec4(0.1, 0.1, 0.1, 0);
-    connect<&Camera::updateMatrix>(position.changed, this);
+    connect<&Camera::updateMatrix>(matrixChanged, this);
+}
+
+const glm::mat4& Camera::getProjectionMatrix() const
+{
+    return projection;
+}
+
+const glm::mat4& Camera::getViewMatrix() const
+{
+    return view;
 }
 
 const glm::mat4& Camera::getViewProjectionMatrix() const
@@ -16,8 +26,8 @@ const glm::mat4& Camera::getViewProjectionMatrix() const
 
 void Camera::updateMatrix()
 {
-    viewProjection = projection * glm::lookAt(*position, center, up);
-    viewProjectionChanged(viewProjection);
+    view = glm::lookAt(getPosition(), center, up);
+    viewProjection = projection * view;
 }
 
 void Camera::setPerspective(float fovy, const glm::vec4& viewport, const glm::vec2& zNearFar)
@@ -54,4 +64,14 @@ const glm::vec3& Camera::getViewCenter() const
 const glm::vec3& Camera::getUp() const
 {
     return up;
+}
+
+const glm::vec4& Camera::getBackgroundColor()
+{
+    return backgroundColor;
+}
+
+void Camera::setBackgroundColor(const glm::vec4& color)
+{
+    backgroundColor = color;
 }

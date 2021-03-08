@@ -2,7 +2,6 @@
 
 #include "BackendResource.h"
 #include "Object.h"
-#include "Property.h"
 #include <memory>
 
 namespace coral
@@ -34,13 +33,12 @@ namespace coral
         void bind(int index);
         backend::BackendResource* getBackendResource() const;
 
+        virtual void init();
+        virtual void release();
+
     private:
         ResourceParams params;
         unsigned char* fileData;
         std::unique_ptr<backend::BackendResource> backendResource;
-
-        // initialization
-        void init();
-        void release();
     };
 }

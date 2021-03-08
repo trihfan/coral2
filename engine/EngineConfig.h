@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Property.h"
 #include <thread>
 
 namespace coral

@@ -10,6 +10,13 @@ namespace coral
 {
     class ObjectFactory;
 
+    enum class ObjectState
+    {
+        not_initialized,
+        initialized,
+        released
+    };
+
     // The Object class represent an object in coral engine
     class Object : public HandleFromThis
     {
@@ -24,24 +31,25 @@ namespace coral
         template <typename Type>
         bool isA() const;
 
+        // State
+        ObjectState getState() const;
+
         // name
         void setName(const std::string& name);
         const std::string& getName() const;
 
-        // Signals
-        Signal<> init;
-        Signal<> release;
-        Signal<> update;
+        // Initialize the resources
+        virtual void init();
+
+        // Release the resources
+        virtual void release();
+
+        // Update the Object, called each frame
+        virtual void update();
 
     protected:
         // state
-        enum class ObjectState
-        {
-            not_initialized,
-            initialized,
-            released
-        } state;
-        ObjectState getState() const;
+        ObjectState state;
 
     private:
         std::string name;

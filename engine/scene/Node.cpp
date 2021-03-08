@@ -1,17 +1,20 @@
 #include "Node.h"
+#include "renderpasses/RenderPassManager.h"
 #include <algorithm>
 #include <glm/gtx/transform.hpp>
 
 using namespace coral;
 
 Node::Node(Handle<Node> parent)
+    : enabled(true)
+    , translation(0, 0, 0)
+    , rotation(0, 0, 0)
+    , scale(1, 1, 1)
+    , worldPosition(0, 0, 0)
+    , matrix(1.f)
+    , dirty(true)
 {
     this->parent = parent;
-    enabled = true;
-    matrix = glm::mat4(1);
-    connect<&Node::updateWorldPosition>(position.changed, this);
-    connect<&Node::updateWorldRotation>(rotation.changed, this);
-    connect<&Node::updateWorldScale>(scale.changed, this);
 }
 
 bool Node::isDrawable() const
@@ -19,59 +22,159 @@ bool Node::isDrawable() const
     return false;
 }
 
-void Node::updateWorldPosition(const glm::vec3& position)
+bool Node::isEnabled() const
 {
-    const auto worldPosition = position + (*parent ? *parent->position : glm::vec3(0, 0, 0));
-    udpateMatrix(worldPosition, worldRotation, worldScale);
+    return enabled;
 }
 
-void Node::updateWorldRotation(const glm::vec3& rotation)
+void Node::addRenderQueueTag(const std::string& renderQueueId)
 {
-    const auto worldRotation = rotation + (*parent ? *parent->rotation : glm::vec3(0, 0, 0));
-    udpateMatrix(worldPosition, worldRotation, worldScale);
-}
-
-void Node::updateWorldScale(const glm::vec3& scale)
-{
-    const auto worldScale = scale + (*parent ? *parent->scale : glm::vec3(0, 0, 0));
-    udpateMatrix(worldPosition, worldRotation, worldScale);
-}
-
-void Node::udpateMatrix(const glm::vec3& parentPosition, const glm::vec3& parentRotation, const glm::vec3& parentScale)
-{
-    worldPosition = parentPosition + *position;
-    worldRotation = parentRotation + *rotation;
-    worldScale = parentScale + *scale;
-
-    matrix = glm::rotate(glm::mat4(1), worldRotation.x, glm::vec3(1, 0, 0));
-    matrix = glm::rotate(matrix, worldRotation.y, glm::vec3(0, 1, 0));
-    matrix = glm::rotate(matrix, worldRotation.z, glm::vec3(0, 0, 1));
-    matrix = glm::translate(matrix, worldPosition);
-    matrix = glm::scale(matrix, worldScale);
-    matrixChanged(matrix);
-
-    for (size_t i = 0; i < children.size(); i++)
+    auto it = std::find(renderQueueTags.begin(), renderQueueTags.end(), renderQueueId);
+    if (it == renderQueueTags.end())
     {
-        children[i]->udpateMatrix(worldPosition, worldRotation, worldScale);
+        renderQueueTags.push_back(renderQueueId);
     }
 }
 
-const glm::vec3& Node::getWorldPosition() const
+void Node::removeRenderQueueTag(const std::string& renderQueueId)
+{
+    auto it = std::find(renderQueueTags.begin(), renderQueueTags.end(), renderQueueId);
+    if (it != renderQueueTags.end())
+    {
+        renderQueueTags.erase(it);
+    }
+}
+
+bool Node::isTagForRenderQueue(const std::string& renderQueueId) const
+{
+    return std::find(renderQueueTags.begin(), renderQueueTags.end(), renderQueueId) != renderQueueTags.end();
+}
+
+const std::vector<std::string>& Node::getRenderQueueTags() const
+{
+    return renderQueueTags;
+}
+
+void Node::setEnabled(bool enabled)
+{
+    this->enabled = enabled;
+}
+
+void Node::setParent(Handle<Node> parent)
+{
+    this->parent = parent;
+    parent->children.push_back(toHandle<Node>());
+    dirty = true;
+}
+
+Handle<Node> Node::getParent() const
+{
+    return parent;
+}
+
+void Node::addChild(Handle<Node> child)
+{
+    children.push_back(child);
+    child->parent = toHandle<Node>();
+    child->dirty = true;
+}
+
+void Node::removeChild(Handle<Node> child)
+{
+    auto it = std::find_if(children.begin(), children.end(), [&child](const Handle<Node>& other) {
+        return child == other;
+    });
+    if (it != children.end())
+    {
+        child->parent = nullptr;
+        child->dirty = true;
+        children.erase(it);
+    }
+}
+
+size_t Node::getChildCount() const
+{
+    return children.size();
+}
+
+Handle<Node> Node::getChild(size_t index) const
+{
+    return children[index];
+}
+
+void Node::setTranslation(const glm::vec3& translation)
+{
+    this->translation = translation;
+    dirty = true;
+}
+
+const glm::vec3& Node::getTranslation() const
+{
+    return translation;
+}
+
+void Node::setRotation(const glm::vec3& rotation)
+{
+    this->rotation = rotation;
+    dirty = true;
+}
+
+const glm::vec3& Node::getRotation() const
+{
+    return rotation;
+}
+
+void Node::setScale(const glm::vec3& scale)
+{
+    this->scale = scale;
+    dirty = true;
+}
+
+const glm::vec3& Node::getScale() const
+{
+    return scale;
+}
+
+const glm::vec3& Node::getPosition() const
 {
     return worldPosition;
 }
 
-const glm::vec3& Node::getWorldRotation() const
-{
-    return worldRotation;
-}
-
-const glm::vec3& Node::getWorldScale() const
-{
-    return worldScale;
-}
-
-const glm::mat4& Node::getWorldMatrix() const
+const glm::mat4& Node::getMatrix() const
 {
     return matrix;
+}
+
+void Node::update()
+{
+    Object::update();
+
+    if (dirty)
+    {
+        worldPosition = getTranslation();
+        if (parent)
+        {
+            worldPosition += parent->getPosition();
+        }
+
+        matrix = glm::mat4(1.f);
+        matrix = glm::translate(matrix, getTranslation());
+        matrix = glm::rotate(matrix, glm::radians(getRotation().x), glm::vec3(1.0, 0.0, 0.0));
+        matrix = glm::rotate(matrix, glm::radians(getRotation().y), glm::vec3(0.0, 1.0, 0.0));
+        matrix = glm::rotate(matrix, glm::radians(getRotation().z), glm::vec3(0.0, 0.0, 1.0));
+        matrix = glm::scale(matrix, getScale());
+
+        if (parent)
+        {
+            matrix = matrix * parent->getMatrix();
+        }
+
+        matrixChanged(matrix);
+        dirty = false;
+    }
+
+    for (size_t i = 0; i < children.size(); i++)
+    {
+        children[i]->update();
+    }
 }

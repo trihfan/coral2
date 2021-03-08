@@ -24,11 +24,10 @@ namespace coral
 
         void bind(backend::BackendFramebufferUsage usage);
 
-    private:
-        // initialization
-        virtual void init();
-        virtual void release();
+        virtual void init() override;
+        virtual void release() override;
 
+    private:
         std::unique_ptr<backend::BackendFramebuffer> backendFramebuffer;
         std::vector<FramebufferResource> resources;
     };
@@ -39,11 +38,10 @@ namespace coral
         DefaultFramebuffer();
         void bind(backend::BackendFramebufferUsage usage);
 
+        virtual void init() override;
+        virtual void release() override;
+
     protected:
         std::unique_ptr<backend::BackendDefaultFramebuffer> defaultFramebuffer;
-
-        // initialization
-        virtual void init();
-        virtual void release();
     };
 }

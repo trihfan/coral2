@@ -1,5 +1,4 @@
-#ifndef DIRECTIONALLIGHT_H
-#define DIRECTIONALLIGHT_H
+#pragma once
 
 #include "Light.h"
 
@@ -11,4 +10,3 @@ namespace coral
     private:
     };
 }
-#endif

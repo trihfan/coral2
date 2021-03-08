@@ -8,15 +8,10 @@ Resource::Resource(const ResourceParams& params)
     : params(params)
     , fileData(nullptr)
 {
-    connect<&Resource::init>(Object::init, this);
-    connect<&Resource::release>(Object::release, this);
 }
 
 Resource::Resource(const std::string& file)
 {
-    connect<&Resource::init>(Object::init, this);
-    connect<&Resource::release>(Object::release, this);
-
     // Load file
     int width, height;
     int nbComponents;
@@ -68,6 +63,7 @@ backend::BackendResource* Resource::getBackendResource() const
 
 void Resource::init()
 {
+    Object::init();
     backend::BackendResourceParams params;
     params.type = this->params.type;
     params.format = this->params.format;
@@ -89,5 +85,6 @@ void Resource::init()
 
 void Resource::release()
 {
+    Object::release();
     backendResource = nullptr;
 }

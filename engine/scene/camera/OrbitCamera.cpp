@@ -19,7 +19,7 @@ void OrbitCamera::setDistanceMinMax(float min, float max)
 
 void OrbitCamera::move(float x, float y)
 {
-    const glm::vec3 view = *position - getViewCenter();
+    const glm::vec3 view = getTranslation() - getViewCenter();
     const glm::vec3 up = getUp();
     const float distance = glm::length(view);
     const glm::vec3 unit = view / static_cast<float>(distance);
@@ -27,20 +27,20 @@ void OrbitCamera::move(float x, float y)
     // Move x
     const glm::vec3 right = glm::cross(up, unit);
     const glm::vec3 movementX2D = right * -x;
-    const glm::vec3 movementX = glm::normalize(*position + movementX2D - getViewCenter()) * distance - *position;
+    const glm::vec3 movementX = glm::normalize(getTranslation() + movementX2D - getViewCenter()) * distance - getTranslation();
 
     // Move Y
     const glm::vec3 movementY2D = up * -y;
-    const glm::vec3 movementY = glm::normalize(*position + movementY2D - getViewCenter()) * distance - *position;
+    const glm::vec3 movementY = glm::normalize(getTranslation() + movementY2D - getViewCenter()) * distance - getTranslation();
 
     // Update position
-    position = *position + movementX + movementY;
+    setTranslation(getTranslation() + movementX + movementY);
 }
 
 void OrbitCamera::zoom(float value)
 {
-    const glm::vec3 view = *position - getViewCenter();
+    const glm::vec3 view = getTranslation() - getViewCenter();
     const float distance = glm::length(view);
     const float t = std::clamp(distance - value, distanceMin, distanceMax);
-    position = getViewCenter() + view / distance * t;
+    setTranslation(getViewCenter() + view / distance * t);
 }

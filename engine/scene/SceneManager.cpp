@@ -39,11 +39,7 @@ void SceneManager::update()
         });
 
     // update
-    traverse(
-        instance->currentScene->getTopNode(), +[](Handle<Node> node) {
-            node->update();
-            return true;
-        });
+    instance->currentScene->getTopNode()->update();
 }
 
 void SceneManager::setCurrentScene(Handle<Scene> scene)
@@ -74,9 +70,10 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
             auto drawableNode = node->toHandle<DrawableNode>();
             for (const auto& id : drawableNode->getRenderQueueTags())
             {
+                assert(drawableNode->getMaterial()->getPipeline());
                 auto& render_queue = queues[id];
                 render_queue.nodes.push_back(drawableNode);
-                render_queue.pipelineMap[*drawableNode->getMaterial()->pipeline].insert(drawableNode->getMaterial());
+                render_queue.pipelineMap[drawableNode->getMaterial()->getPipeline()].insert(drawableNode->getMaterial());
                 render_queue.materialMap[drawableNode->getMaterial()].push_back(drawableNode);
             }
         }

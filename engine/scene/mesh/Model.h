@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include "Mesh.h"
 #include "materials/Material.h"
@@ -20,17 +19,15 @@ namespace coral
     public:
         Model(const std::string& path);
 
+        virtual void init() override;
+
     private:
         std::string path;
         std::string directory;
         std::unordered_map<std::string, Handle<Material>> materialByName;
-
-        void init();
-        void release();
 
         void loadNode(aiNode* node, const aiScene* scene);
         Handle<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
         Handle<Material> loadMaterial(aiMaterial* mat);
     };
 }
-#endif

@@ -15,27 +15,22 @@ namespace coral
     {
     public:
         // construction
-        DrawableNode(Handle<Node> parent = nullptr, const std::vector<std::string>& renderQueueTags = { coral::defaultRenderPassName });
+        DrawableNode(Handle<Node> parent = nullptr);
         virtual ~DrawableNode() override = default;
 
         // meta
         bool isDrawable() const override;
 
-        // render queue
-        void addRenderQueueTag(const std::string& renderQueueId);
-        void removeRenderQueueTag(const std::string& renderQueueId);
-        bool isTagForRenderQueue(const std::string& renderQueueId) const;
-        const std::vector<std::string>& getRenderQueueTags() const;
-
         // material
         void setMaterial(Handle<Material> material);
         Handle<Material> getMaterial() const;
+
+        virtual void update() override;
 
         // draw
         virtual void draw(const RenderParameters& parameters) = 0;
 
     protected:
         Handle<Material> material;
-        std::vector<std::string> renderQueueTags;
     };
 }

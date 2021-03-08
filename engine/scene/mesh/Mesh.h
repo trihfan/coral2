@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include "BackendVertexBuffer.h"
 #include "scene/DrawableNode.h"
@@ -10,20 +9,18 @@
 
 namespace coral
 {
-    /**
-     * @brief The Vertex struct
-     */
-    struct Vertex
+    struct MeshVertexBuffer
     {
-        // Data
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 textCoords;
-        glm::vec3 tangent;
-        glm::vec3 bitangent;
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> textCoords;
+        std::vector<glm::vec3> tangents;
+        std::vector<glm::vec3> bitangents;
 
-        // Constructor
-        Vertex(const glm::vec3& position = glm::vec3(), const glm::vec3& normal = glm::vec3(), const glm::vec3& textCoords = glm::vec3(), const glm::vec3& tangent = glm::vec3(), const glm::vec3& bitangent = glm::vec3());
+        // Helpers
+        void reserve(size_t size);
+        size_t sizeOfVertex() const;
+        void copyTo(std::vector<float>& data) const;
     };
 
     /**
@@ -33,14 +30,17 @@ namespace coral
     {
     public:
         // constructor
-        Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+        Mesh(const MeshVertexBuffer& vertices, const std::vector<unsigned int>& indices);
 
-        // render the mesh;
+        // render the mesh
         virtual void draw(const RenderParameters& parameters) override;
+
+        virtual void init() override;
+        virtual void release() override;
 
     private:
         // Data holders
-        std::vector<Vertex> vertices;
+        MeshVertexBuffer vertices;
         std::vector<unsigned int> indices;
 
         // Buffers
@@ -48,10 +48,5 @@ namespace coral
 
         // initializes all the buffer objects/arrays
         void setupMesh();
-
-        // slots
-        void init();
-        void release();
     };
 }
-#endif

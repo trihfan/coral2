@@ -11,12 +11,13 @@ using namespace coral;
 Model::Model(const std::string& path)
     : path(path)
 {
-    connect<&Model::init>(Object::init, this);
-    connect<&Model::release>(Object::release, this);
+    addRenderQueueTag(defaultRenderPassName);
 }
 
 void Model::init()
 {
+    Node::init();
+
     // Read the file
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -38,17 +39,14 @@ void Model::init()
     materialByName.clear();
 }
 
-void Model::release()
-{
-}
-
 void Model::loadNode(aiNode* node, const aiScene* scene)
 {
     // Meshes
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        children.add(loadMesh(mesh, scene));
+        auto meshm = loadMesh(mesh, scene);
+        addChild(meshm);
     }
 
     // Children nodes
@@ -61,34 +59,35 @@ void Model::loadNode(aiNode* node, const aiScene* scene)
 Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
 {
     // Load vertices
-    std::vector<Vertex> vertices(mesh->mNumVertices);
+    MeshVertexBuffer vertices;
+    vertices.reserve(mesh->mNumVertices);
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         // Position
-        vertices[i].position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+        vertices.positions.push_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
 
         // Normal
         if (mesh->HasNormals())
         {
-            vertices[i].normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            vertices.normals.push_back(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
         }
 
         // Texture coordinates
         if (mesh->mTextureCoords[0])
         {
-            vertices[i].textCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+            vertices.textCoords.push_back(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
 
         // Tangent
         if (mesh->mTangents)
         {
-            vertices[i].tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            vertices.tangents.push_back(glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z));
         }
 
         // Bitangent
         if (mesh->mBitangents)
         {
-            vertices[i].bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+            vertices.bitangents.push_back(glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z));
         }
     }
 
@@ -129,34 +128,34 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat)
     // -- Textured Material --
     if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
     {
-        Handle<TexturedMaterial> meshMaterial = ObjectFactory::createWithName<TexturedMaterial>(name);
+        Handle<TexturedMaterial> meshMaterial = ObjectFactory::createWithName<TexturedMaterial>(name, getRenderQueueTags());
 
         // Diffuse map
         for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_DIFFUSE); i++)
         {
             std::string resourcePath = directory + "/" + name;
-            meshMaterial->diffuseTextures.add(ObjectFactory::createWithName<Resource>(name, resourcePath));
+            meshMaterial->diffuseTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
         }
 
         // Specular map
         for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_SPECULAR); i++)
         {
             std::string resourcePath = directory + "/" + name;
-            meshMaterial->specularTextures.add(ObjectFactory::createWithName<Resource>(name, resourcePath));
+            meshMaterial->specularTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
         }
 
         // Normal map
         for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_HEIGHT); i++)
         {
             std::string resourcePath = directory + "/" + name;
-            meshMaterial->normalTextures.add(ObjectFactory::createWithName<Resource>(name, resourcePath));
+            meshMaterial->normalTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
         }
 
         // Height map
         for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_AMBIENT); i++)
         {
             std::string resourcePath = directory + "/" + name;
-            meshMaterial->heightTextures.add(ObjectFactory::createWithName<Resource>(name, resourcePath));
+            meshMaterial->heightTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
         }
 
         return meshMaterial;
@@ -164,7 +163,7 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat)
 
     // --------------------
     // -- Basic Material --
-    Handle<BasicMaterial> meshMaterial = ObjectFactory::createWithName<BasicMaterial>(name);
+    Handle<BasicMaterial> meshMaterial = ObjectFactory::createWithName<BasicMaterial>(name, getRenderQueueTags());
 
     // Ambient color
     aiColor3D ambient(0, 0, 0);

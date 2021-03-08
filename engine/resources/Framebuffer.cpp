@@ -7,8 +7,6 @@ using namespace coral;
 
 Framebuffer::Framebuffer()
 {
-    connect<&Framebuffer::init>(Object::init, this);
-    connect<&Framebuffer::release>(Object::release, this);
 }
 
 void Framebuffer::addResource(const FramebufferResource& resource)
@@ -28,6 +26,7 @@ void Framebuffer::bind(backend::BackendFramebufferUsage usage)
 
 void Framebuffer::init()
 {
+    Object::init();
     std::vector<backend::BackendFramebufferResource> backendResources;
     for (const auto& resource : resources)
     {
@@ -39,13 +38,12 @@ void Framebuffer::init()
 
 void Framebuffer::release()
 {
+    Object::release();
     backendFramebuffer = nullptr;
 }
 
 DefaultFramebuffer::DefaultFramebuffer()
 {
-    connect<&DefaultFramebuffer::init>(Object::init, this);
-    connect<&DefaultFramebuffer::release>(Object::release, this);
 }
 
 void DefaultFramebuffer::bind(backend::BackendFramebufferUsage usage)

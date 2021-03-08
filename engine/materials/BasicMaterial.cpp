@@ -9,33 +9,37 @@
 
 using namespace coral;
 
-BasicMaterial::BasicMaterial()
+BasicMaterial::BasicMaterial(const std::vector<std::string>& renderQueueTags)
+    : Material(renderQueueTags)
 {
-    PipelineParams params;
-    params.name = "basic_material";
-    params.renderpass = defaultRenderPassName;
-    params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
-    params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
-
-    pipeline = PipelineManager::getPipeline(params);
 }
 
 void BasicMaterial::use(const RenderParameters& parameters)
 {
     setupLights(parameters);
 
-    pipeline->setUniform("view", parameters.camera->getViewProjectionMatrix());
-    pipeline->setUniform("viewPosition", parameters.camera->getWorldPosition());
+    getPipeline()->setUniform("view", parameters.camera->getViewProjectionMatrix());
+    getPipeline()->setUniform("viewPosition", parameters.camera->getPosition());
 
     // Material
-    pipeline->setUniform("material.ambient", *ambient);
-    pipeline->setUniform("material.diffuse", *diffuse);
-    pipeline->setUniform("material.specular", *specular);
-    pipeline->setUniform("material.shininess", *shininess);
+    getPipeline()->setUniform("material.ambient", ambient);
+    getPipeline()->setUniform("material.diffuse", diffuse);
+    getPipeline()->setUniform("material.specular", specular);
+    getPipeline()->setUniform("material.shininess", shininess);
 }
 
 void BasicMaterial::setNode(Handle<Node> node)
 {
     // Matrix
-    pipeline->setUniform("model", node->getWorldMatrix());
+    getPipeline()->setUniform("model", node->getMatrix());
+}
+
+Handle<Pipeline> BasicMaterial::getPipelineFor(const std::string& renderpass)
+{
+    PipelineParams params;
+    params.name = "basic_material";
+    params.renderpass = renderpass;
+    params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
+    params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
+    return PipelineManager::getPipeline(params);
 }

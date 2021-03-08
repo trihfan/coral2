@@ -16,7 +16,7 @@ void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameter
     auto commandBuffer = backend::BackendCommandBuffer::getCommandBuffer();
 
     // setup rendering
-    const glm::vec4 clearColor = *parameters.camera->backgroundColor;
+    const glm::vec4 clearColor = parameters.camera->getBackgroundColor();
     commandBuffer->clearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
     commandBuffer->clearDepth();
 

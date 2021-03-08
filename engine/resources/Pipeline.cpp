@@ -10,14 +10,14 @@ bool PipelineParams::operator==(const PipelineParams& other) const
         && vertexShaderFile == other.vertexShaderFile
         && fragmentShaderFile == other.fragmentShaderFile
         && depthTest == other.depthTest
-        && cullFace == other.cullFace;
+        && cullFace == other.cullFace
+        && blending == other.blending;
 }
 
 Pipeline::Pipeline(const PipelineParams& params)
     : params(params)
+    , dirty(false)
 {
-    connect<&Pipeline::init>(Object::init, this);
-    connect<&Pipeline::release>(Object::release, this);
 }
 
 const std::string& Pipeline::getRenderPassName() const
@@ -32,11 +32,23 @@ void Pipeline::use()
 
 void Pipeline::init()
 {
+    Object::init();
     backend::BackendPipelineParams bParams = params;
     backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(bParams);
 }
 
 void Pipeline::release()
 {
+    Object::release();
     backendPipeline = nullptr;
+}
+
+bool Pipeline::isDirty() const
+{
+    return dirty;
+}
+
+void Pipeline::setDirty()
+{
+    dirty = true;
 }

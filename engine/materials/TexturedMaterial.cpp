@@ -9,30 +9,24 @@
 
 using namespace coral;
 
-TexturedMaterial::TexturedMaterial()
+TexturedMaterial::TexturedMaterial(const std::vector<std::string>& renderQueueTags)
+    : Material(renderQueueTags)
 {
-    PipelineParams params;
-    params.name = "textured_material";
-    params.renderpass = defaultRenderPassName;
-    params.vertexShaderFile = AssetManager::getShader("textured_material", ShaderType::vertex).asset.url;
-    params.fragmentShaderFile = AssetManager::getShader("textured_material", ShaderType::fragment).asset.url;
-
-    pipeline = PipelineManager::getPipeline(params);
 }
 
 void TexturedMaterial::use(const RenderParameters& parameters)
 {
     setupLights(parameters);
 
-    pipeline->setUniform("view", parameters.camera->getViewProjectionMatrix());
-    pipeline->setUniform("viewPosition", parameters.camera->getWorldPosition());
+    getPipeline()->setUniform("view", parameters.camera->getViewProjectionMatrix());
+    getPipeline()->setUniform("viewPosition", parameters.camera->getPosition());
 
     // Diffuse
     int currentId = 0;
     for (size_t i = 0; i < diffuseTextures.size(); i++)
     {
         diffuseTextures[i]->bind(currentId);
-        pipeline->setUniform("texture_diffuse" + std::to_string(i), currentId);
+        getPipeline()->setUniform("texture_diffuse" + std::to_string(i), currentId);
         currentId++;
     }
 
@@ -40,7 +34,7 @@ void TexturedMaterial::use(const RenderParameters& parameters)
     for (size_t i = 0; i < specularTextures.size(); i++)
     {
         specularTextures[i]->bind(currentId);
-        pipeline->setUniform("specular_diffuse" + std::to_string(i), currentId);
+        getPipeline()->setUniform("specular_diffuse" + std::to_string(i), currentId);
         currentId++;
     }
 
@@ -48,7 +42,7 @@ void TexturedMaterial::use(const RenderParameters& parameters)
     for (size_t i = 0; i < normalTextures.size(); i++)
     {
         normalTextures[i]->bind(currentId);
-        pipeline->setUniform("normal_diffuse" + std::to_string(i), currentId);
+        getPipeline()->setUniform("normal_diffuse" + std::to_string(i), currentId);
         currentId++;
     }
 
@@ -56,12 +50,22 @@ void TexturedMaterial::use(const RenderParameters& parameters)
     for (size_t i = 0; i < heightTextures.size(); i++)
     {
         heightTextures[i]->bind(currentId);
-        pipeline->setUniform("height_diffuse" + std::to_string(i), currentId);
+        getPipeline()->setUniform("height_diffuse" + std::to_string(i), currentId);
         currentId++;
     }
 }
 
 void TexturedMaterial::setNode(Handle<Node> node)
 {
-    pipeline->setUniform("model", node->getWorldMatrix());
+    getPipeline()->setUniform("model", node->getMatrix());
+}
+
+Handle<Pipeline> TexturedMaterial::getPipelineFor(const std::string& renderpass)
+{
+    PipelineParams params;
+    params.name = "textured_material";
+    params.renderpass = renderpass;
+    params.vertexShaderFile = AssetManager::getShader("textured_material", ShaderType::vertex).asset.url;
+    params.fragmentShaderFile = AssetManager::getShader("textured_material", ShaderType::fragment).asset.url;
+    return PipelineManager::getPipeline(params);
 }
