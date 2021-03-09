@@ -21,7 +21,7 @@ namespace coral
         MAKE_SINGLETON(Engine)
     public:
         /**
-         * @brief Resize the pipeline
+         * @brief Resize the render
          */
         static void resize(int width, int height);
 

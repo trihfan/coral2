@@ -23,6 +23,8 @@ bool OpenglBackend::internalInit()
     Logs(success) << "OpenGL " << GLVersion.major << "." << GLVersion.minor;
 #endif
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     // Set creators
     creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };
     creator<BackendDefaultFramebuffer> = []() { return std::make_unique<OpenglDefaultFramebuffer>(); };

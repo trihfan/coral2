@@ -63,9 +63,9 @@ void TexturedMaterial::setNode(Handle<Node> node)
 Handle<Pipeline> TexturedMaterial::getPipelineFor(const std::string& renderpass)
 {
     PipelineParams params;
-    params.name = "textured_material";
+    params.params.name = "textured_material";
     params.renderpass = renderpass;
-    params.vertexShaderFile = AssetManager::getShader("textured_material", ShaderType::vertex).asset.url;
-    params.fragmentShaderFile = AssetManager::getShader("textured_material", ShaderType::fragment).asset.url;
+    params.params.vertexShaderFile = AssetManager::getShader("textured_material", ShaderType::vertex).asset.url;
+    params.params.fragmentShaderFile = AssetManager::getShader("textured_material", ShaderType::fragment).asset.url;
     return PipelineManager::getPipeline(params);
 }

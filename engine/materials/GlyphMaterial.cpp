@@ -1,27 +1,37 @@
 #include "GlyphMaterial.h"
 #include "AssetManager.h"
+#include "Engine.h"
 #include "ObjectFactory.h"
 #include "RenderParameters.h"
 #include "renderpasses/RenderPassManager.h"
 #include "resources/PipelineManager.h"
 #include "scene/camera/Camera.h"
 #include "utils/Freetype.h"
+#include <glm/gtx/transform.hpp>
 
 using namespace coral;
 
 GlyphMaterial::GlyphMaterial(const std::vector<std::string>& renderQueueTags, const GlyphMaterialParams& params)
     : Material(renderQueueTags)
     , params(params)
+    , dirty(true)
 {
     FreetypeGlyphParams freetypeParams;
     freetypeParams.font = params.font;
     freetypeParams.character = params.character;
+    freetypeParams.size = params.size;
     glyph = Freetype::getGlyph(freetypeParams);
 }
 
 void GlyphMaterial::use(const RenderParameters& params)
 {
-    getPipeline()->setUniform("projection", this->params.mode == TextMode::text3d ? params.camera->getProjectionMatrix() : glm::mat4(1));
+    if (this->params.mode == TextMode::text2d && dirty)
+    {
+        projection = glm::ortho(0.f, static_cast<float>(params.width), 0.f, static_cast<float>(params.height), 0.1f, 100.f);
+        dirty = false;
+    }
+
+    getPipeline()->setUniform("projection", this->params.mode == TextMode::text2d ? projection : params.camera->getViewProjectionMatrix());
     getPipeline()->setUniform("color", color);
     getPipeline()->setUniform("glyph", 0);
     resource->bind(0);
@@ -59,11 +69,12 @@ void GlyphMaterial::setColor(const glm::vec3& color)
 
 Handle<Pipeline> GlyphMaterial::getPipelineFor(const std::string& renderpass)
 {
+    dirty = true;
     PipelineParams params;
-    params.name = "glyph_material";
+    params.params.name = "glyph_material";
     params.renderpass = renderpass;
-    params.vertexShaderFile = AssetManager::getShader("glyph_material", ShaderType::vertex).asset.url;
-    params.fragmentShaderFile = AssetManager::getShader("glyph_material", ShaderType::fragment).asset.url;
+    params.params.vertexShaderFile = AssetManager::getShader("glyph_material", ShaderType::vertex).asset.url;
+    params.params.fragmentShaderFile = AssetManager::getShader("glyph_material", ShaderType::fragment).asset.url;
     params.params.depthTest = this->params.mode == TextMode::text3d;
     params.params.blending = true;
     return PipelineManager::getPipeline(params);

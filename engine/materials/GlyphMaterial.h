@@ -16,6 +16,7 @@ namespace coral
         char character;
         std::string font;
         TextMode mode;
+        int size;
     };
 
     class GlyphMaterial : public Material
@@ -41,5 +42,7 @@ namespace coral
         GlyphMaterialParams params;
         FreetypeGlyph glyph;
         Handle<Resource> resource;
+        glm::mat4 projection;
+        bool dirty;
     };
 }

@@ -4,14 +4,20 @@ using namespace coral;
 
 Logs::Logs(LogType type) : type(type)
 {
+#ifndef __EMSCRIPTEN__
     setColor(type);
+#endif
     static constexpr std::array<std::string_view, 6> headers { "error", "warning", "info", "success", "fail", "debug" };
     write(std::string("[") + std::string(headers[static_cast<size_t>(type)]) + "] ");
 }
 
 Logs::~Logs()
 {
+#ifndef __EMSCRIPTEN__
     *this << "\033[0m" << std::endl;
+#else
+    *this << std::endl;
+#endif
 }
 
 Logs& Logs::operator<<(coutManipulator manip)

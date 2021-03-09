@@ -35,6 +35,7 @@ static bool firstMouse = true;
 static bool mousePressed = false;
 static GLFWwindow* window;
 static Handle<OrbitCamera> camera;
+static Handle<Text> text;
 
 void setupScene();
 
@@ -195,11 +196,14 @@ void setupScene()
     scene->add(light3);
 
     // Text
-    auto text = ObjectFactory::create<Text>("assets/fonts/Locanita.ttf");
-    //text->setTranslation(glm::vec3(25, 25, 0));
-    text->setScale(glm::vec3(0.004, 0.004, 0.004));
-    text->setText("test");
-    text->setColor(glm::vec3(0, 0.9, 0.4));
+    TextFormat format;
+    format.font = "assets/fonts/Ubuntu-C.ttf";
+    format.size = 56;
+    text = ObjectFactory::create<Text>(format);
+    text->setColor(glm::vec3(0.1, 0.1, 0.1));
+    text->setScale(glm::vec3(0.5, 0.5, 0.5));
+    text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, 0));
+    text->setText("thibault.cardaire@gmail.com");
     scene->add(text);
 }
 
@@ -218,6 +222,8 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     glViewport(0, 0, width, height);
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width * 2, height * 2);
+
+    text->setTranslation(glm::vec3(10, height - 30, 0));
 }
 
 void mouse_button(GLFWwindow*, int button, int action, int)

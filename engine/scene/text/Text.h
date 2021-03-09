@@ -7,22 +7,29 @@
 
 namespace coral
 {
+    struct TextFormat
+    {
+        std::string font;
+        TextMode mode = TextMode::text2d;
+        int size = 16;
+    };
+
     class Text : public Node
     {
     public:
-        Text(const std::string& font);
+        Text(const TextFormat& format);
 
         // Set the text
-        void setText(const std::string& text, TextMode mode = TextMode::text2d);
+        void setTextFormat(const TextFormat& format);
+        void setText(const std::string& text);
         void setColor(const glm::vec3& color);
 
         // Render the text
         virtual void release() override;
 
     private:
-        std::string font;
+        TextFormat format;
         std::string text;
-        TextMode mode;
         glm::vec3 color;
         std::vector<Handle<Mesh>> glyphs;
         std::unordered_map<char, Handle<GlyphMaterial>> dictionary;

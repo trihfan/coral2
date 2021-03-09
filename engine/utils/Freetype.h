@@ -12,6 +12,7 @@ namespace coral
     {
         std::string font;
         char character;
+        int size;
     };
 
     struct FreetypeGlyph

@@ -10,7 +10,7 @@ namespace coral
      * @brief The PipelineParams contains the creation parameters 
      * for the pipeline
      */
-    struct PipelineParams : backend::BackendPipelineParams
+    struct PipelineParams
     {
         // Corresponding renderpass
         std::string renderpass;

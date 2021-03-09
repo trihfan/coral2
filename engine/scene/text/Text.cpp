@@ -6,16 +6,21 @@
 
 using namespace coral;
 
-Text::Text(const std::string& font)
-    : font(font)
+Text::Text(const TextFormat& format)
+    : format(format)
 {
     addRenderQueueTag(defaultRenderPassName);
 }
 
-void Text::setText(const std::string& text, TextMode mode)
+void Text::setTextFormat(const TextFormat& format)
+{
+    this->format = format;
+    setText(text);
+}
+
+void Text::setText(const std::string& text)
 {
     this->text = text;
-    this->mode = mode;
 
     // Clear old text
     for (const auto& mesh : glyphs)
@@ -25,6 +30,7 @@ void Text::setText(const std::string& text, TextMode mode)
     glyphs.clear();
 
     // Set new text
+    int currentX = 0;
     for (size_t i = 0; i < text.size(); i++)
     {
         // Material
@@ -32,14 +38,15 @@ void Text::setText(const std::string& text, TextMode mode)
 
         // Compute vertices
         MeshVertexBuffer vertices;
-        if (mode == TextMode::text2d)
+        if (format.mode == TextMode::text2d)
         {
-            const float xpos = getTranslation().x + i * (material->getGlyph().advance >> 6) * getScale().x + material->getGlyph().bearing.x * getScale().x;
+            const float xpos = currentX + getTranslation().x + +material->getGlyph().bearing.x * getScale().x;
             const float ypos = getTranslation().y - (material->getGlyph().size.y - material->getGlyph().bearing.y) * getScale().y;
             const float w = material->getGlyph().size.x * getScale().x;
             const float h = material->getGlyph().size.y * getScale().y;
+            currentX += (material->getGlyph().advance >> 6) * getScale().x;
 
-            vertices.positions = { glm::vec3(xpos, ypos + h, 0), glm::vec3(xpos, ypos, 0), glm::vec3(xpos + w, ypos, 0), glm::vec3(xpos, ypos + h, 0), glm::vec3(xpos + w, ypos, 0), glm::vec3(xpos + w, ypos + h, 0) };
+            vertices.positions = { glm::vec3(xpos, ypos + h, -0.1), glm::vec3(xpos, ypos, -0.1), glm::vec3(xpos + w, ypos, -0.1), glm::vec3(xpos, ypos + h, -0.1), glm::vec3(xpos + w, ypos, -0.1), glm::vec3(xpos + w, ypos + h, -0.1) };
             vertices.textCoords = { glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f) };
         }
         else
@@ -82,8 +89,9 @@ Handle<GlyphMaterial> Text::getMaterialFor(char character)
 
     GlyphMaterialParams params;
     params.character = character;
-    params.font = font;
-    params.mode = mode;
+    params.font = format.font;
+    params.mode = format.mode;
+    params.size = format.size;
     auto material = ObjectFactory::create<GlyphMaterial>(getRenderQueueTags(), params);
     material->setColor(color);
 

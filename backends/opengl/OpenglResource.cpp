@@ -14,6 +14,8 @@ OpenglResource::OpenglResource(const backend::BackendResourceParams& params)
     glTexImage2D(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, 0, getInternalFormatFrom(params.format), params.width, params.height, 0, getFormatFrom(params.format), getTypeFrom(params.format), params.data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     CHECK_OPENGL_ERROR
 }
 
@@ -39,10 +41,10 @@ GLint OpenglResource::getInternalFormatFrom(backend::BackendResourceFormat forma
     switch (format)
     {
     case backend::BackendResourceFormat::r8:
-        return GL_RED;
+        return GL_R8;
 
     case backend::BackendResourceFormat::r8g8:
-        return GL_RG;
+        return GL_RG8;
 
     case backend::BackendResourceFormat::r8g8b8:
         return GL_RGB;

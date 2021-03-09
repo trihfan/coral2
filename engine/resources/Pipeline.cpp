@@ -7,11 +7,11 @@ using namespace coral;
 bool PipelineParams::operator==(const PipelineParams& other) const
 {
     return renderpass == other.renderpass
-        && vertexShaderFile == other.vertexShaderFile
-        && fragmentShaderFile == other.fragmentShaderFile
-        && depthTest == other.depthTest
-        && cullFace == other.cullFace
-        && blending == other.blending;
+        && params.vertexShaderFile == other.params.vertexShaderFile
+        && params.fragmentShaderFile == other.params.fragmentShaderFile
+        && params.depthTest == other.params.depthTest
+        && params.cullFace == other.params.cullFace
+        && params.blending == other.params.blending;
 }
 
 Pipeline::Pipeline(const PipelineParams& params)
@@ -33,8 +33,7 @@ void Pipeline::use()
 void Pipeline::init()
 {
     Object::init();
-    backend::BackendPipelineParams bParams = params;
-    backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(bParams);
+    backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(params.params);
 }
 
 void Pipeline::release()

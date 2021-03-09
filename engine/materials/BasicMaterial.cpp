@@ -37,9 +37,9 @@ void BasicMaterial::setNode(Handle<Node> node)
 Handle<Pipeline> BasicMaterial::getPipelineFor(const std::string& renderpass)
 {
     PipelineParams params;
-    params.name = "basic_material";
     params.renderpass = renderpass;
-    params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
-    params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
+    params.params.name = "basic_material";
+    params.params.vertexShaderFile = AssetManager::getShader("basic_material", ShaderType::vertex).asset.url;
+    params.params.fragmentShaderFile = AssetManager::getShader("basic_material", ShaderType::fragment).asset.url;
     return PipelineManager::getPipeline(params);
 }

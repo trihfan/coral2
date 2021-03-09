@@ -38,7 +38,7 @@ Handle<Pipeline> PipelineManager::getPipeline(const PipelineParams& params)
     }
 
     // Create new pipeline
-    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.name, params);
+    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.params.name, params);
     instance->pipelines.push_back(std::make_pair(params, pipeline));
     return pipeline;
 }

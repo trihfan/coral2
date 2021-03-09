@@ -48,10 +48,10 @@ FreetypeGlyph Freetype::getGlyph(const FreetypeGlyphParams& params)
 {
     FreetypeGlyph glyph;
     FT_Face face = getFace(params.font);
-    FT_Set_Pixel_Sizes(face, 0, 48);
+    FT_Set_Pixel_Sizes(face, 0, static_cast<unsigned int>(params.size));
 
     // Load character glyph
-    if (FT_Load_Char(face, params.character, FT_LOAD_RENDER))
+    if (FT_Load_Char(face, static_cast<unsigned char>(params.character), FT_LOAD_RENDER))
     {
         Logs(error) << "Failed to load Glyph";
     }
