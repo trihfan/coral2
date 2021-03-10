@@ -204,7 +204,7 @@ void setupScene()
     text->setScale(glm::vec3(0.5, 0.5, 0.5));
     text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, 0));
     text->setText("thibault.cardaire@gmail.com");
-    scene->add(text);
+    //scene->add(text);
 }
 
 void processInput(GLFWwindow* window)
@@ -221,7 +221,7 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
-    Engine::resize(width * 2, height * 2);
+    Engine::resize(width, height);
 
     text->setTranslation(glm::vec3(10, height - 30, 0));
 }

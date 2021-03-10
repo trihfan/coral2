@@ -2,6 +2,8 @@
 
 #include "Object.h"
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -44,8 +46,9 @@ namespace coral
         const glm::vec3& getTranslation() const;
 
         // Rotation
-        void setRotation(const glm::vec3& rotation);
-        const glm::vec3& getRotation() const;
+        void setRotation(const glm::quat& rotation);
+        void setRotation(const glm::vec3& eulerAngles);
+        const glm::quat& getRotation() const;
 
         // Scale
         void setScale(const glm::vec3& scale);
@@ -72,7 +75,7 @@ namespace coral
 
         // Transform
         glm::vec3 translation;
-        glm::vec3 rotation;
+        glm::quat rotation;
         glm::vec3 scale;
 
         // Computed transform

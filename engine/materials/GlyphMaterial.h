@@ -24,6 +24,9 @@ namespace coral
     public:
         GlyphMaterial(const std::vector<std::string>& renderQueueTags, const GlyphMaterialParams& params);
 
+        // Return the attributes of the material
+        virtual std::vector<ShaderAttribute> getAttributes() const override;
+
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
         virtual void setNode(Handle<Node> node) override;

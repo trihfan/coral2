@@ -14,6 +14,14 @@ BasicMaterial::BasicMaterial(const std::vector<std::string>& renderQueueTags)
 {
 }
 
+std::vector<ShaderAttribute> BasicMaterial::getAttributes() const
+{
+    return {
+        ShaderAttribute { ShaderAttributeType::position, 0 },
+        ShaderAttribute { ShaderAttributeType::normal, 1 }
+    };
+}
+
 void BasicMaterial::use(const RenderParameters& parameters)
 {
     setupLights(parameters);

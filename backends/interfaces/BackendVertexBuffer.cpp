@@ -4,9 +4,8 @@
 using namespace backend;
 
 template <>
-std::function<std::unique_ptr<BackendVertexBuffer>(const BackendVertexBufferParams&, const BackendVertexBufferData&)> creator<BackendVertexBuffer, BackendVertexBufferParams, BackendVertexBufferData> = nullptr;
+std::function<std::unique_ptr<BackendVertexBuffer>(const BackendVertexBufferData&)> creator<BackendVertexBuffer, BackendVertexBufferData> = nullptr;
 
-BackendVertexBuffer::BackendVertexBuffer(const BackendVertexBufferParams& params, const BackendVertexBufferData&)
-    : params(params)
+BackendVertexBuffer::BackendVertexBuffer(const BackendVertexBufferData&)
 {
 }

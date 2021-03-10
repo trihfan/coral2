@@ -7,7 +7,7 @@ namespace backend::opengl
     class OpenglVertexBuffer : public BackendVertexBuffer
     {
     public:
-        OpenglVertexBuffer(const BackendVertexBufferParams& params, const BackendVertexBufferData& data);
+        OpenglVertexBuffer(const BackendVertexBufferData& data);
         ~OpenglVertexBuffer() override;
         void draw() override;
 

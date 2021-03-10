@@ -1,12 +1,14 @@
 #include "OpenglVertexBuffer.h"
 #include "BackendCommandBuffer.h"
+#include "Logs.h"
 #include "OpenglError.h"
 #include "gl.h"
 
+using namespace coral;
 using namespace backend::opengl;
 
-OpenglVertexBuffer::OpenglVertexBuffer(const BackendVertexBufferParams& params, const BackendVertexBufferData& data)
-    : BackendVertexBuffer(params, data)
+OpenglVertexBuffer::OpenglVertexBuffer(const BackendVertexBufferData& data)
+    : BackendVertexBuffer(data)
     , size(data.indicesCount)
 {
     // Vao
@@ -27,8 +29,11 @@ OpenglVertexBuffer::OpenglVertexBuffer(const BackendVertexBufferParams& params, 
     int offset = 0;
     for (size_t i = 0; i < data.vertexAttributes.size(); i++)
     {
-        glEnableVertexAttribArray(static_cast<GLuint>(i));
-        glVertexAttribPointer(static_cast<GLuint>(i), data.vertexAttributes[i].size, GL_FLOAT, GL_FALSE, data.vertexSize, reinterpret_cast<void*>(static_cast<size_t>(offset) * sizeof(float)));
+        if (data.vertexAttributes[i].location != -1)
+        {
+            glEnableVertexAttribArray(static_cast<GLuint>(data.vertexAttributes[i].location));
+            glVertexAttribPointer(static_cast<GLuint>(data.vertexAttributes[i].location), data.vertexAttributes[i].size, GL_FLOAT, GL_FALSE, data.vertexSize, reinterpret_cast<void*>(static_cast<size_t>(offset) * sizeof(float)));
+        }
         offset += data.vertexAttributes[i].size;
     }
 

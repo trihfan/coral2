@@ -23,6 +23,14 @@ GlyphMaterial::GlyphMaterial(const std::vector<std::string>& renderQueueTags, co
     glyph = Freetype::getGlyph(freetypeParams);
 }
 
+std::vector<ShaderAttribute> GlyphMaterial::getAttributes() const
+{
+    return {
+        ShaderAttribute { ShaderAttributeType::position, 0 },
+        ShaderAttribute { ShaderAttributeType::textCoords, 1 }
+    };
+}
+
 void GlyphMaterial::use(const RenderParameters& params)
 {
     if (this->params.mode == TextMode::text2d && dirty)

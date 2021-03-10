@@ -10,6 +10,24 @@ namespace coral
     struct RenderParameters;
     class Node;
 
+    enum class ShaderAttributeType : int
+    {
+        position,
+        normal,
+        textCoords,
+        tangent,
+        bitangent,
+        bone,
+        weight,
+        count
+    };
+
+    struct ShaderAttribute
+    {
+        ShaderAttributeType type;
+        int location;
+    };
+
     // A material is the class containing the shader and the shader parameters
     class Material : public Object
     {
@@ -18,6 +36,9 @@ namespace coral
 
         // Pipeline
         Handle<Pipeline> getPipeline() const;
+
+        // Return the attributes of the material
+        virtual std::vector<ShaderAttribute> getAttributes() const = 0;
 
         // setup the shader and its parameters
         virtual void init() override;

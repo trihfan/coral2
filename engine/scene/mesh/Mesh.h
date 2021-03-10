@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BackendVertexBuffer.h"
+#include "materials/Material.h"
 #include "scene/DrawableNode.h"
 #include <glm/glm.hpp>
 #include <memory>
@@ -11,16 +12,18 @@ namespace coral
 {
     struct MeshVertexBuffer
     {
-        std::vector<glm::vec3> positions;
-        std::vector<glm::vec3> normals;
-        std::vector<glm::vec2> textCoords;
-        std::vector<glm::vec3> tangents;
-        std::vector<glm::vec3> bitangents;
+        std::array<std::vector<float>, size_t(ShaderAttributeType::count)> data;
+        std::array<size_t, size_t(ShaderAttributeType::count)> dataSize;
 
         // Helpers
+        MeshVertexBuffer();
         void reserve(size_t size);
         size_t sizeOfVertex() const;
-        void copyTo(std::vector<float>& data) const;
+        void copyTo(std::vector<float>& buffer) const;
+        void insert(ShaderAttributeType type, glm::vec1 value);
+        void insert(ShaderAttributeType type, glm::vec2 value);
+        void insert(ShaderAttributeType type, glm::vec3 value);
+        void insert(ShaderAttributeType type, glm::vec4 value);
     };
 
     /**
@@ -48,5 +51,7 @@ namespace coral
 
         // initializes all the buffer objects/arrays
         void setupMesh();
+
+        std::vector<backend::BackendVertexAttribute> createAttributeArray() const;
     };
 }

@@ -8,75 +8,113 @@
 
 using namespace coral;
 
+MeshVertexBuffer::MeshVertexBuffer()
+{
+    // Default values for data sizes
+    for (size_t i = 0; i < dataSize.size(); i++)
+    {
+        switch (ShaderAttributeType(i))
+        {
+        case ShaderAttributeType::position:
+            dataSize[i] = 3;
+            break;
+
+        case ShaderAttributeType::normal:
+            dataSize[i] = 3;
+            break;
+
+        case ShaderAttributeType::textCoords:
+            dataSize[i] = 2;
+            break;
+
+        case ShaderAttributeType::tangent:
+            dataSize[i] = 3;
+            break;
+
+        case ShaderAttributeType::bitangent:
+            dataSize[i] = 3;
+            break;
+
+        case ShaderAttributeType::bone:
+            dataSize[i] = 4;
+            break;
+
+        case ShaderAttributeType::weight:
+            dataSize[i] = 4;
+            break;
+
+        default:
+            dataSize[i] = 0;
+            break;
+        }
+    }
+}
+
 void MeshVertexBuffer::reserve(size_t size)
 {
-    positions.reserve(size);
-    normals.reserve(size);
-    textCoords.reserve(size);
-    tangents.reserve(size);
-    bitangents.reserve(size);
+    for (size_t i = 0; i < data.size(); i++)
+    {
+        data[i].reserve(size * dataSize[i]);
+    }
 }
 
 size_t MeshVertexBuffer::sizeOfVertex() const
 {
     size_t size = 0;
-    if (!positions.empty())
+    for (size_t i = 0; i < data.size(); i++)
     {
-        size += sizeof(float) * 3;
+        size += data[i].empty() ? 0 : dataSize[i];
     }
-    if (!normals.empty())
-    {
-        size += sizeof(float) * 3;
-    }
-    if (!textCoords.empty())
-    {
-        size += sizeof(float) * 2;
-    }
-    if (!tangents.empty())
-    {
-        size += sizeof(float) * 3;
-    }
-    if (!bitangents.empty())
-    {
-        size += sizeof(float) * 3;
-    }
-    return size;
+    return size * sizeof(float);
 }
 
-void MeshVertexBuffer::copyTo(std::vector<float>& data) const
+void MeshVertexBuffer::copyTo(std::vector<float>& buffer) const
 {
-    size_t vertexSize = sizeOfVertex() / sizeof(float);
-    data.resize(vertexSize * positions.size());
+    size_t componentCount = this->sizeOfVertex() / sizeof(float);
+    size_t positionCount = data[size_t(ShaderAttributeType::position)].size() / dataSize[size_t(ShaderAttributeType::position)];
 
-    for (size_t i = 0; i < positions.size(); i++)
+    // Resize buffer
+    buffer.resize(componentCount * positionCount);
+
+    // Copy data
+    for (size_t currentVertex = 0; currentVertex < positionCount; currentVertex++)
     {
         size_t current = 0;
-        if (!positions.empty())
+        for (size_t i = 0; i < data.size(); i++)
         {
-            std::memcpy(&data[i * vertexSize], &positions[i], 3 * sizeof(float));
-            current += 3;
-        }
-        if (!normals.empty())
-        {
-            std::memcpy(&data[i * vertexSize + current], &normals[i], 3 * sizeof(float));
-            current += 3;
-        }
-        if (!textCoords.empty())
-        {
-            std::memcpy(&data[i * vertexSize + current], &textCoords[i], 2 * sizeof(float));
-            current += 2;
-        }
-        if (!tangents.empty())
-        {
-            std::memcpy(&data[i * vertexSize + current], &tangents[i], 3 * sizeof(float));
-            current += 3;
-        }
-        if (!bitangents.empty())
-        {
-            std::memcpy(&data[i * vertexSize + current], &bitangents[i], 3 * sizeof(float));
-            current += 3;
+            if (!data[i].empty())
+            {
+                std::memcpy(&buffer[currentVertex * componentCount + current], &data[i][currentVertex * dataSize[i]], dataSize[i] * sizeof(float));
+                current += dataSize[i];
+            }
         }
     }
+}
+
+void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec1 value)
+{
+    data[size_t(type)].push_back(value.x);
+}
+
+void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec2 value)
+{
+    data[size_t(type)].push_back(value.x);
+    data[size_t(type)].push_back(value.y);
+}
+
+void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec3 value)
+{
+    data[size_t(type)].push_back(value.x);
+    data[size_t(type)].push_back(value.y);
+    data[size_t(type)].push_back(value.z);
+}
+
+void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec4 value)
+{
+    data[size_t(type)].push_back(value.x);
+    data[size_t(type)].push_back(value.y);
+    data[size_t(type)].push_back(value.z);
+    data[size_t(type)].push_back(value.w);
 }
 
 Mesh::Mesh(const MeshVertexBuffer& vertices, const std::vector<unsigned int>& indices)
@@ -96,14 +134,11 @@ void Mesh::init()
 {
     DrawableNode::init();
 
-    // Params
-    backend::BackendVertexBufferParams params;
-
     // Data
     backend::BackendVertexBufferData data;
 
     // Copy vertices
-    data.verticesCount = static_cast<int>(vertices.positions.size());
+    data.verticesCount = static_cast<int>(vertices.data[size_t(ShaderAttributeType::position)].size() / vertices.dataSize[size_t(ShaderAttributeType::position)]);
     std::vector<float> vertexData;
     vertices.copyTo(vertexData);
     data.vertices = vertexData.data();
@@ -114,37 +149,34 @@ void Mesh::init()
 
     // Attributes
     data.vertexSize = static_cast<int>(vertices.sizeOfVertex());
-    std::vector<backend::BackendVertexAttribute> attributes;
-
-    if (!vertices.positions.empty())
-    {
-        attributes.push_back(backend::BackendVertexAttribute { 3 });
-    }
-    if (!vertices.normals.empty())
-    {
-        attributes.push_back(backend::BackendVertexAttribute { 3 });
-    }
-    if (!vertices.textCoords.empty())
-    {
-        attributes.push_back(backend::BackendVertexAttribute { 2 });
-    }
-    if (!vertices.tangents.empty())
-    {
-        attributes.push_back(backend::BackendVertexAttribute { 3 });
-    }
-    if (!vertices.bitangents.empty())
-    {
-        attributes.push_back(backend::BackendVertexAttribute { 3 });
-    }
-
-    data.vertexAttributes = attributes;
+    data.vertexAttributes = createAttributeArray();
 
     // Create buffer
-    vertexBuffer = backend::BackendObjectFactory<backend::BackendVertexBuffer>::create(params, data);
+    vertexBuffer = backend::BackendObjectFactory<backend::BackendVertexBuffer>::create(data);
+}
 
-    // Clear data holders
-    vertices = MeshVertexBuffer();
-    indices.clear();
+std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
+{
+    std::vector<backend::BackendVertexAttribute> attributes;
+    if (!material)
+    {
+        return attributes;
+    }
+
+    std::vector<ShaderAttribute> shaderAttributes = material->getAttributes();
+    for (size_t i = 0; i < vertices.data.size(); i++)
+    {
+        if (!vertices.data[i].empty())
+        {
+            auto it = std::find_if(shaderAttributes.begin(), shaderAttributes.end(), [i](const ShaderAttribute& attribute) { return attribute.type == ShaderAttributeType(i); });
+
+            backend::BackendVertexAttribute attribute;
+            attribute.size = static_cast<int>(vertices.dataSize[i]);
+            attribute.location = it != shaderAttributes.end() ? it->location : -1;
+            attributes.push_back(attribute);
+        }
+    }
+    return attributes;
 }
 
 void Mesh::release()

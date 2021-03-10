@@ -64,30 +64,30 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         // Position
-        vertices.positions.push_back(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+        vertices.insert(ShaderAttributeType::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
 
         // Normal
         if (mesh->HasNormals())
         {
-            vertices.normals.push_back(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+            vertices.insert(ShaderAttributeType::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
         }
 
         // Texture coordinates
         if (mesh->mTextureCoords[0])
         {
-            vertices.textCoords.push_back(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
 
         // Tangent
         if (mesh->mTangents)
         {
-            vertices.tangents.push_back(glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z));
+            vertices.insert(ShaderAttributeType::tangent, glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z));
         }
 
         // Bitangent
         if (mesh->mBitangents)
         {
-            vertices.bitangents.push_back(glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z));
+            vertices.insert(ShaderAttributeType::bitangent, glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z));
         }
     }
 

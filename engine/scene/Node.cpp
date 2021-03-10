@@ -1,19 +1,17 @@
 #include "Node.h"
 #include "renderpasses/RenderPassManager.h"
 #include <algorithm>
-#include <glm/gtx/transform.hpp>
 
 using namespace coral;
 
 Node::Node(Handle<Node> parent)
     : enabled(true)
     , translation(0, 0, 0)
-    , rotation(0, 0, 0)
     , scale(1, 1, 1)
-    , worldPosition(0, 0, 0)
-    , matrix(1.f)
+    , matrix(1)
     , dirty(true)
 {
+    setRotation(glm::vec3(0, 0, 0));
     this->parent = parent;
 }
 
@@ -113,13 +111,22 @@ const glm::vec3& Node::getTranslation() const
     return translation;
 }
 
-void Node::setRotation(const glm::vec3& rotation)
+void Node::setRotation(const glm::quat& rotation)
 {
     this->rotation = rotation;
     dirty = true;
 }
 
-const glm::vec3& Node::getRotation() const
+void Node::setRotation(const glm::vec3& eulerAngles)
+{
+    glm::quat quaternionX = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1.0, 0.0, 0.0));
+    glm::quat quaternionY = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0.0, 1.0, 0.0));
+    glm::quat quaternionZ = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0.0, 0.0, 1.0));
+    glm::quat finalOrientation = quaternionX * quaternionY * quaternionZ;
+    setRotation(finalOrientation);
+}
+
+const glm::quat& Node::getRotation() const
 {
     return rotation;
 }
@@ -157,12 +164,9 @@ void Node::update()
             worldPosition += parent->getPosition();
         }
 
-        matrix = glm::mat4(1.f);
-        matrix = glm::translate(matrix, getTranslation());
-        matrix = glm::rotate(matrix, glm::radians(getRotation().x), glm::vec3(1.0, 0.0, 0.0));
-        matrix = glm::rotate(matrix, glm::radians(getRotation().y), glm::vec3(0.0, 1.0, 0.0));
-        matrix = glm::rotate(matrix, glm::radians(getRotation().z), glm::vec3(0.0, 0.0, 1.0));
-        matrix = glm::scale(matrix, getScale());
+        matrix = glm::translate(glm::mat4(1), getTranslation());
+        matrix *= glm::toMat4(rotation);
+        matrix *= glm::scale(glm::mat4(1), getScale());
 
         if (parent)
         {

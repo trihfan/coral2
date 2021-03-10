@@ -14,6 +14,15 @@ TexturedMaterial::TexturedMaterial(const std::vector<std::string>& renderQueueTa
 {
 }
 
+std::vector<ShaderAttribute> TexturedMaterial::getAttributes() const
+{
+    return {
+        ShaderAttribute { ShaderAttributeType::position, 0 },
+        ShaderAttribute { ShaderAttributeType::normal, 1 },
+        ShaderAttribute { ShaderAttributeType::textCoords, 2 }
+    };
+}
+
 void TexturedMaterial::use(const RenderParameters& parameters)
 {
     setupLights(parameters);

@@ -1,14 +1,12 @@
 #pragma once
+#include "BackendPipeline.h"
 #include <vector>
 
 namespace backend
 {
-    struct BackendVertexBufferParams
-    {
-    };
-
     struct BackendVertexAttribute
     {
+        int location;
         int size;
     };
 
@@ -30,12 +28,8 @@ namespace backend
     class BackendVertexBuffer
     {
     public:
-        BackendVertexBuffer(const BackendVertexBufferParams& params, const BackendVertexBufferData& data);
+        BackendVertexBuffer(const BackendVertexBufferData& data);
         virtual ~BackendVertexBuffer() = default;
-
         virtual void draw() = 0;
-
-    protected:
-        const BackendVertexBufferParams params;
     };
 }

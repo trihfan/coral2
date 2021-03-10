@@ -46,8 +46,19 @@ void Text::setText(const std::string& text)
             const float h = material->getGlyph().size.y * getScale().y;
             currentX += (material->getGlyph().advance >> 6) * getScale().x;
 
-            vertices.positions = { glm::vec3(xpos, ypos + h, -0.1), glm::vec3(xpos, ypos, -0.1), glm::vec3(xpos + w, ypos, -0.1), glm::vec3(xpos, ypos + h, -0.1), glm::vec3(xpos + w, ypos, -0.1), glm::vec3(xpos + w, ypos + h, -0.1) };
-            vertices.textCoords = { glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f) };
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos + h, -0.1f));
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos, -0.1f));
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos, -0.1f));
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos + h, -0.1f));
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos, -0.1f));
+            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos + h, -0.1f));
+
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 0));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 1));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 1));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 0));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 1));
+            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 0));
         }
         else
         {
