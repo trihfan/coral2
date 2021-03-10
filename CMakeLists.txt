@@ -33,7 +33,7 @@ if(BACKEND_OPENGL_ENABLED)
     add_definitions(-DENABLE_OPENGL)
 endif()
 if(BACKEND_VULKAN_ENABLED)
-    add_definitions(-DENABLE_VULKAN)
+    #add_definitions(-DENABLE_VULKAN)
 endif()
 
 # define output directories

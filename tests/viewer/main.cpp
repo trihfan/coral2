@@ -122,10 +122,7 @@ int main()
     }
     else if (type == vulkan)
     {
-        /* backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
-        backend->init();
-        backend->resize(SCR_WIDTH, SCR_HEIGHT);
-        backend->destroy();*/
+        //backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
         return 0;
     }
 
@@ -202,9 +199,9 @@ void setupScene()
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
     text->setScale(glm::vec3(0.5, 0.5, 0.5));
-    text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, 0));
+    text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, -1));
     text->setText("thibault.cardaire@gmail.com");
-    //scene->add(text);
+    scene->add(text);
 }
 
 void processInput(GLFWwindow* window)
