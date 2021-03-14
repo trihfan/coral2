@@ -1,5 +1,7 @@
 #include "Material.h"
 #include "RenderParameters.h"
+#include "resources/PipelineManager.h"
+#include "scene/camera/Camera.h"
 #include "scene/light/PointLight.h"
 
 using namespace coral;
@@ -20,6 +22,8 @@ Handle<Pipeline> Material::getPipeline() const
 
 void Material::setupLights(const RenderParameters& parameters)
 {
+    getPipeline()->setUniform("viewPosition", parameters.camera->getPosition());
+
     // Point lights
     size_t lightCount = std::min(parameters.lights.pointLights.size(), static_cast<size_t>(32));
     pipeline->setUniform("pointLightCount", static_cast<int>(lightCount));
@@ -40,10 +44,26 @@ void Material::setupLights(const RenderParameters& parameters)
     }
 }
 
+void Material::use(const RenderParameters& parameters)
+{
+    getPipeline()->setUniform("projectionMatrix", parameters.camera->getProjectionMatrix());
+    getPipeline()->setUniform("viewMatrix", parameters.camera->getViewMatrix());
+
+    if (lighting)
+    {
+        setupLights(parameters);
+    }
+}
+
 void Material::init()
 {
     Object::init();
-    pipeline = getPipelineFor(renderQueueTags[0]);
+
+    pipeline = PipelineManager::getPipelineByName(getPipelineName());
+    if (!pipeline)
+    {
+        pipeline = createPipelineFor(renderQueueTags[0]);
+    }
 }
 
 void Material::update()
@@ -53,6 +73,16 @@ void Material::update()
     // Check the pipeline (todo)
     if (!pipeline || pipeline->isDirty())
     {
-        pipeline = getPipelineFor(renderQueueTags[0]);
+        pipeline = createPipelineFor(renderQueueTags[0]);
     }
+}
+
+void Material::setNode(Handle<Node> node)
+{
+    getPipeline()->setUniform("modelMatrix", node->getMatrix());
+}
+
+void Material::enableLighting()
+{
+    lighting = true;
 }

@@ -10,20 +10,36 @@
 
 namespace coral
 {
+    enum class MeshShaderAttributeType : int
+    {
+        position,
+        normal,
+        textCoords,
+        bone,
+        weight,
+        count
+    };
+
+    /**
+     * @brief The MeshVertexBuffer struct contains data for the mesh vertex buffer
+     */
     struct MeshVertexBuffer
     {
-        std::array<std::vector<float>, size_t(ShaderAttributeType::count)> data;
-        std::array<size_t, size_t(ShaderAttributeType::count)> dataSize;
+        std::array<std::vector<float>, size_t(MeshShaderAttributeType::count)> data;
+        std::array<size_t, size_t(MeshShaderAttributeType::count)> dataSize;
 
         // Helpers
         MeshVertexBuffer();
         void reserve(size_t size);
         size_t sizeOfVertex() const;
         void copyTo(std::vector<float>& buffer) const;
-        void insert(ShaderAttributeType type, glm::vec1 value);
-        void insert(ShaderAttributeType type, glm::vec2 value);
-        void insert(ShaderAttributeType type, glm::vec3 value);
-        void insert(ShaderAttributeType type, glm::vec4 value);
+        void insert(MeshShaderAttributeType type, glm::vec1 value);
+        void insert(MeshShaderAttributeType type, glm::vec2 value);
+        void insert(MeshShaderAttributeType type, glm::vec3 value);
+        void insert(MeshShaderAttributeType type, glm::vec4 value);
+
+        bool has(MeshShaderAttributeType type) const;
+        int getLocation(MeshShaderAttributeType type) const;
     };
 
     /**
@@ -37,7 +53,6 @@ namespace coral
 
         // render the mesh
         virtual void draw(const RenderParameters& parameters) override;
-
         virtual void init() override;
         virtual void release() override;
 

@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "ObjectFactory.h"
 #include "materials/BasicMaterial.h"
+#include "materials/MeshMaterial.h"
 #include "materials/TexturedMaterial.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -64,30 +65,18 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         // Position
-        vertices.insert(ShaderAttributeType::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+        vertices.insert(MeshShaderAttributeType::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
 
         // Normal
         if (mesh->HasNormals())
         {
-            vertices.insert(ShaderAttributeType::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+            vertices.insert(MeshShaderAttributeType::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
         }
 
         // Texture coordinates
         if (mesh->mTextureCoords[0])
         {
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
-        }
-
-        // Tangent
-        if (mesh->mTangents)
-        {
-            vertices.insert(ShaderAttributeType::tangent, glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z));
-        }
-
-        // Bitangent
-        if (mesh->mBitangents)
-        {
-            vertices.insert(ShaderAttributeType::bitangent, glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z));
+            vertices.insert(MeshShaderAttributeType::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
     }
 
@@ -105,7 +94,7 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
 
     // Load the material
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    Handle<Material> meshMaterial = loadMaterial(material);
+    Handle<Material> meshMaterial = loadMaterial(material, vertices);
 
     // Create the mesh object
     std::string name = mesh->mName.C_Str();
@@ -114,7 +103,7 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
     return meshObject;
 }
 
-Handle<Material> Model::loadMaterial(aiMaterial* mat)
+Handle<Material> Model::loadMaterial(aiMaterial* mat, const MeshVertexBuffer& vertexBuffer)
 {
     // Check if the material is already loaded
     std::string name = mat->GetName().C_Str();
@@ -124,66 +113,84 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat)
         return it->second;
     }
 
-    // -----------------------
-    // -- Textured Material --
-    if (mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+    // Create material
+    Handle<MeshMaterial> material = ObjectFactory::create<MeshMaterial>(getRenderQueueTags());
+
+    // Attributes
+    std::vector<ShaderAttribute> attributes;
+    attributes.push_back(ShaderAttribute { "position", vertexBuffer.getLocation(MeshShaderAttributeType::position), "vec3" });
+    if (vertexBuffer.has(MeshShaderAttributeType::normal))
     {
-        Handle<TexturedMaterial> meshMaterial = ObjectFactory::createWithName<TexturedMaterial>(name, getRenderQueueTags());
+        attributes.push_back(ShaderAttribute { "normal", vertexBuffer.getLocation(MeshShaderAttributeType::normal), "vec3" });
+    }
+    if (vertexBuffer.has(MeshShaderAttributeType::textCoords))
+    {
+        attributes.push_back(ShaderAttribute { "textCoords", vertexBuffer.getLocation(MeshShaderAttributeType::textCoords), "vec2" });
+    }
+    if (vertexBuffer.has(MeshShaderAttributeType::bone))
+    {
+        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshShaderAttributeType::bone), "vec4" });
+        material->enableSkining();
+    }
+    if (vertexBuffer.has(MeshShaderAttributeType::weight))
+    {
+        attributes.push_back(ShaderAttribute { "weight", vertexBuffer.getLocation(MeshShaderAttributeType::weight), "vec4" });
+    }
+    material->setAttributes(attributes);
 
-        // Diffuse map
-        for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_DIFFUSE); i++)
-        {
-            std::string resourcePath = directory + "/" + name;
-            meshMaterial->diffuseTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
-        }
-
-        // Specular map
-        for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_SPECULAR); i++)
-        {
-            std::string resourcePath = directory + "/" + name;
-            meshMaterial->specularTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
-        }
-
-        // Normal map
-        for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_HEIGHT); i++)
-        {
-            std::string resourcePath = directory + "/" + name;
-            meshMaterial->normalTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
-        }
-
-        // Height map
-        for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_AMBIENT); i++)
-        {
-            std::string resourcePath = directory + "/" + name;
-            meshMaterial->heightTextures.push_back(ObjectFactory::createWithName<Resource>(name, resourcePath));
-        }
-
-        return meshMaterial;
+    // Diffuse map
+    for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_DIFFUSE); i++)
+    {
+        std::string resourcePath = directory + "/" + name;
+        material->addTexture(MeshTextureType::diffuse, ObjectFactory::createWithName<Resource>(name, resourcePath));
     }
 
-    // --------------------
-    // -- Basic Material --
-    Handle<BasicMaterial> meshMaterial = ObjectFactory::createWithName<BasicMaterial>(name, getRenderQueueTags());
+    // Specular map
+    for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_SPECULAR); i++)
+    {
+        std::string resourcePath = directory + "/" + name;
+        material->addTexture(MeshTextureType::specular, ObjectFactory::createWithName<Resource>(name, resourcePath));
+    }
+
+    // Normal map
+    for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_HEIGHT); i++)
+    {
+        std::string resourcePath = directory + "/" + name;
+        material->addTexture(MeshTextureType::normal, ObjectFactory::createWithName<Resource>(name, resourcePath));
+    }
+
+    // Height map
+    for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_AMBIENT); i++)
+    {
+        std::string resourcePath = directory + "/" + name;
+        material->addTexture(MeshTextureType::height, ObjectFactory::createWithName<Resource>(name, resourcePath));
+    }
 
     // Ambient color
-    aiColor3D ambient(0, 0, 0);
-    mat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-    meshMaterial->ambient = glm::vec3(ambient.r, ambient.g, ambient.b);
+    aiColor3D color(0, 0, 0);
+    if (mat->Get(AI_MATKEY_COLOR_AMBIENT, color) == aiReturn_SUCCESS)
+    {
+        material->setAmbientColor(glm::vec3(color.r, color.g, color.b));
+    }
 
     // Diffuse color
-    aiColor3D diffuse(0, 0, 0);
-    mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-    meshMaterial->diffuse = glm::vec3(diffuse.r, diffuse.g, diffuse.b);
+    if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == aiReturn_SUCCESS)
+    {
+        material->setDiffuseColor(glm::vec3(color.r, color.g, color.b));
+    }
 
     // Specular color
-    aiColor3D specular(0, 0, 0);
-    mat->Get(AI_MATKEY_COLOR_DIFFUSE, specular);
-    meshMaterial->specular = glm::vec3(specular.r, specular.g, specular.b);
+    if (mat->Get(AI_MATKEY_COLOR_SPECULAR, color) == aiReturn_SUCCESS)
+    {
+        material->setSpecularColor(glm::vec3(color.r, color.g, color.b));
+    }
 
     // Shininess
     float shininess;
-    mat->Get(AI_MATKEY_SHININESS, shininess);
-    meshMaterial->shininess = shininess;
+    if (mat->Get(AI_MATKEY_SHININESS, shininess) == aiReturn_SUCCESS)
+    {
+        material->setShininess(shininess);
+    }
 
-    return meshMaterial;
+    return material;
 }

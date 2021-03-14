@@ -193,15 +193,15 @@ void setupScene()
     scene->add(light3);
 
     // Text
-    TextFormat format;
+    /*TextFormat format;
     format.font = "assets/fonts/Ubuntu-C.ttf";
     format.size = 56;
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
     text->setScale(glm::vec3(0.5, 0.5, 0.5));
     text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, -1));
-    text->setText("thibault.cardaire@gmail.com");
-    scene->add(text);
+    text->setText("coral 0.1");
+    scene->add(text);*/
 }
 
 void processInput(GLFWwindow* window)

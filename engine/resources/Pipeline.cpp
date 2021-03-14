@@ -4,16 +4,6 @@
 
 using namespace coral;
 
-bool PipelineParams::operator==(const PipelineParams& other) const
-{
-    return renderpass == other.renderpass
-        && params.vertexShaderFile == other.params.vertexShaderFile
-        && params.fragmentShaderFile == other.params.fragmentShaderFile
-        && params.depthTest == other.params.depthTest
-        && params.cullFace == other.params.cullFace
-        && params.blending == other.params.blending;
-}
-
 Pipeline::Pipeline(const PipelineParams& params)
     : params(params)
     , dirty(false)

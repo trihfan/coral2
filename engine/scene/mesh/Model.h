@@ -14,6 +14,8 @@ class aiMaterial;
 
 namespace coral
 {
+    struct MeshVertexBuffer;
+
     class Model : public Node
     {
     public:
@@ -28,6 +30,6 @@ namespace coral
 
         void loadNode(aiNode* node, const aiScene* scene);
         Handle<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
-        Handle<Material> loadMaterial(aiMaterial* mat);
+        Handle<Material> loadMaterial(aiMaterial* mat, const MeshVertexBuffer& vertexBuffer);
     };
 }

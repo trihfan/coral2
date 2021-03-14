@@ -12,7 +12,8 @@ namespace coral
     public:
         static void clear();
         static void update();
-        static Handle<Pipeline> getPipeline(const PipelineParams& params);
+        static Handle<Pipeline> getPipelineByName(const std::string& name);
+        static Handle<Pipeline> createPipeline(const PipelineParams& params);
 
     protected:
         PipelineManager();

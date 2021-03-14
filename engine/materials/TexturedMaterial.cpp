@@ -12,23 +12,12 @@ using namespace coral;
 TexturedMaterial::TexturedMaterial(const std::vector<std::string>& renderQueueTags)
     : Material(renderQueueTags)
 {
-}
-
-std::vector<ShaderAttribute> TexturedMaterial::getAttributes() const
-{
-    return {
-        ShaderAttribute { ShaderAttributeType::position, 0 },
-        ShaderAttribute { ShaderAttributeType::normal, 1 },
-        ShaderAttribute { ShaderAttributeType::textCoords, 2 }
-    };
+    enableLighting();
 }
 
 void TexturedMaterial::use(const RenderParameters& parameters)
 {
-    setupLights(parameters);
-
-    getPipeline()->setUniform("view", parameters.camera->getViewProjectionMatrix());
-    getPipeline()->setUniform("viewPosition", parameters.camera->getPosition());
+    Material::use(parameters);
 
     // Diffuse
     int currentId = 0;
@@ -64,17 +53,17 @@ void TexturedMaterial::use(const RenderParameters& parameters)
     }
 }
 
-void TexturedMaterial::setNode(Handle<Node> node)
-{
-    getPipeline()->setUniform("model", node->getMatrix());
-}
-
-Handle<Pipeline> TexturedMaterial::getPipelineFor(const std::string& renderpass)
+Handle<Pipeline> TexturedMaterial::createPipelineFor(const std::string& renderpass)
 {
     PipelineParams params;
-    params.params.name = "textured_material";
     params.renderpass = renderpass;
+    params.params.name = getPipelineName();
     params.params.vertexShaderFile = AssetManager::getShader("textured_material", ShaderType::vertex).asset.url;
     params.params.fragmentShaderFile = AssetManager::getShader("textured_material", ShaderType::fragment).asset.url;
-    return PipelineManager::getPipeline(params);
+    return PipelineManager::createPipeline(params);
+}
+
+std::string TexturedMaterial::getPipelineName() const
+{
+    return "TexturedMaterialPipeline";
 }

@@ -19,15 +19,9 @@ const glm::mat4& Camera::getViewMatrix() const
     return view;
 }
 
-const glm::mat4& Camera::getViewProjectionMatrix() const
-{
-    return viewProjection;
-}
-
 void Camera::updateMatrix()
 {
     view = glm::lookAt(getPosition(), center, up);
-    viewProjection = projection * view;
 }
 
 void Camera::setPerspective(float fovy, const glm::vec4& viewport, const glm::vec2& zNearFar)

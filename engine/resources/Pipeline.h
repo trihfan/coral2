@@ -12,13 +12,8 @@ namespace coral
      */
     struct PipelineParams
     {
-        // Corresponding renderpass
         std::string renderpass;
-
         backend::BackendPipelineParams params;
-
-        // Comparison
-        bool operator==(const PipelineParams& other) const;
     };
 
     /**

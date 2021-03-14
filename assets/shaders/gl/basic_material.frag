@@ -10,6 +10,10 @@ struct Material
     float shininess;
 };
 
+// Lighting
+uniform vec3 viewPosition;
+
+// - Point lights
 struct PointLight
 {
     vec3 position;
@@ -19,24 +23,18 @@ struct PointLight
     float quadratic;
 };
 
-struct AmbientLight
-{
-    float t;
-};
+uniform PointLight pointLights[LIGHT_MAX];
+uniform int pointLightCount;
+
+// -----
 
 in vec3 fPosition;
 in vec3 fNormal;
 
 out vec4 fColor;
 
-uniform vec3 viewPosition;
 uniform Material material;
 
-// Lighting
-uniform PointLight pointLights[LIGHT_MAX];
-uniform int pointLightCount;
-
-uniform AmbientLight ambientLight;
 
 void main()
 {

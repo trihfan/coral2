@@ -8,6 +8,7 @@ out vec3 fNormal;
 out vec2 fTexCoords;
 
 uniform mat4 model;
+uniform mat4 projection;
 uniform mat4 view;
 
 void main()
@@ -16,5 +17,5 @@ void main()
     fNormal = mat3(transpose(inverse(model))) * vNormal;
 	fTexCoords = vTexCoords;
 
-    gl_Position = view * vec4(fPosition, 1);
+    gl_Position = projection * view * vec4(fPosition, 1);
 }

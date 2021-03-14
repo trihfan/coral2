@@ -23,14 +23,6 @@ GlyphMaterial::GlyphMaterial(const std::vector<std::string>& renderQueueTags, co
     glyph = Freetype::getGlyph(freetypeParams);
 }
 
-std::vector<ShaderAttribute> GlyphMaterial::getAttributes() const
-{
-    return {
-        ShaderAttribute { ShaderAttributeType::position, 0 },
-        ShaderAttribute { ShaderAttributeType::textCoords, 1 }
-    };
-}
-
 void GlyphMaterial::use(const RenderParameters& params)
 {
     if (this->params.mode == TextMode::text2d && dirty)
@@ -39,14 +31,10 @@ void GlyphMaterial::use(const RenderParameters& params)
         dirty = false;
     }
 
-    getPipeline()->setUniform("projection", this->params.mode == TextMode::text2d ? projection : params.camera->getViewProjectionMatrix());
+    getPipeline()->setUniform("projection", this->params.mode == TextMode::text2d ? projection : params.camera->getProjectionMatrix() * params.camera->getViewMatrix());
     getPipeline()->setUniform("color", color);
     getPipeline()->setUniform("glyph", 0);
     resource->bind(0);
-}
-
-void GlyphMaterial::setNode(Handle<Node>)
-{
 }
 
 void GlyphMaterial::init()
@@ -75,17 +63,22 @@ void GlyphMaterial::setColor(const glm::vec3& color)
     this->color = color;
 }
 
-Handle<Pipeline> GlyphMaterial::getPipelineFor(const std::string& renderpass)
+Handle<Pipeline> GlyphMaterial::createPipelineFor(const std::string& renderpass)
 {
     dirty = true;
     PipelineParams params;
-    params.params.name = "glyph_material";
+    params.params.name = getPipelineName();
     params.renderpass = renderpass;
     params.params.vertexShaderFile = AssetManager::getShader("glyph_material", ShaderType::vertex).asset.url;
     params.params.fragmentShaderFile = AssetManager::getShader("glyph_material", ShaderType::fragment).asset.url;
     params.params.depthTest = this->params.mode == TextMode::text3d;
     params.params.blending = true;
-    return PipelineManager::getPipeline(params);
+    return PipelineManager::createPipeline(params);
+}
+
+std::string GlyphMaterial::getPipelineName() const
+{
+    return "GlyphMaterialPipeline";
 }
 
 const FreetypeGlyph& GlyphMaterial::getGlyph() const

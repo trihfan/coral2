@@ -2,6 +2,7 @@
 #include "Logs.h"
 #include "OpenglError.h"
 #include "gl.h"
+#include <sstream>
 
 using namespace backend::opengl;
 using namespace coral;
@@ -13,7 +14,18 @@ OpenglShader::OpenglShader(const std::string& name)
 
 void OpenglShader::addShaderData(ShaderType type, const std::string& data)
 {
-    shader_data[static_cast<size_t>(type)] = data;
+    std::stringstream head;
+#ifdef OPENGL_CORE
+    head << "#version " << GLVersion.major << GLVersion.minor << "0 core" << std::endl;
+#else
+    head << "#version 300 es" << std::endl;
+    head << "precision highp float;" << std::endl;
+#endif
+
+    head << data;
+
+    shader_data[static_cast<size_t>(type)] = head.str();
+    Logs(info) << head.str();
 }
 
 void OpenglShader::init()

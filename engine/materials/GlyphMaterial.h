@@ -24,12 +24,8 @@ namespace coral
     public:
         GlyphMaterial(const std::vector<std::string>& renderQueueTags, const GlyphMaterialParams& params);
 
-        // Return the attributes of the material
-        virtual std::vector<ShaderAttribute> getAttributes() const override;
-
         // setup the shader and its parameters
         virtual void use(const RenderParameters& parameters) override;
-        virtual void setNode(Handle<Node> node) override;
 
         virtual void init() override;
         virtual void release() override;
@@ -38,7 +34,8 @@ namespace coral
         const FreetypeGlyph& getGlyph() const;
 
     protected:
-        virtual Handle<Pipeline> getPipelineFor(const std::string& renderpass) override;
+        virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
+        virtual std::string getPipelineName() const override;
 
     private:
         glm::vec3 color;

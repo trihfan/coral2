@@ -13,33 +13,25 @@ MeshVertexBuffer::MeshVertexBuffer()
     // Default values for data sizes
     for (size_t i = 0; i < dataSize.size(); i++)
     {
-        switch (ShaderAttributeType(i))
+        switch (MeshShaderAttributeType(i))
         {
-        case ShaderAttributeType::position:
+        case MeshShaderAttributeType::position:
             dataSize[i] = 3;
             break;
 
-        case ShaderAttributeType::normal:
+        case MeshShaderAttributeType::normal:
             dataSize[i] = 3;
             break;
 
-        case ShaderAttributeType::textCoords:
+        case MeshShaderAttributeType::textCoords:
             dataSize[i] = 2;
             break;
 
-        case ShaderAttributeType::tangent:
-            dataSize[i] = 3;
-            break;
-
-        case ShaderAttributeType::bitangent:
-            dataSize[i] = 3;
-            break;
-
-        case ShaderAttributeType::bone:
+        case MeshShaderAttributeType::bone:
             dataSize[i] = 4;
             break;
 
-        case ShaderAttributeType::weight:
+        case MeshShaderAttributeType::weight:
             dataSize[i] = 4;
             break;
 
@@ -71,7 +63,7 @@ size_t MeshVertexBuffer::sizeOfVertex() const
 void MeshVertexBuffer::copyTo(std::vector<float>& buffer) const
 {
     size_t componentCount = this->sizeOfVertex() / sizeof(float);
-    size_t positionCount = data[size_t(ShaderAttributeType::position)].size() / dataSize[size_t(ShaderAttributeType::position)];
+    size_t positionCount = data[size_t(MeshShaderAttributeType::position)].size() / dataSize[size_t(MeshShaderAttributeType::position)];
 
     // Resize buffer
     buffer.resize(componentCount * positionCount);
@@ -91,31 +83,51 @@ void MeshVertexBuffer::copyTo(std::vector<float>& buffer) const
     }
 }
 
-void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec1 value)
+void MeshVertexBuffer::insert(MeshShaderAttributeType type, glm::vec1 value)
 {
     data[size_t(type)].push_back(value.x);
 }
 
-void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec2 value)
+void MeshVertexBuffer::insert(MeshShaderAttributeType type, glm::vec2 value)
 {
     data[size_t(type)].push_back(value.x);
     data[size_t(type)].push_back(value.y);
 }
 
-void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec3 value)
+void MeshVertexBuffer::insert(MeshShaderAttributeType type, glm::vec3 value)
 {
     data[size_t(type)].push_back(value.x);
     data[size_t(type)].push_back(value.y);
     data[size_t(type)].push_back(value.z);
 }
 
-void MeshVertexBuffer::insert(ShaderAttributeType type, glm::vec4 value)
+void MeshVertexBuffer::insert(MeshShaderAttributeType type, glm::vec4 value)
 {
     data[size_t(type)].push_back(value.x);
     data[size_t(type)].push_back(value.y);
     data[size_t(type)].push_back(value.z);
     data[size_t(type)].push_back(value.w);
 }
+
+bool MeshVertexBuffer::has(MeshShaderAttributeType type) const
+{
+    return !data[size_t(type)].empty();
+}
+
+int MeshVertexBuffer::getLocation(MeshShaderAttributeType type) const
+{
+    int location = 0;
+    for (size_t i = 0; i < size_t(type); i++)
+    {
+        if (!data[i].empty())
+        {
+            location++;
+        }
+    }
+    return location;
+}
+
+/**********************************************************/
 
 Mesh::Mesh(const MeshVertexBuffer& vertices, const std::vector<unsigned int>& indices)
     : vertices(vertices)
@@ -138,7 +150,7 @@ void Mesh::init()
     backend::BackendVertexBufferData data;
 
     // Copy vertices
-    data.verticesCount = static_cast<int>(vertices.data[size_t(ShaderAttributeType::position)].size() / vertices.dataSize[size_t(ShaderAttributeType::position)]);
+    data.verticesCount = static_cast<int>(vertices.data[size_t(MeshShaderAttributeType::position)].size() / vertices.dataSize[size_t(MeshShaderAttributeType::position)]);
     std::vector<float> vertexData;
     vertices.copyTo(vertexData);
     data.vertices = vertexData.data();
@@ -163,16 +175,13 @@ std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
         return attributes;
     }
 
-    std::vector<ShaderAttribute> shaderAttributes = material->getAttributes();
     for (size_t i = 0; i < vertices.data.size(); i++)
     {
-        if (!vertices.data[i].empty())
+        if (vertices.has(MeshShaderAttributeType(i)))
         {
-            auto it = std::find_if(shaderAttributes.begin(), shaderAttributes.end(), [i](const ShaderAttribute& attribute) { return attribute.type == ShaderAttributeType(i); });
-
             backend::BackendVertexAttribute attribute;
             attribute.size = static_cast<int>(vertices.dataSize[i]);
-            attribute.location = it != shaderAttributes.end() ? it->location : -1;
+            attribute.location = static_cast<int>(i);
             attributes.push_back(attribute);
         }
     }

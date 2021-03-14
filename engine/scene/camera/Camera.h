@@ -35,9 +35,6 @@ namespace coral
         // Get the view matrix
         const glm::mat4& getViewMatrix() const;
 
-        // Get the projection view matrix
-        const glm::mat4& getViewProjectionMatrix() const;
-
         // Background color
         const glm::vec4& getBackgroundColor();
         void setBackgroundColor(const glm::vec4& color);
@@ -49,7 +46,6 @@ namespace coral
         glm::vec3 up;
         glm::mat4 projection;
         glm::mat4 view;
-        glm::mat4 viewProjection;
 
         // Background color
         glm::vec4 backgroundColor;
