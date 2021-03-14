@@ -11,7 +11,7 @@ namespace coral
 
     enum MeshMaterialRenderType
     {
-        basic
+        basic_lighting
     };
 
     enum MeshTextureType : int
@@ -37,9 +37,9 @@ namespace coral
         void enableSkining();
 
         // Uniforms
-        void setAmbientColor(const glm::vec3& ambient);
-        void setDiffuseColor(const glm::vec3& diffuse);
-        void setSpecularColor(const glm::vec3& specular);
+        void setAmbientColor(const glm::vec3& color);
+        void setDiffuseColor(const glm::vec3& color);
+        void setSpecularColor(const glm::vec3& color);
         void setShininess(float shininess);
         void addTexture(MeshTextureType type, Handle<Resource> resource);
 

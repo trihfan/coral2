@@ -37,11 +37,6 @@ void Material::setupLights(const RenderParameters& parameters)
         pipeline->setUniform(lightStr + ".linear", light->linear);
         pipeline->setUniform(lightStr + ".quadratic", light->quadratic);
     }
-
-    // Ambient light
-    if (!parameters.lights.areaLights.empty())
-    {
-    }
 }
 
 void Material::use(const RenderParameters& parameters)

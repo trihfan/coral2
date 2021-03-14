@@ -8,7 +8,7 @@ using namespace coral;
 
 MeshMaterial::MeshMaterial(const std::vector<std::string>& renderQueueTags)
     : Material(renderQueueTags)
-    , renderType(MeshMaterialRenderType::basic)
+    , renderType(MeshMaterialRenderType::basic_lighting)
 {
     enableLighting();
 }
@@ -28,7 +28,7 @@ void MeshMaterial::use(const RenderParameters& parameters)
     Material::use(parameters);
 
     // Basic shading
-    if (renderType == MeshMaterialRenderType::basic)
+    if (renderType == MeshMaterialRenderType::basic_lighting)
     {
         getPipeline()->setUniform("material.ambient", ambient);
         getPipeline()->setUniform("material.diffuse", diffuse);
@@ -107,19 +107,19 @@ void MeshMaterial::enableSkining()
     skining = true;
 }
 
-void MeshMaterial::setAmbientColor(const glm::vec3& ambient)
+void MeshMaterial::setAmbientColor(const glm::vec3& color)
 {
-    this->ambient = ambient;
+    ambient = color;
 }
 
-void MeshMaterial::setDiffuseColor(const glm::vec3& diffuse)
+void MeshMaterial::setDiffuseColor(const glm::vec3& color)
 {
-    this->diffuse = diffuse;
+    diffuse = color;
 }
 
-void MeshMaterial::setSpecularColor(const glm::vec3& specular)
+void MeshMaterial::setSpecularColor(const glm::vec3& color)
 {
-    this->specular = specular;
+    specular = color;
 }
 
 void MeshMaterial::setShininess(float shininess)

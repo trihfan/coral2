@@ -115,6 +115,7 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat, const MeshVertexBuffer& ve
 
     // Create material
     Handle<MeshMaterial> material = ObjectFactory::create<MeshMaterial>(getRenderQueueTags());
+    material->setRenderType(MeshMaterialRenderType::basic_lighting);
 
     // Attributes
     std::vector<ShaderAttribute> attributes;

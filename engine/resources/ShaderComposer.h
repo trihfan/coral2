@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Object.h"
+#include <sstream>
 
 namespace coral
 {
@@ -26,10 +27,21 @@ namespace coral
         std::string getFragmentShader() const;
 
     private:
+        // Parameter
+        std::string shaderFile;
         std::vector<ShaderAttribute> attributes;
         std::vector<std::string> definitions;
-        std::string shaderFile;
+
+        // Parser
+        bool basicLighting;
+        int maxLightCount;
+
+        // Output
         std::string vertexContent;
         std::string fragmentContent;
+
+        void parseParameters(const std::string& content);
+        void parseVertexShader(const std::string& content);
+        void parseFragmentShader(const std::string& content);
     };
 }

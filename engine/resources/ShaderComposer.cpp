@@ -6,6 +6,61 @@
 
 using namespace coral;
 
+static const std::string basicLightingShader = R"(
+uniform vec3 viewPosition;
+
+struct PointLight
+{
+    vec3 position;
+    vec3 color;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+uniform PointLight pointLights[LIGHT_MAX];
+uniform int pointLightCount;
+
+vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 normal, vec3 position)
+{
+    // properties
+    vec3 viewDirection = normalize(viewPosition - position);
+
+    // Ambien4
+    vec3 result = ambientColor;
+
+    // Point lights
+    for (int i = 0; i < pointLightCount; i++)
+    {
+        vec3 lightDir = normalize(pointLights[i].position - position);
+
+        // diffuse
+        float diff = max(dot(normal, lightDir), 0.);
+
+        // specular shading
+        vec3 reflectDir = reflect(-lightDir, normal);
+        float spec = pow(max(dot(viewDirection, reflectDir), 0.), shininess);
+
+        // attenuation
+        float distance = length(pointLights[i].position - position);
+        float attenuation = 1. / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
+
+        vec3 diffuse = pointLights[i].color * diff;
+        vec3 specular = pointLights[i].color * spec;
+
+        result += diffuse * diffuseColor  + specular * specularColor * attenuation;
+    }
+    return result;
+}
+)";
+
+enum class ParserCurrentPart
+{
+    parameters,
+    vertex,
+    fragment
+};
+
 static std::string replaceAll(std::string str, const std::string& from, const std::string& to)
 {
     size_t start_pos = 0;
@@ -19,6 +74,8 @@ static std::string replaceAll(std::string str, const std::string& from, const st
 
 ShaderComposer::ShaderComposer(const std::string& shaderfile)
     : shaderFile(shaderfile)
+    , basicLighting(false)
+    , maxLightCount(32)
 {
 }
 
@@ -41,39 +98,11 @@ void ShaderComposer::process()
         Logs(error) << "Can't open shader file";
     }
 
-    // Prepare stream
-    std::stringstream vertexShader;
-    std::stringstream fragmentShader;
-
-    // Set definitions
-    for (const std::string& definition : definitions)
-    {
-        vertexShader << "#define " << definition << std::endl;
-        fragmentShader << "#define " << definition << std::endl;
-    }
-
-    // Set keywords
-    vertexShader << "#define MODEL_MATRIX modelMatrix" << std::endl;
-    vertexShader << "#define PROJECTION_MATRIX projectionMatrix" << std::endl;
-    vertexShader << "#define VIEW_MATRIX viewMatrix" << std::endl;
-
-    // Set attributes
-    for (const auto& attribute : attributes)
-    {
-        vertexShader << "layout(location = " << attribute.location << ") in " << attribute.type << " vertex_" << attribute.name << ";" << std::endl;
-    }
-
-    // Uniforms
-    // Vertex matrix
-    vertexShader << "uniform mat4 projectionMatrix;" << std::endl;
-    vertexShader << "uniform mat4 viewMatrix;" << std::endl;
-    vertexShader << "uniform mat4 modelMatrix;" << std::endl;
-
-    // Fragment output
-    fragmentShader << "out vec4 fragColor0;" << std::endl;
+    // Content of each parts
+    std::stringstream parameters, vertex, fragment;
 
     // Read it
-    std::string currentPartTitle;
+    ParserCurrentPart currentPart = ParserCurrentPart::parameters;
     std::string line;
     while (std::getline(shader, line))
     {
@@ -82,36 +111,38 @@ void ShaderComposer::process()
         {
             size_t titleStart = line.find_first_of('[');
             size_t titleEnd = line.find_first_of(']');
-            currentPartTitle = line.substr(titleStart, titleEnd - titleStart + 1);
+            std::string currentPartTitle = line.substr(titleStart, titleEnd - titleStart + 1);
+
+            if (currentPartTitle == "[vertex]")
+            {
+                currentPart = ParserCurrentPart::vertex;
+            }
+            else if (currentPartTitle == "[fragment]")
+            {
+                currentPart = ParserCurrentPart::fragment;
+            }
             continue;
         }
 
-        // Parameters
-        if (currentPartTitle.empty())
+        switch (currentPart)
         {
-            // If shading enable
-        }
+        case ParserCurrentPart::parameters:
+            parameters << line << std::endl;
+            break;
 
-        // Add to the correct shader
-        if (currentPartTitle == "[vertex]")
-        {
-            vertexShader << line << std::endl;
-        }
-        else if (currentPartTitle == "[fragment]")
-        {
-            fragmentShader << line << std::endl;
+        case ParserCurrentPart::vertex:
+            vertex << line << std::endl;
+            break;
+
+        case ParserCurrentPart::fragment:
+            fragment << line << std::endl;
+            break;
         }
     }
 
-    // Finalize
-    vertexContent = vertexShader.str();
-    fragmentContent = fragmentShader.str();
-
-    // Replace attribute names
-    for (const auto& attribute : attributes)
-    {
-        vertexContent = replaceAll(vertexContent, "VERTEX." + attribute.name, "vertex_" + attribute.name);
-    }
+    parseParameters(parameters.str());
+    parseVertexShader(vertex.str());
+    parseFragmentShader(fragment.str());
 }
 
 std::string ShaderComposer::getVertexShader() const
@@ -122,4 +153,75 @@ std::string ShaderComposer::getVertexShader() const
 std::string ShaderComposer::getFragmentShader() const
 {
     return fragmentContent;
+}
+
+void ShaderComposer::parseParameters(const std::string& content)
+{
+    if (content.find("basic_lighting") != std::string::npos)
+    {
+        basicLighting = true;
+    }
+}
+
+void ShaderComposer::parseVertexShader(const std::string& content)
+{
+    // Replace attribute names
+    std::string str = content;
+    for (const auto& attribute : attributes)
+    {
+        str = replaceAll(str, "VERTEX." + attribute.name, "vertex_" + attribute.name);
+    }
+
+    std::stringstream finalContent;
+
+    // Definitions
+    for (const std::string& definition : definitions)
+    {
+        finalContent << "#define " << definition << std::endl;
+    }
+
+    finalContent << "#define MODEL_MATRIX modelMatrix" << std::endl;
+    finalContent << "#define PROJECTION_MATRIX projectionMatrix" << std::endl;
+    finalContent << "#define VIEW_MATRIX viewMatrix" << std::endl;
+
+    // Attributes
+    for (const auto& attribute : attributes)
+    {
+        finalContent << "layout(location = " << attribute.location << ") in " << attribute.type << " vertex_" << attribute.name << ";" << std::endl;
+    }
+
+    // Uniforms
+    finalContent << "uniform mat4 projectionMatrix;" << std::endl;
+    finalContent << "uniform mat4 viewMatrix;" << std::endl;
+    finalContent << "uniform mat4 modelMatrix;" << std::endl;
+
+    // Finalize
+    finalContent << str;
+    vertexContent = finalContent.str();
+}
+
+void ShaderComposer::parseFragmentShader(const std::string& content)
+{
+    std::stringstream finalContent;
+
+    // Definitions
+    for (const std::string& definition : definitions)
+    {
+        finalContent << "#define " << definition << std::endl;
+    }
+
+    finalContent << "#define LIGHT_MAX " << maxLightCount << std::endl;
+
+    // Uniforms
+    if (basicLighting)
+    {
+        finalContent << basicLightingShader << std::endl;
+    }
+
+    // Output
+    finalContent << "out vec4 fragColor0;" << std::endl;
+
+    // Finalize
+    finalContent << content;
+    fragmentContent = finalContent.str();
 }

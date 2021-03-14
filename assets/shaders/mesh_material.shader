@@ -33,13 +33,9 @@ uniform Material material;
 in vec3 position;
 in vec3 normal;
 
-vec3 computeLighting()
-{
-    return vec3(1, 0, 0);
-}
-
 void main()
 {
-    vec3 result = computeLighting();
+    vec3 fragmentNormal = normalize(normal);
+    vec3 result = computeLighting(material.ambient, material.diffuse, material.specular, material.shininess, fragmentNormal, position);
     fragColor0 = vec4(result, 1);
 }
