@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BackendVertexBuffer.h"
+#include "MeshVertexBuffer.h"
 #include "materials/Material.h"
 #include "scene/DrawableNode.h"
 #include <glm/glm.hpp>
@@ -10,38 +11,6 @@
 
 namespace coral
 {
-    enum class MeshShaderAttributeType : int
-    {
-        position,
-        normal,
-        textCoords,
-        bone,
-        weight,
-        count
-    };
-
-    /**
-     * @brief The MeshVertexBuffer struct contains data for the mesh vertex buffer
-     */
-    struct MeshVertexBuffer
-    {
-        std::array<std::vector<float>, size_t(MeshShaderAttributeType::count)> data;
-        std::array<size_t, size_t(MeshShaderAttributeType::count)> dataSize;
-
-        // Helpers
-        MeshVertexBuffer();
-        void reserve(size_t size);
-        size_t sizeOfVertex() const;
-        void copyTo(std::vector<float>& buffer) const;
-        void insert(MeshShaderAttributeType type, glm::vec1 value);
-        void insert(MeshShaderAttributeType type, glm::vec2 value);
-        void insert(MeshShaderAttributeType type, glm::vec3 value);
-        void insert(MeshShaderAttributeType type, glm::vec4 value);
-
-        bool has(MeshShaderAttributeType type) const;
-        int getLocation(MeshShaderAttributeType type) const;
-    };
-
     /**
      * @brief A mesh drawable node using vertices and indices
      */

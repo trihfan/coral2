@@ -65,18 +65,18 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         // Position
-        vertices.insert(MeshShaderAttributeType::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+        vertices.insert(MeshVertexBuffer::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
 
         // Normal
         if (mesh->HasNormals())
         {
-            vertices.insert(MeshShaderAttributeType::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+            vertices.insert(MeshVertexBuffer::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
         }
 
         // Texture coordinates
         if (mesh->mTextureCoords[0])
         {
-            vertices.insert(MeshShaderAttributeType::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
+            vertices.insert(MeshVertexBuffer::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
     }
 
@@ -119,23 +119,23 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat, const MeshVertexBuffer& ve
 
     // Attributes
     std::vector<ShaderAttribute> attributes;
-    attributes.push_back(ShaderAttribute { "position", vertexBuffer.getLocation(MeshShaderAttributeType::position), "vec3" });
-    if (vertexBuffer.has(MeshShaderAttributeType::normal))
+    attributes.push_back(ShaderAttribute { "position", vertexBuffer.getLocation(MeshVertexBuffer::position), "vec3" });
+    if (vertexBuffer.has(MeshVertexBuffer::normal))
     {
-        attributes.push_back(ShaderAttribute { "normal", vertexBuffer.getLocation(MeshShaderAttributeType::normal), "vec3" });
+        attributes.push_back(ShaderAttribute { "normal", vertexBuffer.getLocation(MeshVertexBuffer::normal), "vec3" });
     }
-    if (vertexBuffer.has(MeshShaderAttributeType::textCoords))
+    if (vertexBuffer.has(MeshVertexBuffer::textCoords))
     {
-        attributes.push_back(ShaderAttribute { "textCoords", vertexBuffer.getLocation(MeshShaderAttributeType::textCoords), "vec2" });
+        attributes.push_back(ShaderAttribute { "textCoords", vertexBuffer.getLocation(MeshVertexBuffer::textCoords), "vec2" });
     }
-    if (vertexBuffer.has(MeshShaderAttributeType::bone))
+    if (vertexBuffer.has(MeshVertexBuffer::bone))
     {
-        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshShaderAttributeType::bone), "vec4" });
+        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshVertexBuffer::bone), "ivec4" });
         material->enableSkining();
     }
-    if (vertexBuffer.has(MeshShaderAttributeType::weight))
+    if (vertexBuffer.has(MeshVertexBuffer::weight))
     {
-        attributes.push_back(ShaderAttribute { "weight", vertexBuffer.getLocation(MeshShaderAttributeType::weight), "vec4" });
+        attributes.push_back(ShaderAttribute { "weight", vertexBuffer.getLocation(MeshVertexBuffer::weight), "vec4" });
     }
     material->setAttributes(attributes);
 
