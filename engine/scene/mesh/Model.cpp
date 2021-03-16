@@ -120,20 +120,20 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat, const MeshVertexBuffer& ve
     // Attributes
     std::vector<ShaderAttribute> attributes;
     attributes.push_back(ShaderAttribute { "position", vertexBuffer.getLocation(MeshVertexBuffer::position), "vec3" });
-    if (vertexBuffer.has(MeshVertexBuffer::normal))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::normal))
     {
         attributes.push_back(ShaderAttribute { "normal", vertexBuffer.getLocation(MeshVertexBuffer::normal), "vec3" });
     }
-    if (vertexBuffer.has(MeshVertexBuffer::textCoords))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::textCoords))
     {
         attributes.push_back(ShaderAttribute { "textCoords", vertexBuffer.getLocation(MeshVertexBuffer::textCoords), "vec2" });
     }
-    if (vertexBuffer.has(MeshVertexBuffer::bone))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::bone))
     {
         attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshVertexBuffer::bone), "ivec4" });
         material->enableSkining();
     }
-    if (vertexBuffer.has(MeshVertexBuffer::weight))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::weight))
     {
         attributes.push_back(ShaderAttribute { "weight", vertexBuffer.getLocation(MeshVertexBuffer::weight), "vec4" });
     }

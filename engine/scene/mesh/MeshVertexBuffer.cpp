@@ -1,36 +1,39 @@
 #include "MeshVertexBuffer.h"
+#include "Logs.h"
 
 using namespace coral;
 
 MeshVertexBuffer::MeshVertexBuffer()
 {
     // Default values for data sizes
-    for (size_t i = 0; i < dataSize.size(); i++)
+    for (size_t i = 0; i < count; i++)
     {
         switch (i)
         {
         case position:
-            dataSize[i] = 3;
-            break;
-
         case normal:
-            dataSize[i] = 3;
+            componentCount[i] = 3;
+            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         case textCoords:
-            dataSize[i] = 2;
+            componentCount[i] = 2;
+            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         case bone:
-            dataSize[i] = 4;
+            componentCount[i] = 4;
+            attributeSize[i] = componentCount[i] * sizeof(int);
             break;
 
         case weight:
-            dataSize[i] = 4;
+            componentCount[i] = 4;
+            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         default:
-            dataSize[i] = 0;
+            componentCount[i] = 0;
+            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
         }
     }
@@ -40,7 +43,7 @@ void MeshVertexBuffer::reserve(size_t size)
 {
     for (size_t i = 0; i < data.size(); i++)
     {
-        data[i].reserve(size * dataSize[i]);
+        data[i].reserve(size * attributeSize[i]);
     }
 }
 
@@ -49,40 +52,43 @@ size_t MeshVertexBuffer::sizeOfVertex() const
     size_t size = 0;
     for (size_t i = 0; i < data.size(); i++)
     {
-        size += data[i].empty() ? 0 : dataSize[i];
+        if (!data[i].empty())
+        {
+            size += attributeSize[i];
+        }
     }
-    return size * sizeof(float);
+    return size;
 }
 
 size_t MeshVertexBuffer::vertexCount() const
 {
-    return data[position].size() / dataSize[position];
+    return data[position].size() / (attributeSize[position]);
 }
 
-void MeshVertexBuffer::copyTo(std::vector<float>& buffer) const
+void MeshVertexBuffer::copyTo(std::vector<std::byte>& buffer) const
 {
-    size_t componentCount = this->sizeOfVertex() / sizeof(float);
-    size_t positionCount = vertexCount();
+    size_t vertexSize = sizeOfVertex();
+    size_t vertexNumber = vertexCount();
 
     // Resize buffer
-    buffer.resize(componentCount * positionCount);
+    buffer.resize(vertexNumber * vertexSize);
 
     // Copy data
-    for (size_t currentVertex = 0; currentVertex < positionCount; currentVertex++)
+    for (size_t currentVertex = 0; currentVertex < vertexNumber; currentVertex++)
     {
         size_t current = 0;
         for (size_t i = 0; i < data.size(); i++)
         {
             if (!data[i].empty())
             {
-                std::memcpy(&buffer[currentVertex * componentCount + current], &data[i][currentVertex * dataSize[i]], dataSize[i] * sizeof(float));
-                current += dataSize[i];
+                std::memcpy(&buffer[currentVertex * vertexSize + current], &data[i][currentVertex * attributeSize[i]], attributeSize[i]);
+                current += attributeSize[i];
             }
         }
     }
 }
 
-bool MeshVertexBuffer::has(AttributeType type) const
+bool MeshVertexBuffer::hasAttribute(AttributeType type) const
 {
     return !data[type].empty();
 }
@@ -102,5 +108,5 @@ int MeshVertexBuffer::getLocation(AttributeType type) const
 
 size_t MeshVertexBuffer::getComponentCount(AttributeType type) const
 {
-    return dataSize[type];
+    return componentCount[type];
 }

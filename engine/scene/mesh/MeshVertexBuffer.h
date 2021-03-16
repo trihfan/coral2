@@ -10,8 +10,9 @@ namespace coral
     /**
      * @brief The MeshVertexBuffer struct contains data for the mesh vertex buffer
      */
-    struct MeshVertexBuffer
+    class MeshVertexBuffer
     {
+    public:
         enum AttributeType : size_t
         {
             position,
@@ -22,26 +23,62 @@ namespace coral
             count
         };
 
-        // Helpers
+        // Constructor
         MeshVertexBuffer();
+
+        /**
+         * @brief Reserve data in each attribute array
+         */
         void reserve(size_t size);
+
+        /**
+         * @brief Return the size of one vertex
+         */
         size_t sizeOfVertex() const;
+
+        /**
+         * @brief Return the number of vertices
+         */
         size_t vertexCount() const;
-        size_t getComponentCount(AttributeType type) const;
-        void copyTo(std::vector<float>& buffer) const;
-        bool has(AttributeType type) const;
+
+        /**
+         * @brief Merge and copy the vertex buffer content to the given buffer
+         */
+        void copyTo(std::vector<std::byte>& buffer) const;
+
+        /**
+         * @brief Insert a data in the given attribute array
+         */
+        template <typename Type>
+        void insert(AttributeType type, const Type& value);
+
+        /**
+         * @brief Return true if the given attribute contains data
+         */
+        bool hasAttribute(AttributeType type) const;
+
+        /**
+         * @brief Return the locatino of the given attribute
+         */
         int getLocation(AttributeType type) const;
 
-        template <typename Type>
-        void insert(AttributeType type, const Type& value)
-        {
-            size_t size = data[type].size();
-            data[type].resize(size + sizeof(value) / sizeof(float));
-            std::memcpy(&data[type][size], &value, sizeof(value));
-        }
+        /**
+         * @brief Return the number of component for the given attribue
+         */
+        size_t getComponentCount(AttributeType type) const;
 
     private:
-        std::array<std::vector<float>, count> data;
-        std::array<size_t, count> dataSize;
+        // Data
+        std::array<std::vector<std::byte>, count> data;
+        std::array<size_t, count> componentCount;
+        std::array<size_t, count> attributeSize;
     };
+
+    template <typename Type>
+    void MeshVertexBuffer::insert(AttributeType type, const Type& value)
+    {
+        size_t size = data[type].size();
+        data[type].resize(size + sizeof(value));
+        std::memcpy(&data[type][size], &value, sizeof(value));
+    }
 }

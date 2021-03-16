@@ -30,7 +30,7 @@ void Mesh::init()
 
     // Copy vertices
     data.verticesCount = static_cast<int>(vertices.vertexCount());
-    std::vector<float> vertexData;
+    std::vector<std::byte> vertexData;
     vertices.copyTo(vertexData);
     data.vertices = vertexData.data();
 
@@ -56,7 +56,7 @@ std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
 
     for (size_t i = 0; i < MeshVertexBuffer::count; i++)
     {
-        if (vertices.has(static_cast<MeshVertexBuffer::AttributeType>(i)))
+        if (vertices.hasAttribute(static_cast<MeshVertexBuffer::AttributeType>(i)))
         {
             backend::BackendVertexAttribute attribute;
             attribute.size = static_cast<int>(vertices.getComponentCount(static_cast<MeshVertexBuffer::AttributeType>(i)));
