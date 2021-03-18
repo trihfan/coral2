@@ -25,7 +25,7 @@ namespace coral
         void setMaterial(Handle<Material> material);
         Handle<Material> getMaterial() const;
 
-        virtual void update() override;
+        virtual void update(const NodeUpdateParameters& parameters) override;
 
         // draw
         virtual void draw(const RenderParameters& parameters) = 0;

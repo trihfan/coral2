@@ -4,17 +4,10 @@
 
 namespace backend
 {
-    enum BackendVertexAttributeType
-    {
-        int32,
-        float32
-    };
-
     struct BackendVertexAttribute
     {
         int location;
         int size;
-        BackendVertexAttributeType type;
     };
 
     struct BackendVertexBufferData
@@ -38,5 +31,8 @@ namespace backend
         BackendVertexBuffer(const BackendVertexBufferData& data);
         virtual ~BackendVertexBuffer() = default;
         virtual void draw() = 0;
+
+    protected:
+        BackendVertexBufferData data;
     };
 }

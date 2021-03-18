@@ -24,11 +24,11 @@ bool DrawableNode::isDrawable() const
     return true;
 }
 
-void DrawableNode::update()
+void DrawableNode::update(const NodeUpdateParameters& parameters)
 {
-    Node::update();
-    if (material)
+    Node::update(parameters);
+    if (!material->getPipeline() || material->getPipeline()->isDirty())
     {
-        material->update();
+        material->invalidatePipeline();
     }
 }

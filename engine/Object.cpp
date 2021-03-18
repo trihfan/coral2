@@ -38,7 +38,3 @@ void Object::init()
 void Object::release()
 {
 }
-
-void Object::update()
-{
-}

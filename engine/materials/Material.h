@@ -18,10 +18,10 @@ namespace coral
 
         // Pipeline
         Handle<Pipeline> getPipeline() const;
+        void invalidatePipeline();
 
         // setup the shader and its parameters
         virtual void init() override;
-        virtual void update() override;
         virtual void use(const RenderParameters& parameters);
         virtual void setNode(Handle<Node> node);
 

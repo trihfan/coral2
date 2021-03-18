@@ -90,7 +90,7 @@ void Engine::frame()
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
     // Update the scene, lists cameras, lights, ...
-    SceneManager::update();
+    SceneManager::update(currentParameters);
 
     // Bake the render graph when invalidated
     RenderPassManager::update(currentParameters);

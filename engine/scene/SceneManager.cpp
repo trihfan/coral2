@@ -17,7 +17,7 @@ void SceneManager::release()
 {
 }
 
-void SceneManager::update()
+void SceneManager::update(const RenderParameters& parameters)
 {
     // check scene
     if (!instance->currentScene)
@@ -39,7 +39,10 @@ void SceneManager::update()
         });
 
     // update
-    instance->currentScene->getTopNode()->update();
+    NodeUpdateParameters updateParams;
+    updateParams.time = parameters.time;
+    updateParams.deltaTime = parameters.deltaTime;
+    instance->currentScene->getTopNode()->update(updateParams);
 }
 
 void SceneManager::setCurrentScene(Handle<Scene> scene)

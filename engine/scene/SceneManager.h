@@ -50,7 +50,7 @@ namespace coral
         /**
          * @brief Update all nodes of the scene
          */
-        static void update();
+        static void update(const RenderParameters& parameters);
 
         /**
          * @brief Build the render queues for the given parameters

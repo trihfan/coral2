@@ -14,7 +14,7 @@ Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
     for (size_t positionIndex = 0; positionIndex < numPositions; ++positionIndex)
     {
         aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
-        float timeStamp = static_cast<float>(channel->mPositionKeys[positionIndex].mTime);
+        double timeStamp = channel->mPositionKeys[positionIndex].mTime;
         KeyPosition data;
         data.position = AssimpHelpers::getGLMVec(aiPosition);
         data.timeStamp = timeStamp;
@@ -25,7 +25,7 @@ Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
     for (size_t rotationIndex = 0; rotationIndex < numRotations; ++rotationIndex)
     {
         aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
-        float timeStamp = static_cast<float>(channel->mRotationKeys[rotationIndex].mTime);
+        double timeStamp = channel->mRotationKeys[rotationIndex].mTime;
         KeyRotation data;
         data.orientation = AssimpHelpers::getGLMQuat(aiOrientation);
         data.timeStamp = timeStamp;
@@ -36,7 +36,7 @@ Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
     for (size_t keyIndex = 0; keyIndex < numScalings; ++keyIndex)
     {
         aiVector3D scale = channel->mScalingKeys[keyIndex].mValue;
-        float timeStamp = static_cast<float>(channel->mScalingKeys[keyIndex].mTime);
+        double timeStamp = channel->mScalingKeys[keyIndex].mTime;
         KeyScale data;
         data.scale = AssimpHelpers::getGLMVec(scale);
         data.timeStamp = timeStamp;
@@ -44,7 +44,7 @@ Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
     }
 }
 
-void Bone::update(float animationTime)
+void Bone::update(double animationTime)
 {
     glm::mat4 translation = interpolatePosition(animationTime);
     glm::mat4 rotation = interpolateRotation(animationTime);
@@ -67,7 +67,7 @@ int Bone::getBoneID()
     return id;
 }
 
-size_t Bone::getPositionIndex(float animationTime)
+size_t Bone::getPositionIndex(double animationTime)
 {
     for (size_t index = 0; index < numPositions - 1; index++)
     {
@@ -79,7 +79,7 @@ size_t Bone::getPositionIndex(float animationTime)
     return size_t(-1);
 }
 
-size_t Bone::getRotationIndex(float animationTime)
+size_t Bone::getRotationIndex(double animationTime)
 {
     for (size_t index = 0; index < numRotations - 1; index++)
     {
@@ -91,7 +91,7 @@ size_t Bone::getRotationIndex(float animationTime)
     return size_t(-1);
 }
 
-size_t Bone::getScaleIndex(float animationTime)
+size_t Bone::getScaleIndex(double animationTime)
 {
     for (size_t index = 0; index < numScalings - 1; index++)
     {
@@ -103,16 +103,16 @@ size_t Bone::getScaleIndex(float animationTime)
     return size_t(-1);
 }
 
-float Bone::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
+double Bone::getScaleFactor(double lastTimeStamp, double nextTimeStamp, double animationTime)
 {
-    float scaleFactor = 0.f;
-    float midWayLength = animationTime - lastTimeStamp;
-    float framesDiff = nextTimeStamp - lastTimeStamp;
+    double scaleFactor = 0;
+    double midWayLength = animationTime - lastTimeStamp;
+    double framesDiff = nextTimeStamp - lastTimeStamp;
     scaleFactor = midWayLength / framesDiff;
     return scaleFactor;
 }
 
-glm::mat4 Bone::interpolatePosition(float animationTime)
+glm::mat4 Bone::interpolatePosition(double animationTime)
 {
     if (numPositions == 1)
     {
@@ -126,7 +126,7 @@ glm::mat4 Bone::interpolatePosition(float animationTime)
     return glm::translate(glm::mat4(1.f), finalPosition);
 }
 
-glm::mat4 Bone::interpolateRotation(float animationTime)
+glm::mat4 Bone::interpolateRotation(double animationTime)
 {
     if (numRotations == 1)
     {
@@ -142,7 +142,7 @@ glm::mat4 Bone::interpolateRotation(float animationTime)
     return glm::toMat4(finalRotation);
 }
 
-glm::mat4 Bone::interpolateScaling(float animationTime)
+glm::mat4 Bone::interpolateScaling(double animationTime)
 {
     if (numScalings == 1)
     {

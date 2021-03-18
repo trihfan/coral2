@@ -12,6 +12,11 @@ Animation::Animation(const AnimationParams& params)
 {
 }
 
+const std::string& Animation::getName() const
+{
+    return params.name;
+}
+
 Handle<Bone> Animation::findBone(const std::string& name) const
 {
     auto it = std::find_if(params.bones.begin(), params.bones.end(), [&name](const Handle<Bone>& bone) { return bone->getBoneName() == name; });
@@ -22,12 +27,12 @@ Handle<Bone> Animation::findBone(const std::string& name) const
     return *it;
 }
 
-float Animation::getTicksPerSecond() const
+double Animation::getTicksPerSecond() const
 {
     return params.ticksPerSecond;
 }
 
-float Animation::getDuration() const
+double Animation::getDuration() const
 {
     return params.duration;
 }

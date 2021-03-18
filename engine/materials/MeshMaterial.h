@@ -7,6 +7,7 @@
 
 namespace coral
 {
+    class Animator;
     struct MeshVertexBuffer;
 
     enum MeshMaterialRenderType
@@ -27,6 +28,8 @@ namespace coral
     class MeshMaterial : public Material
     {
     public:
+        static constexpr int maxBones = 100;
+
         MeshMaterial(const std::vector<std::string>& renderQueueTags);
 
         // Setup the shader and its parameters
@@ -45,6 +48,8 @@ namespace coral
         void setShininess(float shininess);
         void addTexture(MeshTextureType type, Handle<Resource> resource);
 
+        void setAnimator(Handle<Animator> animator);
+
     protected:
         virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
         virtual std::string getPipelineName() const override;
@@ -61,6 +66,7 @@ namespace coral
         glm::vec3 specular;
         float shininess;
         std::array<std::vector<Handle<Resource>>, MeshTextureType::count> textures;
+        Handle<Animator> animator;
 
         std::string getTextureName(MeshTextureType type, int id);
     };

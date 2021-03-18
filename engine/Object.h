@@ -44,9 +44,6 @@ namespace coral
         // Release the resources
         virtual void release();
 
-        // Update the Object, called each frame
-        virtual void update();
-
     protected:
         // state
         ObjectState state;

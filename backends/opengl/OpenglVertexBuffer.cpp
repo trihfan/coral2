@@ -32,8 +32,13 @@ OpenglVertexBuffer::OpenglVertexBuffer(const BackendVertexBufferData& data)
         if (data.vertexAttributes[i].location != -1)
         {
             glEnableVertexAttribArray(static_cast<GLuint>(data.vertexAttributes[i].location));
-            glVertexAttribPointer(static_cast<GLuint>(data.vertexAttributes[i].location), data.vertexAttributes[i].size,
-                data.vertexAttributes[i].type == float32 ? GL_FLOAT : GL_INT, GL_FALSE, data.vertexSize, reinterpret_cast<void*>(static_cast<size_t>(offset) * sizeof(float)));
+            glVertexAttribPointer(
+                static_cast<GLuint>(data.vertexAttributes[i].location),
+                data.vertexAttributes[i].size,
+                GL_FLOAT,
+                GL_FALSE,
+                data.vertexSize,
+                reinterpret_cast<void*>(static_cast<size_t>(offset) * sizeof(float)));
         }
         offset += data.vertexAttributes[i].size;
     }

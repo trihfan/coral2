@@ -2,6 +2,7 @@
 #include "resources/Pipeline.h"
 #include "resources/PipelineManager.h"
 #include "resources/ShaderComposer.h"
+#include "scene/mesh/Animator.h"
 #include "scene/mesh/Mesh.h"
 
 using namespace coral;
@@ -48,6 +49,19 @@ void MeshMaterial::use(const RenderParameters& parameters)
             }
         }
     }
+
+    if (skining)
+    {
+        for (size_t i = 0; i < maxBones; ++i)
+        {
+            getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", animator ? animator->getFinalBoneMatrices()[i] : glm::mat4(1));
+        }
+    }
+}
+
+void MeshMaterial::setAnimator(Handle<Animator> animator)
+{
+    this->animator = animator;
 }
 
 Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
@@ -75,6 +89,7 @@ Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
     if (skining)
     {
         composer.addDefinition("SKINING");
+        composer.addDefinition("MAX_BONES " + std::to_string(maxBones));
     }
 
     // Process

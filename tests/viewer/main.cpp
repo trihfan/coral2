@@ -6,11 +6,11 @@
 #ifndef __EMSCRIPTEN__
 #include "glad/glad.h"
 #endif
-#include "materials/BasicMaterial.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
+#include "scene/mesh/Animator.h"
 #include "scene/mesh/Model.h"
 #include "scene/text/Text.h"
 #include <numeric>
@@ -158,15 +158,18 @@ void setupScene()
     camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     camera->setTranslation(glm::vec3(0, 0, 3));
-    camera->setDistanceMinMax(0.3f, 10);
+    camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
-    // model
+    // Model
     auto model = ObjectFactory::create<Model>("assets/models/mutant.fbx");
-    //model->setRotation(glm::vec3(-90, 0, 180));
     model->setTranslation(glm::vec3(0, -1, 0));
     model->setScale(glm::vec3(0.01, 0.01, 0.01));
     scene->add(model);
+
+    // Animator
+    auto animator = ObjectFactory::create<Animator>("mixamo.com", model);
+    scene->add(animator);
 
     // Lights
     auto light1 = ObjectFactory::create<PointLight>();

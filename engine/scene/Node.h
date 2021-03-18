@@ -10,6 +10,12 @@
 
 namespace coral
 {
+    struct NodeUpdateParameters
+    {
+        double time;
+        double deltaTime;
+    };
+
     // A node represent an item in the scene
     class Node : public Object
     {
@@ -41,6 +47,9 @@ namespace coral
         size_t getChildCount() const;
         Handle<Node> getChild(size_t index) const;
 
+        template <typename Type>
+        std::vector<Handle<Type>> getChildren() const;
+
         // Translation
         void setTranslation(const glm::vec3& translation);
         const glm::vec3& getTranslation() const;
@@ -59,7 +68,7 @@ namespace coral
         const glm::mat4& getMatrix() const;
 
         //
-        virtual void update() override;
+        virtual void update(const NodeUpdateParameters& parameters);
 
         // Signals
         Signal<const glm::mat4&> matrixChanged;
@@ -95,5 +104,26 @@ namespace coral
                 traverse(node->getChild(i), std::forward<decltype(function)>(function), std::forward<Args>(args)...);
             }
         }
+    }
+
+    template <typename Type>
+    std::vector<Handle<Type>> Node::getChildren() const
+    {
+        std::vector<Handle<Type>> childrenList;
+
+        for (auto child : children)
+        {
+            if (child->isA<Type>())
+            {
+                childrenList.push_back(child->toHandle<Type>());
+            }
+
+            for (auto subchild : child->getChildren<Type>())
+            {
+                childrenList.push_back(subchild);
+            }
+        }
+
+        return childrenList;
     }
 }

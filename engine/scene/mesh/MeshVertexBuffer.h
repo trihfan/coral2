@@ -80,16 +80,10 @@ namespace coral
          */
         size_t getComponentCount(AttributeType type) const;
 
-        /**
-         * @brief Return the component type for the given attribue
-         */
-        backend::BackendVertexAttributeType getComponentType(AttributeType type) const;
-
     private:
         // Data
         std::array<std::vector<std::byte>, count> data;
         std::array<size_t, count> componentCount;
-        std::array<size_t, count> attributeSize;
     };
 
     template <typename Type>

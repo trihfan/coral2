@@ -61,7 +61,6 @@ std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
         {
             backend::BackendVertexAttribute attribute;
             attribute.size = static_cast<int>(vertices.getComponentCount(type));
-            attribute.type = vertices.getComponentType(type);
             attribute.location = static_cast<int>(i);
             attributes.push_back(attribute);
         }

@@ -152,10 +152,8 @@ const glm::mat4& Node::getMatrix() const
     return matrix;
 }
 
-void Node::update()
+void Node::update(const NodeUpdateParameters& parameters)
 {
-    Object::update();
-
     if (dirty)
     {
         worldPosition = getTranslation();
@@ -179,6 +177,6 @@ void Node::update()
 
     for (size_t i = 0; i < children.size(); i++)
     {
-        children[i]->update();
+        children[i]->update(parameters);
     }
 }

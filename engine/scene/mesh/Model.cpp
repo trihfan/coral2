@@ -1,9 +1,8 @@
 #include "Model.h"
+#include "Animator.h"
 #include "Bone.h"
 #include "ObjectFactory.h"
-#include "materials/BasicMaterial.h"
 #include "materials/MeshMaterial.h"
-#include "materials/TexturedMaterial.h"
 #include "utils/AssimpHelpers.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -13,7 +12,7 @@
 
 using namespace coral;
 
-std::vector<MeshTextureType> assimpToMeshTextureType {
+static std::vector<MeshTextureType> assimpToMeshTextureType {
     MeshTextureType::unknown, //aiTextureType_NONE = 0,
     MeshTextureType::diffuse, //aiTextureType_DIFFUSE = 1,
     MeshTextureType::specular, //aiTextureType_SPECULAR = 2,
@@ -124,10 +123,11 @@ void Model::loadAnimations(const aiScene* scene)
         auto animation = scene->mAnimations[i];
 
         AnimationParams params;
+        params.name = animation->mName.C_Str();
         params.rootNode = animationRootNode;
         params.boneInfoMap = boneInfoMap;
-        params.duration = static_cast<float>(animation->mDuration);
-        params.ticksPerSecond = static_cast<float>(animation->mTicksPerSecond);
+        params.duration = animation->mDuration;
+        params.ticksPerSecond = animation->mTicksPerSecond;
 
         // Fill bones list
         params.bones.resize(animation->mNumChannels);
@@ -166,8 +166,8 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
         // Bones
         if (mesh->mNumBones > 0)
         {
-            vertices.insert(MeshVertexBuffer::bone, glm::ivec4(-1, -1, -1, -1));
-            vertices.insert(MeshVertexBuffer::weight, glm::vec4());
+            vertices.insert(MeshVertexBuffer::bone, glm::vec4(-1, -1, -1, -1));
+            vertices.insert(MeshVertexBuffer::weight, glm::vec4(0));
         }
     }
 
@@ -199,7 +199,7 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
             float weight = weights[weightIndex].mWeight;
 
             // Get current bone data
-            glm::ivec4 bones;
+            glm::vec4 bones;
             glm::vec4 weights;
             vertices.get(MeshVertexBuffer::bone, vertexId, bones);
             vertices.get(MeshVertexBuffer::weight, vertexId, weights);
@@ -210,7 +210,7 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
                 if (bones[i] < 0)
                 {
                     weights[i] = weight;
-                    bones[i] = boneID;
+                    bones[i] = static_cast<float>(boneID);
                     break;
                 }
             }
@@ -272,7 +272,7 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, cons
     }
     if (vertexBuffer.hasAttribute(MeshVertexBuffer::bone))
     {
-        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshVertexBuffer::bone), "ivec4" });
+        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshVertexBuffer::bone), "vec4" });
         material->enableSkining();
     }
     if (vertexBuffer.hasAttribute(MeshVertexBuffer::weight))
@@ -356,4 +356,17 @@ Handle<Resource> Model::loadTexture(const aiScene* scene, const std::string& fil
 
     // Embedded texture compressed
     return ObjectFactory::createWithName<Resource>(file, reinterpret_cast<const unsigned char*>(texture->pcData), texture->mWidth);
+}
+
+Handle<Animation> Model::getAnimation(const std::string& animationName) const
+{
+    auto it = std::find_if(animations.begin(), animations.end(), [&animationName](const Handle<Animation>& animation) {
+        return animation->getName() == animationName;
+    });
+
+    if (it != animations.end())
+    {
+        return *it;
+    }
+    return nullptr;
 }

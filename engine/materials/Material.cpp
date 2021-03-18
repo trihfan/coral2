@@ -53,20 +53,13 @@ void Material::use(const RenderParameters& parameters)
 void Material::init()
 {
     Object::init();
-
-    pipeline = PipelineManager::getPipelineByName(getPipelineName());
-    if (!pipeline)
-    {
-        pipeline = createPipelineFor(renderQueueTags[0]);
-    }
+    invalidatePipeline();
 }
 
-void Material::update()
+void Material::invalidatePipeline()
 {
-    Object::update();
-
-    // Check the pipeline (todo)
-    if (!pipeline || pipeline->isDirty())
+    pipeline = PipelineManager::getPipelineByName(getPipelineName());
+    if (!pipeline)
     {
         pipeline = createPipelineFor(renderQueueTags[0]);
     }

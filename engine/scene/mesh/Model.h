@@ -2,7 +2,7 @@
 
 #include "Animation.h"
 #include "Mesh.h"
-#include "materials/Material.h"
+#include "materials/MeshMaterial.h"
 #include "resources/Resource.h"
 #include "scene/Node.h"
 #include <assimp/material.h>
@@ -16,19 +16,23 @@ class aiMaterial;
 namespace coral
 {
     class MeshVertexBuffer;
+    class Animator;
 
     class Model : public Node
     {
     public:
+        // Creation
         Model(const std::string& path);
         virtual void init() override;
-        const std::vector<Animation>& getAnimations() const;
+
+        // Animations
+        Handle<Animation> getAnimation(const std::string& animationName) const;
 
     private:
         std::string path;
         std::string directory;
         std::vector<Handle<Animation>> animations;
-        std::unordered_map<std::string, Handle<Material>> materialByName;
+        std::unordered_map<std::string, Handle<MeshMaterial>> materialByName;
         std::unordered_map<std::string, std::vector<Handle<Mesh>>> meshByName;
         std::unordered_map<std::string, BoneInfo> boneInfoMap;
         int boneCounter = 0;

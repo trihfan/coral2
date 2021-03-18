@@ -107,20 +107,14 @@ void ShaderComposer::process()
     while (std::getline(shader, line))
     {
         // Is it a title
-        if (line.find_first_of('[') < line.find_first_of(']'))
+        if (line.find("[vertex]") != std::string::npos)
         {
-            size_t titleStart = line.find_first_of('[');
-            size_t titleEnd = line.find_first_of(']');
-            std::string currentPartTitle = line.substr(titleStart, titleEnd - titleStart + 1);
-
-            if (currentPartTitle == "[vertex]")
-            {
-                currentPart = ParserCurrentPart::vertex;
-            }
-            else if (currentPartTitle == "[fragment]")
-            {
-                currentPart = ParserCurrentPart::fragment;
-            }
+            currentPart = ParserCurrentPart::vertex;
+            continue;
+        }
+        else if (line.find("[fragment]") != std::string::npos)
+        {
+            currentPart = ParserCurrentPart::fragment;
             continue;
         }
 

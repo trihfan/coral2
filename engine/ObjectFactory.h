@@ -32,7 +32,7 @@ namespace coral
         static Handle<ObjectType> create(Args&&... args);
 
         /**
-         * @brief Update all objects
+         * @brief Initialize and release objects
          */
         static void update();
 

@@ -1,26 +1,29 @@
 #pragma once
 
-#include "Object.h"
+#include "scene/Node.h"
 
 namespace coral
 {
     class Animation;
-    struct AssimpNodeData;
+    class AnimationNode;
+    class Model;
 
-    class Animator : public Object
+    class Animator : public Node
     {
     public:
-        Animator(Handle<Animation> Animation);
+        Animator(const std::string& animationName, Handle<Model> model);
 
-        void updateAnimation(float dt);
-        void playAnimation(Animation* pAnimation);
-        void calculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform);
-        std::vector<glm::mat4> getFinalBoneMatrices();
+        void playAnimation(const std::string& animationName);
+
+        virtual void update(const NodeUpdateParameters& parameters) override;
+        void calculateBoneTransform(Handle<AnimationNode> node, const glm::mat4& parentTransform);
+        const std::vector<glm::mat4>& getFinalBoneMatrices() const;
 
     private:
         std::vector<glm::mat4> finalBoneMatrices;
-        Handle<Animation> currentAnimation;
-        float currentTime;
-        float deltaTime;
+        std::string animationName;
+        Handle<Animation> animation;
+        Handle<Model> model;
+        double currentTime;
     };
 }

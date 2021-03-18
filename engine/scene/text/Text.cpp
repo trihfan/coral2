@@ -1,6 +1,5 @@
 #include "Text.h"
 #include "ObjectFactory.h"
-#include "materials/BasicMaterial.h"
 #include "resources/Resource.h"
 #include "utils/Freetype.h"
 

@@ -3,51 +3,56 @@ basic_lighting
 [vertex]
 
 // Uniforms
-const int MAX_BONES = 100;
-const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform mat4 finalBoneMatrices[MAX_BONES];
 
 // Varyings
 out vec3 position;
 out vec3 normal;
 out vec2 textCoords;
 
-#ifdef SKINING
-vec4 computeSkining()
+void main()
 {
+#ifdef SKINING
     vec4 totalPosition = vec4(0);
-    for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
+    vec3 totalNormal = vec3(0);
+    float count = 0;
+
+    for (int i = 0; i < 4; i++)
     {
-        if (boneIds[i] == -1) 
+        float boneIdF = VERTEX.bone[i];
+        int boneId = int(boneIdF);
+        if (boneId == -1) 
         {
             continue;
         }
-
-        if (boneIds[i] >= MAX_JOINTS) 
+        if (boneId >= MAX_BONES) 
         {
             totalPosition = vec4(VERTEX.position, 1);
             break;
         }
 
-        vec4 localPosition = finalBoneMatrices[boneIds[i]] * vec4(VERTEX.position, 1);
-        totalPosition += localPosition * weights[i];
-        vec3 localNormal = mat3(finalBoneMatrices[boneIds[i]]) * VERTEX.normal;
-   }
-   return totalPosition;
-}
-#endif
+        vec4 localPosition = finalBoneMatrices[boneId] * vec4(VERTEX.position, 1);
+        totalPosition += localPosition * VERTEX.weight[i];
 
-void main()
-{
-#ifdef SKINING
-    position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
+        totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
+        count++;
+   }
+
+    position = vec3(MODEL_MATRIX * totalPosition);
+    if (count > 0.f)
+    {
+        normal = mat3(transpose(inverse(MODEL_MATRIX))) * (totalNormal / count);
+    }
+    else 
+    {
+        normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
+    }
 #else
     position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
-#endif
-
     normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
+#endif
+ 
     textCoords = VERTEX.textCoords;
-
     gl_Position = PROJECTION_MATRIX * VIEW_MATRIX * vec4(position, 1);
 }
 

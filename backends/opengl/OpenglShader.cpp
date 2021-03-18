@@ -23,9 +23,8 @@ void OpenglShader::addShaderData(ShaderType type, const std::string& data)
 #endif
 
     head << data;
-
     shader_data[static_cast<size_t>(type)] = head.str();
-    //Logs(info) << head.str();
+    //Logs(info) << data;
 }
 
 void OpenglShader::init()
@@ -53,7 +52,7 @@ void OpenglShader::init()
     checkCompileErrors(fragment, "FRAGMENT");
 
     // if geometry shader is given, compile geometry shader
-    unsigned int geometry;
+    unsigned int geometry = 0;
     if (has_geometry)
     {
 #ifdef GL_GEOMETRY_SHADER

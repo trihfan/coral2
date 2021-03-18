@@ -13,27 +13,19 @@ MeshVertexBuffer::MeshVertexBuffer()
         case position:
         case normal:
             componentCount[i] = 3;
-            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         case textCoords:
             componentCount[i] = 2;
-            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         case bone:
-            componentCount[i] = 4;
-            attributeSize[i] = componentCount[i] * sizeof(int);
-            break;
-
         case weight:
             componentCount[i] = 4;
-            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
 
         default:
             componentCount[i] = 0;
-            attributeSize[i] = componentCount[i] * sizeof(float);
             break;
         }
     }
@@ -43,7 +35,7 @@ void MeshVertexBuffer::reserve(size_t size)
 {
     for (size_t i = 0; i < data.size(); i++)
     {
-        data[i].reserve(size * attributeSize[i]);
+        data[i].reserve(size * componentCount[i] * sizeof(float));
     }
 }
 
@@ -54,7 +46,7 @@ size_t MeshVertexBuffer::sizeOfVertex() const
     {
         if (!data[i].empty())
         {
-            size += attributeSize[i];
+            size += componentCount[i] * sizeof(float);
         }
     }
     return size;
@@ -62,7 +54,7 @@ size_t MeshVertexBuffer::sizeOfVertex() const
 
 size_t MeshVertexBuffer::vertexCount() const
 {
-    return data[position].size() / (attributeSize[position]);
+    return data[position].size() / (componentCount[position] * sizeof(float));
 }
 
 void MeshVertexBuffer::copyTo(std::vector<std::byte>& buffer) const
@@ -81,8 +73,9 @@ void MeshVertexBuffer::copyTo(std::vector<std::byte>& buffer) const
         {
             if (!data[i].empty())
             {
-                std::memcpy(&buffer[currentVertex * vertexSize + current], &data[i][currentVertex * attributeSize[i]], attributeSize[i]);
-                current += attributeSize[i];
+                size_t attributeSize = componentCount[i] * sizeof(float);
+                std::memcpy(&buffer[currentVertex * vertexSize + current], &data[i][currentVertex * attributeSize], attributeSize);
+                current += attributeSize;
             }
         }
     }
@@ -109,20 +102,4 @@ int MeshVertexBuffer::getLocation(AttributeType type) const
 size_t MeshVertexBuffer::getComponentCount(AttributeType type) const
 {
     return componentCount[type];
-}
-
-backend::BackendVertexAttributeType MeshVertexBuffer::getComponentType(AttributeType type) const
-{
-    switch (type)
-    {
-    default:
-    case position:
-    case normal:
-    case textCoords:
-    case weight:
-        return backend::float32;
-
-    case bone:
-        return backend::int32;
-    }
 }
