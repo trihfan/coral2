@@ -4,10 +4,17 @@
 
 namespace backend
 {
+    enum BackendVertexAttributeType
+    {
+        int32,
+        float32
+    };
+
     struct BackendVertexAttribute
     {
         int location;
         int size;
+        BackendVertexAttributeType type;
     };
 
     struct BackendVertexBufferData

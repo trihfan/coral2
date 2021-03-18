@@ -10,6 +10,7 @@ uniform mat4 finalBonesMatrices[MAX_BONES];
 // Varyings
 out vec3 position;
 out vec3 normal;
+out vec2 textCoords;
 
 #ifdef SKINING
 vec4 computeSkining()
@@ -45,6 +46,8 @@ void main()
 #endif
 
     normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
+    textCoords = VERTEX.textCoords;
+
     gl_Position = PROJECTION_MATRIX * VIEW_MATRIX * vec4(position, 1);
 }
 
@@ -61,13 +64,34 @@ struct Material
 
 uniform Material material;
 
+#ifdef TEXTURING
+uniform sampler2D texture_ambient0;
+uniform sampler2D texture_diffuse0;
+uniform sampler2D texture_specular0;
+#endif
+
 // Varyings
 in vec3 position;
 in vec3 normal;
+in vec2 textCoords;
 
 void main()
 {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+
+    #ifdef TEXTURING
+        ambient = texture(texture_ambient0, textCoords).rgb;
+        diffuse = texture(texture_diffuse0, textCoords).rgb;
+        specular = texture(texture_specular0, textCoords).rgb;
+    #else
+        ambient = material.ambient;
+        diffuse = material.diffuse;
+        specular = material.specular;
+    #endif
+
     vec3 fragmentNormal = normalize(normal);
-    vec3 result = computeLighting(material.ambient, material.diffuse, material.specular, material.shininess, fragmentNormal, position);
+    vec3 result = computeLighting(material.ambient, diffuse, material.specular, material.shininess, fragmentNormal, position);
     fragColor0 = vec4(result, 1);
 }

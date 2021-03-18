@@ -162,9 +162,10 @@ void setupScene()
     scene->add(camera);
 
     // model
-    auto model = ObjectFactory::create<Model>("assets/models/droid/Droid.dae");
-    model->setRotation(glm::vec3(-90, 0, 180));
+    auto model = ObjectFactory::create<Model>("assets/models/mutant.fbx");
+    //model->setRotation(glm::vec3(-90, 0, 180));
     model->setTranslation(glm::vec3(0, -1, 0));
+    model->setScale(glm::vec3(0.01, 0.01, 0.01));
     scene->add(model);
 
     // Lights

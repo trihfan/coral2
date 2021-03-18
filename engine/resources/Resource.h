@@ -30,6 +30,9 @@ namespace coral
         // Create resource from file
         Resource(const std::string& file);
 
+        // Create resource from memory
+        Resource(const unsigned char* buffer, int length);
+
         void bind(int index);
         backend::BackendResource* getBackendResource() const;
 
@@ -40,5 +43,7 @@ namespace coral
         ResourceParams params;
         unsigned char* fileData;
         std::unique_ptr<backend::BackendResource> backendResource;
+
+        void setFromMemory();
     };
 }

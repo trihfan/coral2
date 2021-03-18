@@ -110,3 +110,19 @@ size_t MeshVertexBuffer::getComponentCount(AttributeType type) const
 {
     return componentCount[type];
 }
+
+backend::BackendVertexAttributeType MeshVertexBuffer::getComponentType(AttributeType type) const
+{
+    switch (type)
+    {
+    default:
+    case position:
+    case normal:
+    case textCoords:
+    case weight:
+        return backend::float32;
+
+    case bone:
+        return backend::int32;
+    }
+}

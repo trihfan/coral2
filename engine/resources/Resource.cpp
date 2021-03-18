@@ -30,19 +30,60 @@ Resource::Resource(const std::string& file)
         break;
 
     case 2:
-        params.format = backend::BackendResourceFormat::r8g8;
+        params.format = backend::BackendResourceFormat::rg88;
         break;
 
     case 3:
-        params.format = backend::BackendResourceFormat::r8g8b8;
+        params.format = backend::BackendResourceFormat::rgb888;
         break;
 
     case 4:
-        params.format = backend::BackendResourceFormat::r8g8b8a8;
+        params.format = backend::BackendResourceFormat::rgba8888;
         break;
 
     default:
         Logs(error) << "Texture failed to load (wrong component size) at path: " << file;
+        return;
+    }
+
+    params.type = backend::BackendResourceType::texture2d;
+    params.width = width;
+    params.height = height;
+}
+
+Resource::Resource(const unsigned char* buffer, int length)
+{
+    // Load file
+    int width, height;
+    int nbComponents;
+    fileData = stbi_load_from_memory(buffer, length, &width, &height, &nbComponents, 0);
+
+    if (!fileData)
+    {
+        Logs(error) << "Texture failed to load from memory";
+        return;
+    }
+
+    switch (nbComponents)
+    {
+    case 1:
+        params.format = backend::BackendResourceFormat::r8;
+        break;
+
+    case 2:
+        params.format = backend::BackendResourceFormat::rg88;
+        break;
+
+    case 3:
+        params.format = backend::BackendResourceFormat::rgb888;
+        break;
+
+    case 4:
+        params.format = backend::BackendResourceFormat::rgba8888;
+        break;
+
+    default:
+        Logs(error) << "Texture failed to load from memory";
         return;
     }
 

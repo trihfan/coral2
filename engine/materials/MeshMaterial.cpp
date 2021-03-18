@@ -9,6 +9,8 @@ using namespace coral;
 MeshMaterial::MeshMaterial(const std::vector<std::string>& renderQueueTags)
     : Material(renderQueueTags)
     , renderType(MeshMaterialRenderType::basic_lighting)
+    , skining(false)
+    , texturing(false)
 {
     enableLighting();
 }
@@ -63,6 +65,12 @@ Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
         composer.addAttribute(attribute);
     }
 
+    // Texturing
+    if (texturing)
+    {
+        composer.addDefinition("TEXTURING");
+    }
+
     // Skining
     if (skining)
     {
@@ -105,6 +113,11 @@ std::string MeshMaterial::getTextureName(MeshTextureType type, int id)
 void MeshMaterial::enableSkining()
 {
     skining = true;
+}
+
+void MeshMaterial::enableTexturing()
+{
+    texturing = true;
 }
 
 void MeshMaterial::setAmbientColor(const glm::vec3& color)

@@ -25,7 +25,7 @@ void OpenglShader::addShaderData(ShaderType type, const std::string& data)
     head << data;
 
     shader_data[static_cast<size_t>(type)] = head.str();
-    Logs(info) << head.str();
+    //Logs(info) << head.str();
 }
 
 void OpenglShader::init()

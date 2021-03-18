@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BackendVertexBuffer.h"
 #include <array>
 #include <glm/glm.hpp>
 #include <vector>
@@ -53,6 +54,18 @@ namespace coral
         void insert(AttributeType type, const Type& value);
 
         /**
+         * @brief Set a data in the given attribute array
+         */
+        template <typename Type>
+        void set(AttributeType type, size_t index, const Type& value);
+
+        /**
+         * @brief Get the attribute data
+         */
+        template <typename Type>
+        void get(AttributeType type, size_t index, Type& value) const;
+
+        /**
          * @brief Return true if the given attribute contains data
          */
         bool hasAttribute(AttributeType type) const;
@@ -67,6 +80,11 @@ namespace coral
          */
         size_t getComponentCount(AttributeType type) const;
 
+        /**
+         * @brief Return the component type for the given attribue
+         */
+        backend::BackendVertexAttributeType getComponentType(AttributeType type) const;
+
     private:
         // Data
         std::array<std::vector<std::byte>, count> data;
@@ -78,7 +96,19 @@ namespace coral
     void MeshVertexBuffer::insert(AttributeType type, const Type& value)
     {
         size_t size = data[type].size();
-        data[type].resize(size + sizeof(value));
-        std::memcpy(&data[type][size], &value, sizeof(value));
+        data[type].resize(size + sizeof(Type));
+        std::memcpy(&data[type][size], &value, sizeof(Type));
+    }
+
+    template <typename Type>
+    void MeshVertexBuffer::set(AttributeType type, size_t index, const Type& value)
+    {
+        std::memcpy(&data[type][index * sizeof(Type)], &value, sizeof(Type));
+    }
+
+    template <typename Type>
+    void MeshVertexBuffer::get(AttributeType type, size_t index, Type& value) const
+    {
+        std::memcpy(&value, &data[type][index * sizeof(Type)], sizeof(Type));
     }
 }

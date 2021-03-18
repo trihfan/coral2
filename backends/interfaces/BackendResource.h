@@ -17,9 +17,10 @@ namespace backend
     enum class BackendResourceFormat
     {
         r8,
-        r8g8,
-        r8g8b8,
-        r8g8b8a8,
+        rg88,
+        rgb888,
+        rgba8888,
+        argb8888,
         depth24_pencil8
     };
 

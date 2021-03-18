@@ -43,20 +43,20 @@ GLint OpenglResource::getInternalFormatFrom(backend::BackendResourceFormat forma
     case backend::BackendResourceFormat::r8:
         return GL_R8;
 
-    case backend::BackendResourceFormat::r8g8:
+    case backend::BackendResourceFormat::rg88:
         return GL_RG8;
 
-    case backend::BackendResourceFormat::r8g8b8:
+    case backend::BackendResourceFormat::rgb888:
         return GL_RGB;
 
-    case backend::BackendResourceFormat::r8g8b8a8:
+    case backend::BackendResourceFormat::rgba8888:
         return GL_RGBA;
 
     case backend::BackendResourceFormat::depth24_pencil8:
         return GL_DEPTH24_STENCIL8;
 
     default:
-        Logs(error) << "Unimplemented format";
+        Logs(error) << "Unimplemented internal format";
         return 0;
     }
 }
@@ -68,13 +68,13 @@ GLenum OpenglResource::getFormatFrom(backend::BackendResourceFormat format)
     case backend::BackendResourceFormat::r8:
         return GL_RED;
 
-    case backend::BackendResourceFormat::r8g8:
+    case backend::BackendResourceFormat::rg88:
         return GL_RG;
 
-    case backend::BackendResourceFormat::r8g8b8:
+    case backend::BackendResourceFormat::rgb888:
         return GL_RGB;
 
-    case backend::BackendResourceFormat::r8g8b8a8:
+    case backend::BackendResourceFormat::rgba8888:
         return GL_RGBA;
 
     case backend::BackendResourceFormat::depth24_pencil8:
@@ -92,20 +92,20 @@ GLenum OpenglResource::getTypeFrom(backend::BackendResourceFormat format)
     case backend::BackendResourceFormat::r8:
         return GL_UNSIGNED_BYTE;
 
-    case backend::BackendResourceFormat::r8g8:
+    case backend::BackendResourceFormat::rg88:
         return GL_UNSIGNED_BYTE;
 
-    case backend::BackendResourceFormat::r8g8b8:
+    case backend::BackendResourceFormat::rgb888:
         return GL_UNSIGNED_BYTE;
 
-    case backend::BackendResourceFormat::r8g8b8a8:
+    case backend::BackendResourceFormat::rgba8888:
         return GL_UNSIGNED_BYTE;
 
     case backend::BackendResourceFormat::depth24_pencil8:
         return GL_UNSIGNED_INT_24_8;
 
     default:
-        Logs(error) << "Unimplemented format";
+        Logs(error) << "Unimplemented type";
         return 0;
     }
 }

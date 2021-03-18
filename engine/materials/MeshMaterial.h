@@ -20,7 +20,8 @@ namespace coral
         specular,
         normal,
         height,
-        count
+        count,
+        unknown = count
     };
 
     class MeshMaterial : public Material
@@ -34,6 +35,7 @@ namespace coral
         // parameters
         void setAttributes(const std::vector<ShaderAttribute>& attributes);
         void setRenderType(MeshMaterialRenderType type);
+        void enableTexturing();
         void enableSkining();
 
         // Uniforms
@@ -50,6 +52,7 @@ namespace coral
     private:
         MeshMaterialRenderType renderType;
         bool skining;
+        bool texturing;
         std::vector<ShaderAttribute> attributes;
 
         // uniforms

@@ -56,10 +56,12 @@ std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
 
     for (size_t i = 0; i < MeshVertexBuffer::count; i++)
     {
-        if (vertices.hasAttribute(static_cast<MeshVertexBuffer::AttributeType>(i)))
+        auto type = static_cast<MeshVertexBuffer::AttributeType>(i);
+        if (vertices.hasAttribute(type))
         {
             backend::BackendVertexAttribute attribute;
-            attribute.size = static_cast<int>(vertices.getComponentCount(static_cast<MeshVertexBuffer::AttributeType>(i)));
+            attribute.size = static_cast<int>(vertices.getComponentCount(type));
+            attribute.type = vertices.getComponentType(type);
             attribute.location = static_cast<int>(i);
             attributes.push_back(attribute);
         }
