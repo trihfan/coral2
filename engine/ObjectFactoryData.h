@@ -26,7 +26,7 @@ namespace coral
 
         // Object pool, todo data structure
         std::vector<Handle<Object>> objects;
-        std::list<uint32_t> freeIndex;
+        std::list<uintptr_t> freeIndex;
 
         // Initialize and release queues
         moodycamel::ConcurrentQueue<Handle<Object>> initializeList;

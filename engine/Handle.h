@@ -12,7 +12,8 @@ namespace coral
     struct HandleSharedMemory
     {
         std::atomic<uint32_t> useCount = 0;
-        uint64_t index;
+        uintptr_t index;
+        std::atomic<bool> deleted = false;
     };
 
     /**

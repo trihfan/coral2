@@ -138,9 +138,13 @@ void MeshVertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weigh
         return;
     }
 
+    // Fill the first available slot or return false
     auto fillBoneIncidence = +[](std::vector<std::pair<glm::vec4, glm::vec4>>& boneIncidences, size_t verticeIndex, int id, float weight, size_t vertexCount) {
         // Resize so vertice index fit inside
-        boneIncidences.resize(vertexCount, std::make_pair(glm::vec4(MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones), glm::vec4(0)));
+        if (boneIncidences.size() < vertexCount)
+        {
+            boneIncidences.resize(vertexCount, std::make_pair(glm::vec4(MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones), glm::vec4(0)));
+        }
 
         // Check if there is an empty slot
         for (int i = 0; i < 4; i++)
@@ -155,15 +159,10 @@ void MeshVertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weigh
         return false;
     };
 
-    if (fillBoneIncidence(boneIncidences0, verticeIndex, id, weight, vertexCount()))
-    {
-        return;
-    }
-    if (fillBoneIncidence(boneIncidences1, verticeIndex, id, weight, vertexCount()))
-    {
-        return;
-    }
-    if (fillBoneIncidence(boneIncidences2, verticeIndex, id, weight, vertexCount()))
+    // Try all bone incidences
+    if (fillBoneIncidence(boneIncidences0, verticeIndex, id, weight, vertexCount())
+        || fillBoneIncidence(boneIncidences1, verticeIndex, id, weight, vertexCount())
+        || fillBoneIncidence(boneIncidences2, verticeIndex, id, weight, vertexCount()))
     {
         return;
     }

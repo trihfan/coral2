@@ -39,16 +39,6 @@ namespace coral
     private:
         // Constructor
         ObjectFactory();
-
-        /**
-         * @brief Add an object to be managed by the factory
-         */
-        void add(Handle<Object> object);
-
-        /**
-         * @brief Remove the object (deallocate resources)
-         */
-        void remove(Handle<Object> object);
     };
 
     template <typename ObjectType, class... Args>
@@ -70,7 +60,7 @@ namespace coral
 
         // register object
         Handle<ObjectType> handle(object, sharedMemory);
-        instance->add(handle);
+        ObjectFactoryData::get()->initializeList.enqueue(handle);
 
         // return created object
         return handle;

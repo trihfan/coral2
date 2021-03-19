@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Logs.h"
 #include "MemoryResource.h"
 #include "ObjectFactoryData.h"
-#include "Logs.h"
 
 namespace coral
 {
@@ -128,7 +128,11 @@ namespace coral
             uint32_t count = this->sharedMemory->useCount.fetch_sub(1, std::memory_order_acquire);
             if (count == 2)
             {
-                ObjectFactoryData::get()->releaseList.enqueue(*this);
+                bool expected = false;
+                if (this->sharedMemory->deleted.compare_exchange_weak(expected, true, std::memory_order_relaxed))
+                {
+                    ObjectFactoryData::get()->releaseList.enqueue(*this);
+                }
             }
         }
 

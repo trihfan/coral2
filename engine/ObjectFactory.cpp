@@ -2,10 +2,10 @@
 #include "HandleImpl.h"
 // /\ Must be included before: ||
 // || ------------------------ \/
+#include "Logs.h"
 #include "Object.h"
 #include "ObjectFactory.h"
 #include "ObjectFactoryData.h"
-#include "Logs.h"
 #include <algorithm>
 
 using namespace coral;
@@ -39,17 +39,6 @@ void ObjectFactory::release()
     update();
 
     ObjectFactoryData::destroy();
-}
-
-void ObjectFactory::add(Handle<Object> object)
-{
-    internalData->initializeList.enqueue(object);
-}
-
-void ObjectFactory::remove(Handle<Object> object)
-{
-    // Move to release list
-    internalData->releaseList.enqueue(object);
 }
 
 void ObjectFactory::update()
@@ -89,7 +78,7 @@ void ObjectFactory::update()
             toDelete.push_back(std::make_pair(object.sharedMemory, object.data));
 
             // Remove from object pool
-            uint64_t index = object.sharedMemory->index;
+            uintptr_t index = object.sharedMemory->index;
             internalData->objects[index] = nullptr;
             internalData->freeIndex.push_back(index);
         }
