@@ -28,6 +28,9 @@ namespace coral
     class MeshMaterial : public Material
     {
     public:
+        /**
+         * @brief Maximum number of bones per model
+         */
         static constexpr int maxBones = 100;
 
         MeshMaterial(const std::vector<std::string>& renderQueueTags);
@@ -40,6 +43,7 @@ namespace coral
         void setRenderType(MeshMaterialRenderType type);
         void enableTexturing();
         void enableSkining();
+        void setBoneIncidenceCount(int count);
 
         // Uniforms
         void setAmbientColor(const glm::vec3& color);
@@ -58,6 +62,7 @@ namespace coral
         MeshMaterialRenderType renderType;
         bool skining;
         bool texturing;
+        int boneIncidenceCount;
         std::vector<ShaderAttribute> attributes;
 
         // uniforms

@@ -3,50 +3,90 @@ basic_lighting
 [vertex]
 
 // Uniforms
+#ifdef SKINING
 uniform mat4 finalBoneMatrices[MAX_BONES];
+#endif 
 
 // Varyings
 out vec3 position;
 out vec3 normal;
 out vec2 textCoords;
 
-void main()
-{
 #ifdef SKINING
+void computeSkining()
+{
     vec4 totalPosition = vec4(0);
     vec3 totalNormal = vec3(0);
-    float count = 0;
+    int count = 0;
+    bool finished = false;
 
     for (int i = 0; i < 4; i++)
     {
-        float boneIdF = VERTEX.bone[i];
-        int boneId = int(boneIdF);
-        if (boneId == -1) 
+        int boneId = floatBitsToInt(VERTEX.bone0[i]);
+        if (boneId == MAX_BONES) 
         {
-            continue;
-        }
-        if (boneId >= MAX_BONES) 
-        {
-            totalPosition = vec4(VERTEX.position, 1);
+            finished = true;
             break;
         }
 
-        vec4 localPosition = finalBoneMatrices[boneId] * vec4(VERTEX.position, 1);
-        totalPosition += localPosition * VERTEX.weight[i];
-
+        totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight0[i];
         totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
         count++;
    }
 
-    position = vec3(MODEL_MATRIX * totalPosition);
-    if (count > 0.f)
+#ifdef ENABLE_BONE_INCIDENCE_1
+    if (!finished)
     {
-        normal = mat3(transpose(inverse(MODEL_MATRIX))) * (totalNormal / count);
+       for (int i = 0; i < 4; i++)
+       {
+            int boneId = floatBitsToInt(VERTEX.bone1[i]);
+            if (boneId == MAX_BONES) 
+            {
+                finished = true;
+                break;
+            }
+
+            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight1[i];
+            totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
+            count++;
+       }
+   }
+#endif
+
+#ifdef ENABLE_BONE_INCIDENCE_2
+    if (!finished)
+    {
+       for (int i = 0; i < 4; i++)
+       {
+            int boneId = floatBitsToInt(VERTEX.bone2[i]);
+            if (boneId == MAX_BONES) 
+            {
+                break;
+            }
+
+            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight2[i];
+            totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
+            count++;
+       }
+   }
+#endif
+
+    position = vec3(MODEL_MATRIX * totalPosition);
+    if (count > 0)
+    {
+        normal = mat3(transpose(inverse(MODEL_MATRIX))) * (totalNormal / float(count));
     }
     else 
     {
         normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
     }
+}
+#endif
+
+void main()
+{
+#ifdef SKINING
+    computeSkining();
 #else
     position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
     normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;

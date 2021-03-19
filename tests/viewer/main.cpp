@@ -169,6 +169,7 @@ void setupScene()
 
     // Animator
     auto animator = ObjectFactory::create<Animator>("mixamo.com", model);
+    animator->setLoopAnimation(true);
     scene->add(animator);
 
     // Lights

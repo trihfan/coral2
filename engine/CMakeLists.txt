@@ -12,7 +12,7 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # Definitions
-add_definitions(-DSTB_IMAGE_STATIC -DSTB_IMAGE_IMPLEMENTATION)
+add_definitions(-DSTB_IMAGE_STATIC -DSTB_IMAGE_IMPLEMENTATION -DAI_MAX_BONE_WEIGHTS=12)
 
 # Sources
 file(GLOB_RECURSE sources *.h *.cpp *.c)

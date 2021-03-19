@@ -30,8 +30,7 @@ void Mesh::init()
 
     // Copy vertices
     data.verticesCount = static_cast<int>(vertices.vertexCount());
-    std::vector<std::byte> vertexData;
-    vertices.copyTo(vertexData);
+    std::vector<std::byte> vertexData = vertices.pack();
     data.vertices = vertexData.data();
 
     // Copy indices

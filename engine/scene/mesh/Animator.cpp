@@ -7,6 +7,7 @@ using namespace coral;
 
 Animator::Animator(const std::string& animationName, Handle<Model> model)
     : model(model)
+    , loop(false)
 {
     playAnimation(animationName);
 }
@@ -39,8 +40,16 @@ void Animator::update(const NodeUpdateParameters& parameters)
             }
         }
 
-        currentTime += static_cast<double>(animation->getTicksPerSecond()) * parameters.deltaTime;
-        currentTime = std::fmod(currentTime, animation->getDuration());
+        // Converte current time to ms and mod to animation duration
+        currentTime = parameters.time * 1000;
+        if (loop)
+        {
+            currentTime = std::fmod(currentTime, animation->getDuration());
+        }
+        else
+        {
+            currentTime = std::clamp(currentTime, 0., animation->getDuration() - 1);
+        }
         calculateBoneTransform(animation->getRootNode(), glm::mat4(1));
     }
 }
@@ -76,4 +85,9 @@ void Animator::calculateBoneTransform(Handle<AnimationNode> node, const glm::mat
 const std::vector<glm::mat4>& Animator::getFinalBoneMatrices() const
 {
     return finalBoneMatrices;
+}
+
+void Animator::setLoopAnimation(bool loop)
+{
+    this->loop = loop;
 }

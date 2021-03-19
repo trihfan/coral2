@@ -12,6 +12,7 @@ MeshMaterial::MeshMaterial(const std::vector<std::string>& renderQueueTags)
     , renderType(MeshMaterialRenderType::basic_lighting)
     , skining(false)
     , texturing(false)
+    , boneIncidenceCount(1)
 {
     enableLighting();
 }
@@ -52,7 +53,13 @@ void MeshMaterial::use(const RenderParameters& parameters)
 
     if (skining)
     {
-        for (size_t i = 0; i < maxBones; ++i)
+        if (animator && animator->getFinalBoneMatrices().size() > maxBones)
+        {
+            Logs(warning) << "Bone count (" << animator->getFinalBoneMatrices().size() << ") exceed the limit of " << maxBones;
+        }
+
+        size_t max = animator ? std::min(animator->getFinalBoneMatrices().size(), static_cast<size_t>(maxBones)) : maxBones;
+        for (size_t i = 0; i < max; i++)
         {
             getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", animator ? animator->getFinalBoneMatrices()[i] : glm::mat4(1));
         }
@@ -90,6 +97,10 @@ Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
     {
         composer.addDefinition("SKINING");
         composer.addDefinition("MAX_BONES " + std::to_string(maxBones));
+        for (int i = 1; i <= boneIncidenceCount; i++)
+        {
+            composer.addDefinition("ENABLE_BONE_INCIDENCE_" + std::to_string(i));
+        }
     }
 
     // Process
@@ -128,6 +139,11 @@ std::string MeshMaterial::getTextureName(MeshTextureType type, int id)
 void MeshMaterial::enableSkining()
 {
     skining = true;
+}
+
+void MeshMaterial::setBoneIncidenceCount(int count)
+{
+    boneIncidenceCount = count;
 }
 
 void MeshMaterial::enableTexturing()

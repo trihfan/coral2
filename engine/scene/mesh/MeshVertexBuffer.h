@@ -19,8 +19,12 @@ namespace coral
             position,
             normal,
             textCoords,
-            bone,
-            weight,
+            boneId0,
+            boneWeight0,
+            boneId1,
+            boneWeight1,
+            boneId2,
+            boneWeight2,
             count
         };
 
@@ -43,27 +47,15 @@ namespace coral
         size_t vertexCount() const;
 
         /**
-         * @brief Merge and copy the vertex buffer content to the given buffer
+         * @brief Merge and copy the vertex buffer content to the a buffer
          */
-        void copyTo(std::vector<std::byte>& buffer) const;
+        std::vector<std::byte> pack() const;
 
-        /**
-         * @brief Insert a data in the given attribute array
-         */
-        template <typename Type>
-        void insert(AttributeType type, const Type& value);
-
-        /**
-         * @brief Set a data in the given attribute array
-         */
-        template <typename Type>
-        void set(AttributeType type, size_t index, const Type& value);
-
-        /**
-         * @brief Get the attribute data
-         */
-        template <typename Type>
-        void get(AttributeType type, size_t index, Type& value) const;
+        // Add data
+        void addPosition(const glm::vec3& position);
+        void addNormal(const glm::vec3& normal);
+        void addTextCoord(const glm::vec2& textCoords);
+        void addBoneIncidence(size_t verticeIndex, int id, float weight);
 
         /**
          * @brief Return true if the given attribute contains data
@@ -81,28 +73,17 @@ namespace coral
         size_t getComponentCount(AttributeType type) const;
 
     private:
-        // Data
-        std::array<std::vector<std::byte>, count> data;
-        std::array<size_t, count> componentCount;
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> texCoords;
+        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences0;
+        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences1;
+        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences2;
+        bool boneIncidenceWarningSend;
+
+        /**
+         * @brief Return a ptr to the value of the given index for the given attribute
+         */
+        const void* getPtrTo(AttributeType type, size_t index) const;
     };
-
-    template <typename Type>
-    void MeshVertexBuffer::insert(AttributeType type, const Type& value)
-    {
-        size_t size = data[type].size();
-        data[type].resize(size + sizeof(Type));
-        std::memcpy(&data[type][size], &value, sizeof(Type));
-    }
-
-    template <typename Type>
-    void MeshVertexBuffer::set(AttributeType type, size_t index, const Type& value)
-    {
-        std::memcpy(&data[type][index * sizeof(Type)], &value, sizeof(Type));
-    }
-
-    template <typename Type>
-    void MeshVertexBuffer::get(AttributeType type, size_t index, Type& value) const
-    {
-        std::memcpy(&value, &data[type][index * sizeof(Type)], sizeof(Type));
-    }
 }

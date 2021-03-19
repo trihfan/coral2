@@ -14,6 +14,7 @@ namespace coral
         Animator(const std::string& animationName, Handle<Model> model);
 
         void playAnimation(const std::string& animationName);
+        void setLoopAnimation(bool loop);
 
         virtual void update(const NodeUpdateParameters& parameters) override;
         void calculateBoneTransform(Handle<AnimationNode> node, const glm::mat4& parentTransform);
@@ -25,5 +26,6 @@ namespace coral
         Handle<Animation> animation;
         Handle<Model> model;
         double currentTime;
+        bool loop;
     };
 }

@@ -12,8 +12,8 @@ namespace coral
 {
     struct NodeUpdateParameters
     {
-        double time;
-        double deltaTime;
+        double time; // Time since engine start in seconds
+        double deltaTime; // Time of the last frame in seconds
     };
 
     // A node represent an item in the scene

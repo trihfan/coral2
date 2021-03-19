@@ -149,25 +149,18 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         // Position
-        vertices.insert(MeshVertexBuffer::position, glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+        vertices.addPosition(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
 
         // Normal
         if (mesh->HasNormals())
         {
-            vertices.insert(MeshVertexBuffer::normal, glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+            vertices.addNormal(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
         }
 
         // Texture coordinates
         if (mesh->mTextureCoords[0])
         {
-            vertices.insert(MeshVertexBuffer::textCoords, glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
-        }
-
-        // Bones
-        if (mesh->mNumBones > 0)
-        {
-            vertices.insert(MeshVertexBuffer::bone, glm::vec4(-1, -1, -1, -1));
-            vertices.insert(MeshVertexBuffer::weight, glm::vec4(0));
+            vertices.addTextCoord(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
         }
     }
 
@@ -197,27 +190,7 @@ Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
         {
             unsigned int vertexId = weights[weightIndex].mVertexId;
             float weight = weights[weightIndex].mWeight;
-
-            // Get current bone data
-            glm::vec4 bones;
-            glm::vec4 weights;
-            vertices.get(MeshVertexBuffer::bone, vertexId, bones);
-            vertices.get(MeshVertexBuffer::weight, vertexId, weights);
-
-            // Max 4 bones can impact a vertex
-            for (int i = 0; i < 4; ++i)
-            {
-                if (bones[i] < 0)
-                {
-                    weights[i] = weight;
-                    bones[i] = static_cast<float>(boneID);
-                    break;
-                }
-            }
-
-            // Update the vertex
-            vertices.set(MeshVertexBuffer::bone, vertexId, bones);
-            vertices.set(MeshVertexBuffer::weight, vertexId, weights);
+            vertices.addBoneIncidence(vertexId, boneID, weight);
         }
     }
 
@@ -270,14 +243,32 @@ Handle<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, cons
     {
         attributes.push_back(ShaderAttribute { "textCoords", vertexBuffer.getLocation(MeshVertexBuffer::textCoords), "vec2" });
     }
-    if (vertexBuffer.hasAttribute(MeshVertexBuffer::bone))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneId0))
     {
-        attributes.push_back(ShaderAttribute { "bone", vertexBuffer.getLocation(MeshVertexBuffer::bone), "vec4" });
+        attributes.push_back(ShaderAttribute { "bone0", vertexBuffer.getLocation(MeshVertexBuffer::boneId0), "vec4" });
         material->enableSkining();
     }
-    if (vertexBuffer.hasAttribute(MeshVertexBuffer::weight))
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneWeight0))
     {
-        attributes.push_back(ShaderAttribute { "weight", vertexBuffer.getLocation(MeshVertexBuffer::weight), "vec4" });
+        attributes.push_back(ShaderAttribute { "weight0", vertexBuffer.getLocation(MeshVertexBuffer::boneWeight0), "vec4" });
+    }
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneId1))
+    {
+        attributes.push_back(ShaderAttribute { "bone1", vertexBuffer.getLocation(MeshVertexBuffer::boneId1), "vec4" });
+        material->setBoneIncidenceCount(1);
+    }
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneWeight1))
+    {
+        attributes.push_back(ShaderAttribute { "weight1", vertexBuffer.getLocation(MeshVertexBuffer::boneWeight1), "vec4" });
+    }
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneId2))
+    {
+        attributes.push_back(ShaderAttribute { "bone2", vertexBuffer.getLocation(MeshVertexBuffer::boneId2), "vec4" });
+        material->setBoneIncidenceCount(2);
+    }
+    if (vertexBuffer.hasAttribute(MeshVertexBuffer::boneWeight2))
+    {
+        attributes.push_back(ShaderAttribute { "weight2", vertexBuffer.getLocation(MeshVertexBuffer::boneWeight2), "vec4" });
     }
     material->setAttributes(attributes);
 

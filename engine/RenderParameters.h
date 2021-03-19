@@ -32,7 +32,7 @@ namespace coral
         Handle<Camera> camera;
         LightArray lights;
 
-        // Time
+        // Time (in seconds)
         double time;
         double deltaTime;
 
