@@ -99,6 +99,7 @@ int main()
         }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     }
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     // glfw window creation
     // --------------------

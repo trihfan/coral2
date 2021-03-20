@@ -67,7 +67,7 @@ if(EMSCRIPTEN)
         add_dependencies(viewer_deploy_emscripten viewer)
 
         # Copy binaries
-        add_custom_command(TARGET viewer_deploy_emscripten PRE_BUILD COMMAND scp -r -i ~/.ssh/id_rsa "${bin_output_directory}/viewer*" "${VIEWER_DEPLOY_EMSCRIPTEN_DIRECTORY}")
+        add_custom_command(TARGET viewer_deploy_emscripten PRE_BUILD COMMAND scp -i ~/.ssh/id_rsa "${bin_output_directory}/viewer*" "${VIEWER_DEPLOY_EMSCRIPTEN_DIRECTORY}")
 
         # Copy loader
         add_custom_command(TARGET viewer_deploy_emscripten PRE_BUILD COMMAND scp -i ~/.ssh/id_rsa "${CMAKE_CURRENT_SOURCE_DIR}/index.html" "${VIEWER_DEPLOY_EMSCRIPTEN_DIRECTORY}")
