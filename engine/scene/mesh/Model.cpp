@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "Animator.h"
 #include "Bone.h"
-#include "ObjectFactory.h"
+#include "base/ObjectFactory.h"
 #include "materials/MeshMaterial.h"
 #include "utils/AssimpHelpers.h"
 #include <assimp/Importer.hpp>
@@ -91,6 +91,7 @@ void Model::loadAnimations(const aiScene* scene)
     for (unsigned int i = 0; i < scene->mNumAnimations; i++)
     {
         auto animation = scene->mAnimations[i];
+        Logs(info) << "Animation found: " << animation->mName.C_Str();
         for (unsigned int j = 0; j < animation->mNumChannels; j++)
         {
             auto channel = animation->mChannels[j];
@@ -359,5 +360,6 @@ Handle<Animation> Model::getAnimation(const std::string& animationName) const
     {
         return *it;
     }
+
     return nullptr;
 }

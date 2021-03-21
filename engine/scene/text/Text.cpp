@@ -1,5 +1,5 @@
 #include "Text.h"
-#include "ObjectFactory.h"
+#include "base/ObjectFactory.h"
 #include "resources/Resource.h"
 #include "utils/Freetype.h"
 
@@ -45,19 +45,19 @@ void Text::setText(const std::string& text)
             const float h = material->getGlyph().size.y * getScale().y;
             currentX += (material->getGlyph().advance >> 6) * getScale().x;
 
-            /*vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos + h, -0.1f));
-            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos, -0.1f));
-            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos, -0.1f));
-            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos, ypos + h, -0.1f));
-            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos, -0.1f));
-            vertices.insert(ShaderAttributeType::position, glm::vec3(xpos + w, ypos + h, -0.1f));
+            vertices.addPosition(glm::vec3(xpos, ypos + h, -0.1f));
+            vertices.addPosition(glm::vec3(xpos, ypos, -0.1f));
+            vertices.addPosition(glm::vec3(xpos + w, ypos, -0.1f));
+            vertices.addPosition(glm::vec3(xpos, ypos + h, -0.1f));
+            vertices.addPosition(glm::vec3(xpos + w, ypos, -0.1f));
+            vertices.addPosition(glm::vec3(xpos + w, ypos + h, -0.1f));
 
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 0));
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 1));
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 1));
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(0, 0));
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 1));
-            vertices.insert(ShaderAttributeType::textCoords, glm::vec2(1, 0));*/
+            vertices.addTextCoord(glm::vec2(0, 0));
+            vertices.addTextCoord(glm::vec2(0, 1));
+            vertices.addTextCoord(glm::vec2(1, 1));
+            vertices.addTextCoord(glm::vec2(0, 0));
+            vertices.addTextCoord(glm::vec2(1, 1));
+            vertices.addTextCoord(glm::vec2(1, 0));
         }
         else
         {
@@ -89,7 +89,7 @@ void Text::release()
     dictionary.clear();
 }
 
-Handle<GlyphMaterial> Text::getMaterialFor(char character)
+Handle<TextMaterial> Text::getMaterialFor(char character)
 {
     auto it = dictionary.find(character);
     if (it != dictionary.end())
@@ -97,12 +97,12 @@ Handle<GlyphMaterial> Text::getMaterialFor(char character)
         return it->second;
     }
 
-    GlyphMaterialParams params;
+    TextMaterialParams params;
     params.character = character;
     params.font = format.font;
     params.mode = format.mode;
     params.size = format.size;
-    auto material = ObjectFactory::create<GlyphMaterial>(getRenderQueueTags(), params);
+    auto material = ObjectFactory::create<TextMaterial>(getRenderQueueTags(), params);
     material->setColor(color);
 
     dictionary[character] = material;

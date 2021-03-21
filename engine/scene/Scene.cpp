@@ -1,6 +1,6 @@
 #include "Scene.h"
 #include "Node.h"
-#include "ObjectFactory.h"
+#include "base/ObjectFactory.h"
 
 using namespace coral;
 

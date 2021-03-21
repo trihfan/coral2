@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BackendResource.h"
-#include "Object.h"
+#include "base/Object.h"
 #include <memory>
 
 namespace coral

@@ -154,6 +154,7 @@ void ShaderComposer::parseParameters(const std::string& content)
     if (content.find("basic_lighting") != std::string::npos)
     {
         basicLighting = true;
+        addDefinition("LIGHT_MAX " + std::to_string(maxLightCount));
     }
 }
 
@@ -203,8 +204,6 @@ void ShaderComposer::parseFragmentShader(const std::string& content)
     {
         finalContent << "#define " << definition << std::endl;
     }
-
-    finalContent << "#define LIGHT_MAX " << maxLightCount << std::endl;
 
     // Uniforms
     if (basicLighting)

@@ -1,6 +1,6 @@
 #include "EngineConfig.h"
-#include "Object.h"
-#include "ObjectFactory.h"
+#include "base/Object.h"
+#include "base/ObjectFactory.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassDefault.h"
 #include "renderpasses/RenderPassManager.h"

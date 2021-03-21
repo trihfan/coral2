@@ -7,17 +7,39 @@ using namespace coral;
 
 Animator::Animator(const std::string& animationName, Handle<Model> model)
     : model(model)
+    , currentTime(0)
     , loop(false)
+    , paused(false)
 {
-    playAnimation(animationName);
+    setAnimation(animationName);
 }
 
-void Animator::playAnimation(const std::string& animationName)
+void Animator::play()
+{
+    paused = false;
+}
+
+void Animator::pause()
+{
+    paused = true;
+}
+
+void Animator::restart()
+{
+    currentTime = 0;
+}
+
+void Animator::setTime(double animationTime)
+{
+    currentTime = animationTime;
+}
+
+void Animator::setAnimation(const std::string& animationName)
 {
     this->animationName = animationName;
     animation = nullptr;
-    currentTime = 0;
     finalBoneMatrices.resize(100, glm::mat4(1));
+    restart();
 }
 
 void Animator::update(const NodeUpdateParameters& parameters)
@@ -40,8 +62,17 @@ void Animator::update(const NodeUpdateParameters& parameters)
             }
         }
 
-        // Converte current time to ms and mod to animation duration
-        currentTime = parameters.time * 1000;
+        // Advance animatino time
+        if (!paused)
+        {
+            currentTime += parameters.deltaTime * 1000;
+            if (currentTime >= animation->getDuration())
+            {
+                animationFinished();
+            }
+        }
+
+        // Clamp animation time
         if (loop)
         {
             currentTime = std::fmod(currentTime, animation->getDuration());

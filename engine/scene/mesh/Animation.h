@@ -1,6 +1,6 @@
 #pragma once
-#include "Handle.h"
-#include "Object.h"
+#include "base/Handle.h"
+#include "base/Object.h"
 #include <unordered_map>
 
 class aiAnimation;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "materials/GlyphMaterial.h"
+#include "materials/TextMaterial.h"
 #include "scene/Node.h"
 #include "scene/mesh/Mesh.h"
 #include <unordered_map>
@@ -32,8 +32,8 @@ namespace coral
         std::string text;
         glm::vec3 color;
         std::vector<Handle<Mesh>> glyphs;
-        std::unordered_map<char, Handle<GlyphMaterial>> dictionary;
+        std::unordered_map<char, Handle<TextMaterial>> dictionary;
 
-        Handle<GlyphMaterial> getMaterialFor(char character);
+        Handle<TextMaterial> getMaterialFor(char character);
     };
 }

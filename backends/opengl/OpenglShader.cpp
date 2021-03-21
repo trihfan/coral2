@@ -24,7 +24,6 @@ void OpenglShader::addShaderData(ShaderType type, const std::string& data)
 
     head << data;
     shader_data[static_cast<size_t>(type)] = head.str();
-    //Logs(info) << data;
 }
 
 void OpenglShader::init()
@@ -43,13 +42,19 @@ void OpenglShader::init()
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, nullptr);
     glCompileShader(vertex);
-    checkCompileErrors(vertex, "VERTEX");
+    if (!checkCompileErrors(vertex, "VERTEX"))
+    {
+        Logs(error) << vShaderCode;
+    }
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, nullptr);
     glCompileShader(fragment);
-    checkCompileErrors(fragment, "FRAGMENT");
+    if (!checkCompileErrors(fragment, "FRAGMENT"))
+    {
+        Logs(error) << fShaderCode;
+    }
 
     // if geometry shader is given, compile geometry shader
     unsigned int geometry = 0;
@@ -59,7 +64,10 @@ void OpenglShader::init()
         geometry = glCreateShader(GL_GEOMETRY_SHADER);
         glShaderSource(geometry, 1, &gShaderCode, nullptr);
         glCompileShader(geometry);
-        checkCompileErrors(geometry, "GEOMETRY");
+        if (!checkCompileErrors(geometry, "GEOMETRY"))
+        {
+            Logs(error) << gShaderCode;
+        }
 #endif
     }
 
@@ -146,7 +154,7 @@ void OpenglShader::setUniform(const std::string& name, const glm::mat4& mat) con
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
+bool OpenglShader::checkCompileErrors(GLuint shader, std::string type)
 {
     GLint success;
     GLchar infoLog[1024];
@@ -172,4 +180,6 @@ void OpenglShader::checkCompileErrors(GLuint shader, std::string type)
             Logs(error) << "-----------------------------------------------------";
         }
     }
+
+    return success;
 }

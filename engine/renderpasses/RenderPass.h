@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Object.h"
+#include "base/Object.h"
 #include "resources/Framebuffer.h"
 
 namespace coral

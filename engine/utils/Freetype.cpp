@@ -1,6 +1,6 @@
 #include "Freetype.h"
 #include "Logs.h"
-#include "ObjectFactory.h"
+#include "base/ObjectFactory.h"
 #include "resources/Resource.h"
 
 using namespace coral;

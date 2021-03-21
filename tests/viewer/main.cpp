@@ -1,7 +1,7 @@
 #include "Engine.h"
-#include "Object.h"
-#include "ObjectFactory.h"
 #include "OpenglBackend.h"
+#include "base/Object.h"
+#include "base/ObjectFactory.h"
 //#include "VulkanBackend.h"
 #ifndef __EMSCRIPTEN__
 #include "glad/glad.h"
@@ -25,6 +25,7 @@
 #endif
 
 using namespace coral;
+using namespace std::chrono;
 
 // variables
 const unsigned int SCR_WIDTH = 1920;
@@ -34,10 +35,21 @@ static double lastY = SCR_HEIGHT / 2.;
 static bool firstMouse = true;
 static bool mousePressed = false;
 static GLFWwindow* window;
-static Handle<OrbitCamera> camera;
-static Handle<Text> text;
 
+// Scene
+static Handle<OrbitCamera> camera;
+static std::vector<Handle<Model>> models;
+static Handle<Text> text;
 void setupScene();
+
+// Animation
+static std::vector<Handle<Animator>> animators;
+static steady_clock::time_point start;
+static double engineTime = 0;
+static double animationStart = 0;
+static size_t currentModel;
+void advanceAnimation();
+void restartAnimation();
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -54,16 +66,16 @@ enum BackendType
 
 void mainloop()
 {
+    // Get current time in seconds
+    engineTime = static_cast<double>(duration_cast<microseconds>(steady_clock::now() - start).count()) / 1e6;
+
     // input
-    // -----
     processInput(window);
 
     // render
-    // ------
     Engine::frame();
 
-    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-    // -------------------------------------------------------------------------------
+    // Finish
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
@@ -162,52 +174,57 @@ void setupScene()
     camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
-    // Model
-    auto model = ObjectFactory::create<Model>("assets/models/mutant.fbx");
-    model->setTranslation(glm::vec3(0, -1, 0));
-    model->setScale(glm::vec3(0.01, 0.01, 0.01));
-    scene->add(model);
+    // Models
+    models = {
+        ObjectFactory::create<Model>("assets/models/Thriller Part 1.fbx"),
+        ObjectFactory::create<Model>("assets/models/Thriller Part 2.fbx"),
+        ObjectFactory::create<Model>("assets/models/Thriller Part 3.fbx"),
+        ObjectFactory::create<Model>("assets/models/Thriller Part 4.fbx")
+    };
 
-    // Animator
-    auto animator = ObjectFactory::create<Animator>("mixamo.com", model);
-    animator->setLoopAnimation(true);
-    scene->add(animator);
+    for (auto model : models)
+    {
+        model->setScale(glm::vec3(0.01, 0.01, 0.01));
+
+        auto animator = ObjectFactory::create<Animator>("mixamo.com", model);
+        connect<&advanceAnimation>(animator->animationFinished);
+        animators.push_back(animator);
+
+        scene->add(model);
+        model->addChild(animator);
+        model->setEnabled(false);
+    }
+
+    models[0]->setTranslation(glm::vec3(0, -1, 0));
+    models[1]->setTranslation(glm::vec3(0, -1, 0));
+    models[2]->setTranslation(glm::vec3(0, -1, 0));
+    models[3]->setTranslation(glm::vec3(0, -1, 0));
+    currentModel = 0;
 
     // Lights
-    auto light1 = ObjectFactory::create<PointLight>();
-    light1->setTranslation(glm::vec3(1, 1, 0.3));
-    light1->color = glm::vec3(1, 1, 1);
-    light1->constant = 1;
-    light1->linear = 0.09f;
-    light1->quadratic = 0.032f;
-    scene->add(light1);
-
-    auto light2 = ObjectFactory::create<PointLight>();
-    light2->setTranslation(glm::vec3(-0.8, 1, 0.2));
-    light2->color = glm::vec3(1, 1, 1);
-    light2->constant = 1;
-    light2->linear = 0.09f;
-    light2->quadratic = 0.032f;
-    scene->add(light2);
-
-    auto light3 = ObjectFactory::create<PointLight>();
-    light3->setTranslation(glm::vec3(-0.3, 1, -0.5));
-    light3->color = glm::vec3(1, 1, 1);
-    light3->constant = 1;
-    light3->linear = 0.09f;
-    light3->quadratic = 0.032f;
-    scene->add(light3);
+    auto createLight = [scene](const glm::vec3& position) {
+        auto light = ObjectFactory::create<PointLight>();
+        light->setTranslation(position);
+        light->color = glm::vec3(1, 1, 1);
+        light->constant = 1;
+        light->linear = 0.09f;
+        light->quadratic = 0.032f;
+        scene->add(light);
+    };
+    createLight(glm::vec3(5, 1, 5));
+    createLight(glm::vec3(5, 1, -5));
+    createLight(glm::vec3(-5, 1, -5));
+    createLight(glm::vec3(-5, 1, 5));
 
     // Text
     TextFormat format;
     format.font = "assets/fonts/Ubuntu-C.ttf";
-    format.size = 56;
+    format.size = 28;
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
-    text->setScale(glm::vec3(0.5, 0.5, 0.5));
     text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, -1));
     text->setText("coral 0.1");
-    //scene->add(text);
+    scene->add(text);
 }
 
 void processInput(GLFWwindow* window)
@@ -265,4 +282,27 @@ void mouse_callback(GLFWwindow*, double xpos, double ypos)
 void scroll_callback(GLFWwindow*, double, double yoffset)
 {
     camera->zoom(static_cast<float>(yoffset) * 0.3f);
+}
+
+void advanceAnimation()
+{
+    if (currentModel == models.size() - 1)
+    {
+        restartAnimation();
+        return;
+    }
+
+    models[currentModel]->setEnabled(false);
+    currentModel++;
+    models[currentModel]->setEnabled(true);
+    animators[currentModel]->restart();
+}
+
+void restartAnimation()
+{
+    models[currentModel]->setEnabled(false);
+    currentModel = 0;
+    models[currentModel]->setEnabled(true);
+    animators[currentModel]->restart();
+    animationStart = engineTime;
 }

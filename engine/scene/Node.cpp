@@ -56,6 +56,11 @@ const std::vector<std::string>& Node::getRenderQueueTags() const
 void Node::setEnabled(bool enabled)
 {
     this->enabled = enabled;
+
+    for (auto child : children)
+    {
+        child->setEnabled(enabled);
+    }
 }
 
 void Node::setParent(Handle<Node> parent)
@@ -177,6 +182,9 @@ void Node::update(const NodeUpdateParameters& parameters)
 
     for (size_t i = 0; i < children.size(); i++)
     {
-        children[i]->update(parameters);
+        if (children[i]->isEnabled())
+        {
+            children[i]->update(parameters);
+        }
     }
 }
