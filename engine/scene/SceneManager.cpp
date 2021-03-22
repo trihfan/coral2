@@ -19,16 +19,15 @@ void SceneManager::release()
 
 void SceneManager::update(const RenderParameters& parameters)
 {
-    // check scene
+    // Check scene
     if (!instance->currentScene)
     {
         return;
     }
 
-    // list cameras
+    // List cameras
     instance->cameras.clear();
     instance->lights.clear();
-
     traverse(
         instance->currentScene->getTopNode(), +[](Handle<Node> node) {
             if (node->isA<Camera>())
@@ -38,7 +37,10 @@ void SceneManager::update(const RenderParameters& parameters)
             return true;
         });
 
-    // update
+    // Update matrices
+    instance->currentScene->getTopNode()->updateMatrix(glm::mat4(1), glm::vec3(0));
+
+    // Update nodes
     NodeUpdateParameters updateParams;
     updateParams.time = parameters.time;
     updateParams.deltaTime = parameters.deltaTime;

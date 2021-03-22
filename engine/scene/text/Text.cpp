@@ -39,11 +39,11 @@ void Text::setText(const std::string& text)
         MeshVertexBuffer vertices;
         if (format.mode == TextMode::text2d)
         {
-            const float xpos = currentX + getTranslation().x + +material->getGlyph().bearing.x * getScale().x;
-            const float ypos = getTranslation().y - (material->getGlyph().size.y - material->getGlyph().bearing.y) * getScale().y;
-            const float w = material->getGlyph().size.x * getScale().x;
-            const float h = material->getGlyph().size.y * getScale().y;
-            currentX += (material->getGlyph().advance >> 6) * getScale().x;
+            const float xpos = currentX + translation.get().x + +material->getGlyph().bearing.x * scale.get().x;
+            const float ypos = translation.get().y - (material->getGlyph().size.y - material->getGlyph().bearing.y) * scale.get().y;
+            const float w = material->getGlyph().size.x * scale.get().x;
+            const float h = material->getGlyph().size.y * scale.get().y;
+            currentX += (material->getGlyph().advance >> 6) * scale.get().x;
 
             vertices.addPosition(glm::vec3(xpos, ypos + h, -0.1f));
             vertices.addPosition(glm::vec3(xpos, ypos, -0.1f));

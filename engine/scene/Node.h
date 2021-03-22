@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Property.h"
 #include "base/Object.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -21,7 +22,7 @@ namespace coral
     {
     public:
         // construction
-        Node(Handle<Node> parent = nullptr);
+        Node();
         virtual ~Node() override = default;
 
         // meta
@@ -37,10 +38,6 @@ namespace coral
         bool isEnabled() const;
         void setEnabled(bool enabled);
 
-        // Parent
-        void setParent(Handle<Node> parent);
-        Handle<Node> getParent() const;
-
         // Children
         void addChild(Handle<Node> child);
         void removeChild(Handle<Node> child);
@@ -50,25 +47,21 @@ namespace coral
         template <typename Type>
         std::vector<Handle<Type>> getChildren() const;
 
-        // Translation
-        void setTranslation(const glm::vec3& translation);
-        const glm::vec3& getTranslation() const;
-
         // Rotation
-        void setRotation(const glm::quat& rotation);
-        void setRotation(const glm::vec3& eulerAngles);
-        const glm::quat& getRotation() const;
-
-        // Scale
-        void setScale(const glm::vec3& scale);
-        const glm::vec3& getScale() const;
+        void setRotationFromEulerAngles(const glm::vec3& eulerAngles);
 
         // World transform values
         const glm::vec3& getPosition() const;
         const glm::mat4& getMatrix() const;
 
         //
+        void updateMatrix(const glm::mat4& parentMatrix, const glm::vec3& parentPosition);
         virtual void update(const NodeUpdateParameters& parameters);
+
+        // Properties
+        Property<glm::vec3> translation;
+        Property<glm::quat> rotation;
+        Property<glm::vec3> scale;
 
         // Signals
         Signal<const glm::mat4&> matrixChanged;
@@ -79,13 +72,7 @@ namespace coral
         std::vector<std::string> renderQueueTags;
 
         // Hierarchy
-        Handle<Node> parent;
         std::vector<Handle<Node>> children;
-
-        // Transform
-        glm::vec3 translation;
-        glm::quat rotation;
-        glm::vec3 scale;
 
         // Computed transform
         glm::vec3 worldPosition;

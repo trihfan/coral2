@@ -28,20 +28,31 @@ namespace coral
         double timeStamp;
     };
 
+    /**
+     * @brief The Bone class contains animation of a bone from assim node animation
+     */
     class Bone : public Object
     {
     public:
         /**
          * @brief Constructor, read keyframe from assimp node anim
          */
-        Bone(const std::string& name, int id, const aiNodeAnim* channel);
+        Bone(int id, const aiNodeAnim* channel);
 
-        // Interpolates b/w positions,rotations & scaling keys based on the curren time of the animation and prepares the local transformation matrix by combining all keys tranformations
-        // animationTime is in seconds
+        /**
+         * @brief Update the bones with the given animation time in s
+         * Interpolates b/w positions,rotations & scaling keys based on the curren time of the animation and prepares the local transformation matrix by combining all keys tranformations
+         */
         void update(double animationTime);
 
+        /**
+         * @brief Return the bone local transformation
+         */
         glm::mat4 getLocalTransform();
-        std::string getBoneName() const;
+
+        /**
+         * @brief Return the bone id
+         */
         int getBoneID();
 
         // Gets the current index on mKeyPositions to interpolate to based on the current animation time
@@ -73,9 +84,7 @@ namespace coral
         size_t numPositions;
         size_t numRotations;
         size_t numScalings;
-
         glm::mat4 localTransform;
-        std::string name;
         int id;
     };
 }

@@ -34,8 +34,8 @@ namespace coral
      * @return The connection object, can be used to disconnect from the signal
      * usage: connect(signal, lambda);
      */
-    template <typename... Args>
-    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, std::function<void(Args...)>&& lambda);
+    template <typename Function, typename... Args>
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda);
 
     /**
      * @brief Disconnect the given connection
@@ -164,8 +164,8 @@ namespace coral
         return signal.template connect<Function>();
     }
 
-    template <typename... Args>
-    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, std::function<void(Args...)>&& lambda)
+    template <typename Function, typename... Args>
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda)
     {
         return signal.connect(std::forward<std::function<void(Args && ...)>>(lambda));
     }

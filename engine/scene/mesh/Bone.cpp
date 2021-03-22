@@ -4,9 +4,8 @@
 
 using namespace coral;
 
-Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
-    : localTransform(1.f)
-    , name(name)
+Bone::Bone(int id, const aiNodeAnim* channel)
+    : localTransform(1)
     , id(id)
 
 {
@@ -46,6 +45,7 @@ Bone::Bone(const std::string& name, int id, const aiNodeAnim* channel)
 
 void Bone::update(double animationTime)
 {
+    animationTime *= 1000; // need animation time in ms
     glm::mat4 translation = interpolatePosition(animationTime);
     glm::mat4 rotation = interpolateRotation(animationTime);
     glm::mat4 scale = interpolateScaling(animationTime);
@@ -57,11 +57,6 @@ glm::mat4 Bone::getLocalTransform()
     return localTransform;
 }
 
-std::string Bone::getBoneName() const
-{
-    return name;
-}
-
 int Bone::getBoneID()
 {
     return id;
@@ -71,7 +66,7 @@ size_t Bone::getPositionIndex(double animationTime)
 {
     for (size_t index = 0; index < numPositions - 1; index++)
     {
-        if (animationTime < positions[index + 1].timeStamp)
+        if (animationTime <= positions[index + 1].timeStamp)
         {
             return index;
         }
@@ -83,7 +78,7 @@ size_t Bone::getRotationIndex(double animationTime)
 {
     for (size_t index = 0; index < numRotations - 1; index++)
     {
-        if (animationTime < rotations[index + 1].timeStamp)
+        if (animationTime <= rotations[index + 1].timeStamp)
         {
             return static_cast<size_t>(index);
         }
@@ -95,7 +90,7 @@ size_t Bone::getScaleIndex(double animationTime)
 {
     for (size_t index = 0; index < numScalings - 1; index++)
     {
-        if (animationTime < scales[index + 1].timeStamp)
+        if (animationTime <= scales[index + 1].timeStamp)
         {
             return static_cast<size_t>(index);
         }
@@ -116,14 +111,14 @@ glm::mat4 Bone::interpolatePosition(double animationTime)
 {
     if (numPositions == 1)
     {
-        return glm::translate(glm::mat4(1.f), positions[0].position);
+        return glm::translate(glm::mat4(1), positions[0].position);
     }
 
     size_t p0Index = getPositionIndex(animationTime);
     size_t p1Index = p0Index + 1;
-    float scaleFactor = getScaleFactor(positions[p0Index].timeStamp, positions[p1Index].timeStamp, animationTime);
+    double scaleFactor = getScaleFactor(positions[p0Index].timeStamp, positions[p1Index].timeStamp, animationTime);
     glm::vec3 finalPosition = glm::mix(positions[p0Index].position, positions[p1Index].position, scaleFactor);
-    return glm::translate(glm::mat4(1.f), finalPosition);
+    return glm::translate(glm::mat4(1), finalPosition);
 }
 
 glm::mat4 Bone::interpolateRotation(double animationTime)
@@ -136,8 +131,8 @@ glm::mat4 Bone::interpolateRotation(double animationTime)
 
     size_t p0Index = getRotationIndex(animationTime);
     size_t p1Index = p0Index + 1;
-    float scaleFactor = getScaleFactor(rotations[p0Index].timeStamp, rotations[p1Index].timeStamp, animationTime);
-    glm::quat finalRotation = glm::slerp(rotations[p0Index].orientation, rotations[p1Index].orientation, scaleFactor);
+    double scaleFactor = getScaleFactor(rotations[p0Index].timeStamp, rotations[p1Index].timeStamp, animationTime);
+    glm::quat finalRotation = glm::slerp(rotations[p0Index].orientation, rotations[p1Index].orientation, static_cast<float>(scaleFactor));
     finalRotation = glm::normalize(finalRotation);
     return glm::toMat4(finalRotation);
 }
@@ -146,12 +141,12 @@ glm::mat4 Bone::interpolateScaling(double animationTime)
 {
     if (numScalings == 1)
     {
-        return glm::scale(glm::mat4(1.f), scales[0].scale);
+        return glm::scale(glm::mat4(1), scales[0].scale);
     }
 
     size_t p0Index = getScaleIndex(animationTime);
     size_t p1Index = p0Index + 1;
-    float scaleFactor = getScaleFactor(scales[p0Index].timeStamp, scales[p1Index].timeStamp, animationTime);
+    double scaleFactor = getScaleFactor(scales[p0Index].timeStamp, scales[p1Index].timeStamp, animationTime);
     glm::vec3 finalScale = glm::mix(scales[p0Index].scale, scales[p1Index].scale, scaleFactor);
-    return glm::scale(glm::mat4(1.f), finalScale);
+    return glm::scale(glm::mat4(1), finalScale);
 }

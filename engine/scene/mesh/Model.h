@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Animation.h"
 #include "Mesh.h"
 #include "materials/MeshMaterial.h"
 #include "resources/Resource.h"
 #include "scene/Node.h"
+#include "scene/mesh/ModelAnimation.h"
 #include <assimp/material.h>
 #include <unordered_map>
 
@@ -26,12 +26,13 @@ namespace coral
         virtual void init() override;
 
         // Animations
-        Handle<Animation> getAnimation(const std::string& animationName) const;
+        std::vector<std::string> getAnimationNames() const;
+        Handle<ModelAnimation> getAnimation(const std::string& animationName) const;
 
     private:
         std::string path;
         std::string directory;
-        std::vector<Handle<Animation>> animations;
+        std::vector<Handle<ModelAnimation>> animations;
         std::unordered_map<std::string, Handle<MeshMaterial>> materialByName;
         std::unordered_map<std::string, std::vector<Handle<Mesh>>> meshByName;
         std::unordered_map<std::string, BoneInfo> boneInfoMap;

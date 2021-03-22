@@ -8,9 +8,9 @@
 #endif
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
+#include "scene/animation/Animator.h"
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
-#include "scene/mesh/Animator.h"
 #include "scene/mesh/Model.h"
 #include "scene/text/Text.h"
 #include <numeric>
@@ -25,7 +25,6 @@
 #endif
 
 using namespace coral;
-using namespace std::chrono;
 
 // variables
 const unsigned int SCR_WIDTH = 1920;
@@ -39,17 +38,11 @@ static GLFWwindow* window;
 // Scene
 static Handle<OrbitCamera> camera;
 static std::vector<Handle<Model>> models;
-static Handle<Text> text;
+//static Handle<Text> text;
 void setupScene();
 
 // Animation
 static std::vector<Handle<Animator>> animators;
-static steady_clock::time_point start;
-static double engineTime = 0;
-static double animationStart = 0;
-static size_t currentModel;
-void advanceAnimation();
-void restartAnimation();
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -66,14 +59,17 @@ enum BackendType
 
 void mainloop()
 {
-    // Get current time in seconds
-    engineTime = static_cast<double>(duration_cast<microseconds>(steady_clock::now() - start).count()) / 1e6;
-
     // input
     processInput(window);
 
     // render
-    Engine::frame();
+    try
+    {
+        Engine::frame();
+    }
+    catch (...)
+    {
+    }
 
     // Finish
     glfwSwapBuffers(window);
@@ -170,41 +166,31 @@ void setupScene()
     camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
     camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    camera->setTranslation(glm::vec3(0, 0, 3));
+    camera->translation.set(glm::vec3(0, 0, 8));
     camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
     // Models
     models = {
-        ObjectFactory::create<Model>("assets/models/Thriller Part 1.fbx"),
-        ObjectFactory::create<Model>("assets/models/Thriller Part 2.fbx"),
-        ObjectFactory::create<Model>("assets/models/Thriller Part 3.fbx"),
-        ObjectFactory::create<Model>("assets/models/Thriller Part 4.fbx")
+        ObjectFactory::create<Model>("assets/models/Zombie/Zombie.fbx")
     };
 
-    for (auto model : models)
+    for (size_t i = 0; i < models.size(); i++)
     {
-        model->setScale(glm::vec3(0.01, 0.01, 0.01));
+        // Setup model
+        scene->add(models[i]);
+        models[i]->scale.set(glm::vec3(0.01, 0.01, 0.01));
 
-        auto animator = ObjectFactory::create<Animator>("mixamo.com", model);
-        connect<&advanceAnimation>(animator->animationFinished);
-        animators.push_back(animator);
-
-        scene->add(model);
-        model->addChild(animator);
-        model->setEnabled(false);
+        // Setup animator
+        animators.push_back(ObjectFactory::create<Animator>());
+        animators[i]->setAnimation(models[i]->getAnimation("Armature|ThrillerPart3"));
+        models[i]->addChild(animators[i]);
     }
-
-    models[0]->setTranslation(glm::vec3(0, -1, 0));
-    models[1]->setTranslation(glm::vec3(0, -1, 0));
-    models[2]->setTranslation(glm::vec3(0, -1, 0));
-    models[3]->setTranslation(glm::vec3(0, -1, 0));
-    currentModel = 0;
 
     // Lights
     auto createLight = [scene](const glm::vec3& position) {
         auto light = ObjectFactory::create<PointLight>();
-        light->setTranslation(position);
+        light->translation.set(position);
         light->color = glm::vec3(1, 1, 1);
         light->constant = 1;
         light->linear = 0.09f;
@@ -217,14 +203,14 @@ void setupScene()
     createLight(glm::vec3(-5, 1, 5));
 
     // Text
-    TextFormat format;
+    /*TextFormat format;
     format.font = "assets/fonts/Ubuntu-C.ttf";
     format.size = 28;
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
     text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, -1));
     text->setText("coral 0.1");
-    scene->add(text);
+    scene->add(text);*/
 }
 
 void processInput(GLFWwindow* window)
@@ -243,7 +229,7 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width, height);
 
-    text->setTranslation(glm::vec3(10, height - 30, 0));
+    //text->setTranslation(glm::vec3(10, height - 30, 0));
 }
 
 void mouse_button(GLFWwindow*, int button, int action, int)
@@ -282,27 +268,4 @@ void mouse_callback(GLFWwindow*, double xpos, double ypos)
 void scroll_callback(GLFWwindow*, double, double yoffset)
 {
     camera->zoom(static_cast<float>(yoffset) * 0.3f);
-}
-
-void advanceAnimation()
-{
-    if (currentModel == models.size() - 1)
-    {
-        restartAnimation();
-        return;
-    }
-
-    models[currentModel]->setEnabled(false);
-    currentModel++;
-    models[currentModel]->setEnabled(true);
-    animators[currentModel]->restart();
-}
-
-void restartAnimation()
-{
-    models[currentModel]->setEnabled(false);
-    currentModel = 0;
-    models[currentModel]->setEnabled(true);
-    animators[currentModel]->restart();
-    animationStart = engineTime;
 }

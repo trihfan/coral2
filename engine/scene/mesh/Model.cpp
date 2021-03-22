@@ -1,6 +1,6 @@
 #include "Model.h"
-#include "Animator.h"
 #include "Bone.h"
+#include "ModelAnimation.h"
 #include "base/ObjectFactory.h"
 #include "materials/MeshMaterial.h"
 #include "utils/AssimpHelpers.h"
@@ -37,11 +37,6 @@ Model::Model(const std::string& path)
     : path(path)
 {
     addRenderQueueTag(defaultRenderPassName);
-}
-
-void Model::init()
-{
-    Node::init();
 
     // Read the file
     Assimp::Importer importer;
@@ -65,6 +60,16 @@ void Model::init()
 
     // Clear data holder
     materialByName.clear();
+}
+
+void Model::init()
+{
+    Node::init();
+
+    for (auto animation : animations)
+    {
+        animation->setModel(toHandle<Model>());
+    }
 }
 
 void Model::loadNode(aiNode* node, const aiScene* scene)
@@ -104,18 +109,18 @@ void Model::loadAnimations(const aiScene* scene)
     }
 
     // Read animation nodes
-    std::function<void(Handle<AnimationNode>, const aiNode*)> readAnimationNode = [&](Handle<AnimationNode> node, const aiNode* src) {
+    std::function<void(Handle<ModelAnimationNode>, const aiNode*)> readAnimationNode = [&](Handle<ModelAnimationNode> node, const aiNode* src) {
         node->name = src->mName.data;
         node->transformation = AssimpHelpers::convertMatrixToGLMFormat(src->mTransformation);
 
         for (unsigned int i = 0; i < src->mNumChildren; i++)
         {
-            auto child = ObjectFactory::create<AnimationNode>();
+            auto child = ObjectFactory::create<ModelAnimationNode>();
             readAnimationNode(child, src->mChildren[i]);
             node->children.push_back(child);
         }
     };
-    auto animationRootNode = ObjectFactory::create<AnimationNode>();
+    auto animationRootNode = ObjectFactory::create<ModelAnimationNode>();
     readAnimationNode(animationRootNode, scene->mRootNode);
 
     // Create animations
@@ -123,11 +128,10 @@ void Model::loadAnimations(const aiScene* scene)
     {
         auto animation = scene->mAnimations[i];
 
-        AnimationParams params;
-        params.name = animation->mName.C_Str();
+        ModelAnimationParams params;
         params.rootNode = animationRootNode;
         params.boneInfoMap = boneInfoMap;
-        params.duration = animation->mDuration;
+        params.duration = animation->mDuration / 1000.;
         params.ticksPerSecond = animation->mTicksPerSecond;
 
         // Fill bones list
@@ -135,10 +139,10 @@ void Model::loadAnimations(const aiScene* scene)
         for (unsigned int j = 0; j < animation->mNumChannels; j++)
         {
             auto channel = animation->mChannels[j];
-            params.bones[j] = ObjectFactory::create<Bone>(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel);
+            params.bones[j] = ObjectFactory::createWithName<Bone>(channel->mNodeName.data, boneInfoMap[channel->mNodeName.data].id, channel);
         }
 
-        animations.push_back(ObjectFactory::create<Animation>(params));
+        animations.push_back(ObjectFactory::createWithName<ModelAnimation>(animation->mName.C_Str(), params));
     }
 }
 
@@ -350,7 +354,17 @@ Handle<Resource> Model::loadTexture(const aiScene* scene, const std::string& fil
     return ObjectFactory::createWithName<Resource>(file, reinterpret_cast<const unsigned char*>(texture->pcData), texture->mWidth);
 }
 
-Handle<Animation> Model::getAnimation(const std::string& animationName) const
+std::vector<std::string> Model::getAnimationNames() const
+{
+    std::vector<std::string> names(animations.size());
+    for (size_t i = 0; i < names.size(); i++)
+    {
+        names[i] = animations[i]->getName();
+    }
+    return names;
+}
+
+Handle<ModelAnimation> Model::getAnimation(const std::string& animationName) const
 {
     auto it = std::find_if(animations.begin(), animations.end(), [&animationName](const Handle<Animation>& animation) {
         return animation->getName() == animationName;
@@ -360,6 +374,5 @@ Handle<Animation> Model::getAnimation(const std::string& animationName) const
     {
         return *it;
     }
-
     return nullptr;
 }

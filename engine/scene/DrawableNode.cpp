@@ -4,11 +4,6 @@
 
 using namespace coral;
 
-DrawableNode::DrawableNode(Handle<Node> parent)
-    : Node(parent)
-{
-}
-
 void DrawableNode::setMaterial(Handle<Material> material)
 {
     this->material = material;

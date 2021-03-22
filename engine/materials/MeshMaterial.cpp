@@ -2,8 +2,8 @@
 #include "resources/Pipeline.h"
 #include "resources/PipelineManager.h"
 #include "resources/ShaderComposer.h"
-#include "scene/mesh/Animator.h"
 #include "scene/mesh/Mesh.h"
+#include "scene/mesh/ModelAnimation.h"
 
 using namespace coral;
 
@@ -12,7 +12,7 @@ MeshMaterial::MeshMaterial(const std::vector<std::string>& renderQueueTags)
     , renderType(MeshMaterialRenderType::basic_lighting)
     , skining(false)
     , texturing(false)
-    , boneIncidenceCount(1)
+    , boneIncidenceCount(0)
 {
     enableLighting();
 }
@@ -53,22 +53,22 @@ void MeshMaterial::use(const RenderParameters& parameters)
 
     if (skining)
     {
-        if (animator && animator->getFinalBoneMatrices().size() > maxBones)
+        if (animation && animation->getFinalBoneMatrices().size() > maxBones)
         {
-            Logs(warning) << "Bone count (" << animator->getFinalBoneMatrices().size() << ") exceed the limit of " << maxBones;
+            Logs(warning) << "Bone count (" << animation->getFinalBoneMatrices().size() << ") exceed the limit of " << maxBones;
         }
 
-        size_t max = animator ? std::min(animator->getFinalBoneMatrices().size(), static_cast<size_t>(maxBones)) : maxBones;
+        size_t max = animation ? std::min(animation->getFinalBoneMatrices().size(), static_cast<size_t>(maxBones)) : maxBones;
         for (size_t i = 0; i < max; i++)
         {
-            getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", animator ? animator->getFinalBoneMatrices()[i] : glm::mat4(1));
+            getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", animation ? animation->getFinalBoneMatrices()[i] : glm::mat4(1));
         }
     }
 }
 
-void MeshMaterial::setAnimator(Handle<Animator> animator)
+void MeshMaterial::setAnimation(Handle<ModelAnimation> animation)
 {
-    this->animator = animator;
+    this->animation = animation;
 }
 
 Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
