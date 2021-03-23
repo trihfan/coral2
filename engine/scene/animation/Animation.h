@@ -1,30 +1,23 @@
 #pragma once
+#include "Channel.h"
 #include "base/Object.h"
+#include <vector>
 
 namespace coral
 {
     /**
-     * @brief Animation interface, an animation contains a number of keyframes for any number of properties
+     * @brief The Animation class
      */
     class Animation : public Object
     {
     public:
-        // Construction
-        Animation() = default;
-        virtual ~Animation() override = default;
-
-        //std::vector<Property>& getProperties();
-        //std::vector<KeyFrame>& getKeyframes();
-        //-----
-
-        // Return the animation duration
-        virtual double getDuration() const = 0;
-
-        // Update the animation
-        virtual void update(double time) = 0;
+        Animation(double duration);
+        void addChannel(Handle<ChannelInterface> channel);
+        double getDuration() const;
+        void update(double time);
 
     private:
-        //std::vector<Property> properties;
-        //std::vector<KeyFrame> keyframes;
+        double duration;
+        std::vector<Handle<ChannelInterface>> channels;
     };
 }

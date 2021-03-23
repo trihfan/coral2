@@ -3,7 +3,6 @@
 #include "resources/PipelineManager.h"
 #include "resources/ShaderComposer.h"
 #include "scene/mesh/Mesh.h"
-#include "scene/mesh/ModelAnimation.h"
 
 using namespace coral;
 
@@ -53,22 +52,26 @@ void MeshMaterial::use(const RenderParameters& parameters)
 
     if (skining)
     {
-        if (animation && animation->getFinalBoneMatrices().size() > maxBones)
+        for (size_t i = 0; i < maxBones; i++)
         {
-            Logs(warning) << "Bone count (" << animation->getFinalBoneMatrices().size() << ") exceed the limit of " << maxBones;
-        }
-
-        size_t max = animation ? std::min(animation->getFinalBoneMatrices().size(), static_cast<size_t>(maxBones)) : maxBones;
-        for (size_t i = 0; i < max; i++)
-        {
-            getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", animation ? animation->getFinalBoneMatrices()[i] : glm::mat4(1));
+            if (bones[i])
+            {
+                getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", bones[i]->getMatrix() * bones[i]->getOffset());
+            }
         }
     }
 }
 
-void MeshMaterial::setAnimation(Handle<ModelAnimation> animation)
+void MeshMaterial::setBone(int id, Handle<Bone> bone)
 {
-    this->animation = animation;
+    if (id > maxBones)
+    {
+        Logs(warning) << "Bone id " << id << " exceed the limit of " << maxBones;
+    }
+    else
+    {
+        bones[static_cast<size_t>(id)] = bone;
+    }
 }
 
 Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)

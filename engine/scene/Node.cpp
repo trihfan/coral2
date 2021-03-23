@@ -9,12 +9,13 @@ Node::Node()
     , scale(glm::vec3(1, 1, 1))
     , enabled(true)
     , matrix(1)
+    , fixedMatrix(false)
     , dirty(true)
 {
     setRotationFromEulerAngles(glm::vec3(0, 0, 0));
-    connect(translation.modified, [this]() { dirty = true; });
-    connect(rotation.modified, [this]() { dirty = true; });
-    connect(scale.modified, [this]() { dirty = true; });
+    connect(translation.modified, [this]() { dirty = true; useFixedMatrix = false; });
+    connect(rotation.modified, [this]() { dirty = true; useFixedMatrix = false; });
+    connect(scale.modified, [this]() { dirty = true; useFixedMatrix = false; });
 }
 
 bool Node::isDrawable() const
@@ -102,6 +103,13 @@ void Node::setRotationFromEulerAngles(const glm::vec3& eulerAngles)
     rotation.set(finalOrientation);
 }
 
+void Node::setMatrix(const glm::mat4& matrix)
+{
+    fixedMatrix = matrix;
+    dirty = true;
+    useFixedMatrix = true;
+}
+
 const glm::vec3& Node::getPosition() const
 {
     return worldPosition;
@@ -116,12 +124,18 @@ void Node::updateMatrix(const glm::mat4& parentMatrix, const glm::vec3& parentPo
 {
     if (dirty)
     {
-        matrix = glm::translate(glm::mat4(1), translation.get());
-        matrix *= glm::toMat4(rotation.get());
-        matrix *= glm::scale(glm::mat4(1), scale.get());
-        matrix = matrix * parentMatrix;
-        worldPosition = translation.get() + parentPosition;
         dirty = false;
+        if (useFixedMatrix)
+        {
+            matrix = parentMatrix * fixedMatrix;
+            worldPosition = glm::vec3(matrix * glm::vec4(0, 0, 0, 1)) + parentPosition;
+        }
+        else
+        {
+            matrix = parentMatrix * glm::translate(glm::mat4(1), translation.get()) * glm::toMat4(rotation.get()) * glm::scale(glm::mat4(1), scale.get());
+            worldPosition = translation.get() + parentPosition;
+        }
+
         matrixChanged(matrix);
     }
 

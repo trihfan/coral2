@@ -50,24 +50,19 @@ void Animator::setLoopAnimation(bool loop)
 void Animator::update(const NodeUpdateParameters& parameters)
 {
     Node::update(parameters);
-    if (!animation)
-    {
-        return;
-    }
 
     // Advance animation time
     if (!paused)
     {
         currentTime += parameters.deltaTime * speed;
-        if (currentTime >= animation->getDuration())
-        {
-            animationFinished();
-        }
     }
 
-    // Clamp animation time
-    currentTime = loop ? std::fmod(currentTime, animation->getDuration()) : std::clamp(currentTime, 0., animation->getDuration());
+    if (animation)
+    {
+        // Clamp animation time
+        currentTime = loop ? std::fmod(currentTime, animation->getDuration()) : std::clamp(currentTime, 0., animation->getDuration());
 
-    // Update the animation
-    animation->update(currentTime);
+        // Update each properties
+        animation->update(currentTime);
+    }
 }

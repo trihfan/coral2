@@ -47,6 +47,10 @@ namespace coral
         template <typename Type>
         std::vector<Handle<Type>> getChildren() const;
 
+        // Directly set the matrix
+        // Modifying the translation / rotation or scale will override this call
+        void setMatrix(const glm::mat4& matrix);
+
         // Rotation
         void setRotationFromEulerAngles(const glm::vec3& eulerAngles);
 
@@ -77,6 +81,8 @@ namespace coral
         // Computed transform
         glm::vec3 worldPosition;
         glm::mat4 matrix;
+        glm::mat4 fixedMatrix;
+        bool useFixedMatrix;
         bool dirty;
     };
 

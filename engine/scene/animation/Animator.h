@@ -1,12 +1,10 @@
 #pragma once
 
-#include "base/Signal.h"
+#include "Animation.h"
 #include "scene/Node.h"
 
 namespace coral
 {
-    class Animation;
-
     /**
      * @brief The Animator class handle an animation
      */
@@ -16,7 +14,7 @@ namespace coral
         // Construction
         Animator();
 
-        // Set the animation
+        // Add an animation to the list
         void setAnimation(Handle<Animation> animation);
 
         // Animation playing
@@ -32,11 +30,8 @@ namespace coral
         // Update the animation, called each frame
         virtual void update(const NodeUpdateParameters& parameters) override;
 
-        // Signal emitted when the animation finish
-        Signal<> animationFinished;
-
     private:
-        // The animation
+        // The animations
         Handle<Animation> animation;
 
         // Parameters

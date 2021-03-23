@@ -164,9 +164,9 @@ void setupScene()
     // camera
     camera = ObjectFactory::createWithName<OrbitCamera>("camera");
     camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
-    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
+    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 10000));
     camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    camera->translation.set(glm::vec3(0, 0, 8));
+    camera->translation.set(glm::vec3(0, 1, 8));
     camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
@@ -183,7 +183,7 @@ void setupScene()
 
         // Setup animator
         animators.push_back(ObjectFactory::create<Animator>());
-        animators[i]->setAnimation(models[i]->getAnimation("Armature|ThrillerPart3"));
+        animators[i]->setAnimation(models[i]->getAnimation("Armature|ThrillerPart2"));
         models[i]->addChild(animators[i]);
     }
 

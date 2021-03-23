@@ -2,13 +2,13 @@
 
 #include "Material.h"
 #include "resources/Resource.h"
-#include "resources/ShaderComposer.h"
+#include "scene/mesh/Bone.h"
 #include <vector>
 
 namespace coral
 {
-    class ModelAnimation;
     struct MeshVertexBuffer;
+    struct ShaderAttribute;
 
     enum MeshMaterialRenderType
     {
@@ -52,8 +52,8 @@ namespace coral
         void setShininess(float shininess);
         void addTexture(MeshTextureType type, Handle<Resource> resource);
 
-        // Set the current animation
-        void setAnimation(Handle<ModelAnimation> animation);
+        // Set a bone
+        void setBone(int id, Handle<Bone> bone);
 
     protected:
         virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
@@ -66,13 +66,15 @@ namespace coral
         int boneIncidenceCount;
         std::vector<ShaderAttribute> attributes;
 
-        // uniforms
+        // Uniforms
         glm::vec3 ambient;
         glm::vec3 diffuse;
         glm::vec3 specular;
         float shininess;
         std::array<std::vector<Handle<Resource>>, MeshTextureType::count> textures;
-        Handle<ModelAnimation> animation;
+
+        // Bones
+        std::array<Handle<Bone>, maxBones> bones;
 
         std::string getTextureName(MeshTextureType type, int id);
     };

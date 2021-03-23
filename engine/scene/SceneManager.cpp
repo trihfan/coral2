@@ -37,6 +37,8 @@ void SceneManager::update(const RenderParameters& parameters)
             return true;
         });
 
+    // Update animators
+
     // Update matrices
     instance->currentScene->getTopNode()->updateMatrix(glm::mat4(1), glm::vec3(0));
 
