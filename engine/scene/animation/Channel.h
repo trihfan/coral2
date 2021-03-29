@@ -22,8 +22,6 @@ namespace coral
     {
     public:
         virtual void update(double time) = 0;
-
-    private:
     };
 
     /**
@@ -33,8 +31,19 @@ namespace coral
     class Channel : public ChannelInterface
     {
     public:
+        /**
+         * @brief Constructor with the property modified by the schannel
+         */
         Channel(Property<Type>& property);
+
+        /**
+         * @brief Add a keyframe
+         */
         void addKeyframe(const KeyFrame<Type>& keyframe);
+
+        /**
+         * @brief Update the channel to the given time
+         */
         void update(double time) override;
 
     private:

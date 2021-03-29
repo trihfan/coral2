@@ -16,9 +16,9 @@
 
 namespace backend::opengl
 {
-class OpenglError
-{
-public:
-    static void check(const std::string& file, const std::string& function, const std::string& line);
-};
+    class OpenglError
+    {
+    public:
+        static void check(const std::string& file, const std::string& function, const std::string& line);
+    };
 }

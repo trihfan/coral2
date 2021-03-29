@@ -34,14 +34,14 @@ namespace coral
         const FreetypeGlyph& getGlyph() const;
 
     protected:
-        virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
+        virtual ptr<Pipeline> createPipelineFor(const std::string& renderpass) override;
         virtual std::string getPipelineName() const override;
 
     private:
         glm::vec3 color;
         TextMaterialParams params;
         FreetypeGlyph glyph;
-        Handle<Resource> resource;
+        ptr<Resource> resource;
         glm::mat4 projection;
         bool dirty;
     };

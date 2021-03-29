@@ -32,9 +32,10 @@ void TextMaterial::use(const RenderParameters& params)
         dirty = false;
     }
 
-    getPipeline()->setUniform("projectionMatrix", projection);
-    getPipeline()->setUniform("color", color);
-    getPipeline()->setUniform("glyph", 0);
+    auto pipeline = getPipeline();
+    pipeline->setUniform("projectionMatrix", projection);
+    pipeline->setUniform("color", color);
+    pipeline->setUniform("glyph", 0);
     resource->bind(0);
 }
 
@@ -64,7 +65,7 @@ void TextMaterial::setColor(const glm::vec3& color)
     this->color = color;
 }
 
-Handle<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
+ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
 {
     dirty = true;
     PipelineParams params;

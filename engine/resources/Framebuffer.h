@@ -3,6 +3,7 @@
 #include "BackendFramebuffer.h"
 #include "Resource.h"
 #include "base/Object.h"
+#include "base/Ptr.h"
 #include <memory>
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace coral
     struct FramebufferResource
     {
         backend::BackendFramebufferResourceRole role;
-        Handle<Resource> resource;
+        ptr<Resource> resource;
     };
 
     class Framebuffer : public Object
@@ -22,7 +23,7 @@ namespace coral
         void addResource(const FramebufferResource& resource);
         const std::vector<FramebufferResource>& getResources() const;
 
-        void bind(backend::BackendFramebufferUsage usage);
+        virtual void bind(backend::BackendFramebufferUsage usage);
 
         virtual void init() override;
         virtual void release() override;
@@ -32,16 +33,19 @@ namespace coral
         std::vector<FramebufferResource> resources;
     };
 
-    class DefaultFramebuffer : public Object
+    /**
+     * Special framebuffer for binding to the backbuffer
+     */
+    class BackbufferFramebuffer : public Framebuffer
     {
     public:
-        DefaultFramebuffer();
-        void bind(backend::BackendFramebufferUsage usage);
+        BackbufferFramebuffer();
+        void bind(backend::BackendFramebufferUsage usage) override;
 
         virtual void init() override;
         virtual void release() override;
 
     protected:
-        std::unique_ptr<backend::BackendDefaultFramebuffer> defaultFramebuffer;
+        std::unique_ptr<backend::BackendBackbufferFramebuffer> backbuffer;
     };
 }

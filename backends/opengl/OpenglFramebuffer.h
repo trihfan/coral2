@@ -17,7 +17,7 @@ namespace backend::opengl
         GLuint framebufferId;
     };
 
-    class OpenglDefaultFramebuffer : public BackendDefaultFramebuffer
+    class OpenglBackendBackbufferFramebuffer : public BackendBackbufferFramebuffer
     {
     public:
         void bind(BackendFramebufferUsage usage) override;

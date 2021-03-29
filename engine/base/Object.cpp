@@ -12,7 +12,7 @@ Object::~Object()
 {
     if (state == ObjectState::initialized)
     {
-        Logs(warning) << "object '" << getName() << "' has not been released, please call detroy()";
+        Logs(warning) << "object '" << getName() << "' has not been released";
     }
 }
 

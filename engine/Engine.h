@@ -2,6 +2,7 @@
 
 #include "Backend.h"
 #include "RenderParameters.h"
+#include "base/Ptr.h"
 #include "utils/Singleton.h"
 #include <chrono>
 #include <memory>
@@ -35,14 +36,14 @@ namespace coral
          * @brief Constructor
          * @param config The engine config used to create the render graph
          */
-        Engine(std::shared_ptr<backend::Backend> backend);
+        Engine(ptr<backend::Backend> backend);
 
     private:
         // Time point of engine start
         std::chrono::steady_clock::time_point startTime;
 
         // Renderer backend
-        std::shared_ptr<backend::Backend> backend;
+        ptr<backend::Backend> backend;
 
         // Current render parameters
         RenderParameters currentParameters;

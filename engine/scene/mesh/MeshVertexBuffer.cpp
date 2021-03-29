@@ -5,11 +5,10 @@
 using namespace coral;
 
 static const std::vector<size_t> componentCount {
-    3, 3, 2, 4, 4, 4, 4, 4, 4
+    3, 3, 2, 4, 4
 };
 
 MeshVertexBuffer::MeshVertexBuffer()
-    : boneIncidenceWarningSend(false)
 {
     assert(componentCount.size() == count);
 }
@@ -19,9 +18,6 @@ void MeshVertexBuffer::reserve(size_t size)
     positions.reserve(size);
     normals.reserve(size);
     texCoords.reserve(size);
-    boneIncidences0.reserve(size);
-    boneIncidences1.reserve(size);
-    boneIncidences2.reserve(size);
 }
 
 size_t MeshVertexBuffer::sizeOfVertex() const
@@ -42,8 +38,11 @@ size_t MeshVertexBuffer::vertexCount() const
     return positions.size();
 }
 
-std::vector<std::byte> MeshVertexBuffer::pack() const
+std::vector<std::byte> MeshVertexBuffer::pack()
 {
+    // Setup
+    packBoneIncidences();
+
     size_t vertexSize = sizeOfVertex();
     size_t vertexNumber = vertexCount();
 
@@ -80,17 +79,9 @@ bool MeshVertexBuffer::hasAttribute(AttributeType type) const
     case textCoords:
         return !texCoords.empty();
 
-    case boneId0:
-    case boneWeight0:
-        return !boneIncidences0.empty();
-
-    case boneId1:
-    case boneWeight1:
-        return !boneIncidences1.empty();
-
-    case boneId2:
-    case boneWeight2:
-        return !boneIncidences2.empty();
+    case boneId:
+    case boneWeight:
+        return !boneIncidences.empty();
 
     default:
         return false;
@@ -138,41 +129,14 @@ void MeshVertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weigh
         return;
     }
 
-    // Fill the first available slot or return false
-    auto fillBoneIncidence = +[](std::vector<std::pair<glm::vec4, glm::vec4>>& boneIncidences, size_t verticeIndex, int id, float weight, size_t vertexCount) {
-        // Resize so vertice index fit inside
-        if (boneIncidences.size() < vertexCount)
-        {
-            boneIncidences.resize(vertexCount, std::make_pair(glm::vec4(MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones, MeshMaterial::maxBones), glm::vec4(0)));
-        }
-
-        // Check if there is an empty slot
-        for (int i = 0; i < 4; i++)
-        {
-            if (static_cast<int>(boneIncidences[verticeIndex].first[i]) == MeshMaterial::maxBones)
-            {
-                std::memcpy(&boneIncidences[verticeIndex].first[i], &id, sizeof(int));
-                boneIncidences[verticeIndex].second[i] = weight;
-                return true;
-            }
-        }
-        return false;
-    };
-
-    // Try all bone incidences
-    if (fillBoneIncidence(boneIncidences0, verticeIndex, id, weight, vertexCount())
-        || fillBoneIncidence(boneIncidences1, verticeIndex, id, weight, vertexCount())
-        || fillBoneIncidence(boneIncidences2, verticeIndex, id, weight, vertexCount()))
+    // Resize if necessary
+    if (boneIncidences.size() < std::max(vertexCount(), verticeIndex))
     {
-        return;
+        boneIncidences.resize(std::max(vertexCount(), verticeIndex));
     }
 
-    // If no more space available for bone indicence, show a warning
-    if (!boneIncidenceWarningSend)
-    {
-        boneIncidenceWarningSend = true;
-        Logs(warning) << "Too much bones incidence for one vertex";
-    }
+    // Put the incidence
+    boneIncidences[verticeIndex].push_back(std::make_pair(id, weight));
 }
 
 const void* MeshVertexBuffer::getPtrTo(AttributeType type, size_t index) const
@@ -188,25 +152,50 @@ const void* MeshVertexBuffer::getPtrTo(AttributeType type, size_t index) const
     case textCoords:
         return &texCoords[index];
 
-    case boneId0:
-        return &boneIncidences0[index].first;
+    case boneId:
+        return &packedBoneIncidences[index].first;
 
-    case boneWeight0:
-        return &boneIncidences0[index].second;
-
-    case boneId1:
-        return &boneIncidences1[index].first;
-
-    case boneWeight1:
-        return &boneIncidences1[index].second;
-
-    case boneId2:
-        return &boneIncidences2[index].first;
-
-    case boneWeight2:
-        return &boneIncidences2[index].second;
+    case boneWeight:
+        return &packedBoneIncidences[index].second;
 
     default:
         return nullptr;
+    }
+}
+
+void MeshVertexBuffer::packBoneIncidences()
+{
+    if (boneIncidences.empty())
+    {
+        return;
+    }
+
+    bool warningSend = false;
+    packedBoneIncidences.resize(vertexCount());
+    for (size_t i = 0; i < packedBoneIncidences.size(); i++)
+    {
+        // Sort by weight so we keep only the heaviest weight in case there is more than 4 incidences
+        std::sort(boneIncidences[i].begin(), boneIncidences[i].end(), [](const auto& a, const auto& b) { return a.second >= b.second; });
+        for (int j = 0; j < 4; j++)
+        {
+            // Bone incidence
+            if (static_cast<size_t>(j) < boneIncidences[i].size())
+            {
+                std::memcpy(&packedBoneIncidences[i].first[j], &boneIncidences[i][static_cast<size_t>(j)].first, sizeof(int));
+                packedBoneIncidences[i].second[j] = boneIncidences[i][static_cast<size_t>(j)].second;
+            }
+            // Default value
+            else
+            {
+                std::memcpy(&packedBoneIncidences[i].first[j], &MeshMaterial::maxBones, sizeof(int));
+            }
+        }
+
+        // Warning in case there is too much incidences for the vertex
+        if (boneIncidences[i].size() > 4 && !warningSend)
+        {
+            Logs(warning) << "Bone incidence count on the vertex exceed 4";
+            warningSend = true;
+        }
     }
 }

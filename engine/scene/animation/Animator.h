@@ -5,6 +5,12 @@
 
 namespace coral
 {
+    struct AnimatorAnimation
+    {
+        ptr<Animation> animation;
+        double startTime;
+    };
+
     /**
      * @brief The Animator class handle an animation
      */
@@ -15,7 +21,7 @@ namespace coral
         Animator();
 
         // Add an animation to the list
-        void setAnimation(Handle<Animation> animation);
+        void addAnimation(AnimatorAnimation animation);
 
         // Animation playing
         void play();
@@ -26,18 +32,20 @@ namespace coral
         void setCurrentTime(double currentTime);
         void setSpeed(double speed);
         void setLoopAnimation(bool loop);
+        double getTotalDuration() const;
 
         // Update the animation, called each frame
         virtual void update(const NodeUpdateParameters& parameters) override;
 
     private:
         // The animations
-        Handle<Animation> animation;
+        std::vector<AnimatorAnimation> animations;
 
         // Parameters
         double currentTime;
         bool loop;
         bool paused;
         double speed;
+        double totalDuration;
     };
 }

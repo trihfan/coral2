@@ -1,15 +1,16 @@
 #pragma once
 
+#include "Ptr.h"
 #include "utils/Singleton.h"
-#include <atomic>
+#include "utils/concurrentqueue.h"
+#include <list>
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace coral
 {
     class Object;
-    struct HandleSharedMemory;
-    template <typename ObjectType>
-    class Handle;
 
     /**
      * @brief Factory for all engine objects
@@ -23,13 +24,13 @@ namespace coral
          * @brief Create an object of the given object type
          */
         template <typename ObjectType, class... Args>
-        static Handle<ObjectType> createWithName(const std::string& name, Args&&... args);
+        static ptr<ObjectType> createWithName(const std::string& name, Args&&... args);
 
         /**
          * @brief Create an object of the given object type
          */
         template <typename ObjectType, class... Args>
-        static Handle<ObjectType> create(Args&&... args);
+        static ptr<ObjectType> create(Args&&... args);
 
         /**
          * @brief Initialize and release objects
@@ -37,32 +38,29 @@ namespace coral
         static void update();
 
     private:
+        static moodycamel::ConcurrentQueue<ptr<Object>> initializeList;
+        static moodycamel::ConcurrentQueue<ptr<Object>> releaseList;
+        static std::vector<ptr<Object>> objects;
+        static std::list<size_t> freePositions;
+
         // Constructor
         ObjectFactory();
     };
 
     template <typename ObjectType, class... Args>
-    Handle<ObjectType> ObjectFactory::createWithName(const std::string& name, Args&&... args)
+    ptr<ObjectType> ObjectFactory::createWithName(const std::string& name, Args&&... args)
     {
-        Handle<ObjectType> object = create<ObjectType>(std::forward<Args>(args)...);
+        ptr<ObjectType> object = create<ObjectType>(std::forward<Args>(args)...);
         object->setName(name);
         return object;
     }
 
     template <typename ObjectType, class... Args>
-    Handle<ObjectType> ObjectFactory::create(Args&&... args)
+    ptr<ObjectType> ObjectFactory::create(Args&&... args)
     {
         static_assert(std::is_base_of<Object, ObjectType>::value, "Only object derivated from Object can be instanciated");
-
-        // allocate object
-        ObjectType* object = new ObjectType(std::forward<Args>(args)...);
-        HandleSharedMemory* sharedMemory = new HandleSharedMemory();
-
-        // register object
-        Handle<ObjectType> handle(object, sharedMemory);
-        ObjectFactoryData::get()->initializeList.enqueue(handle);
-
-        // return created object
-        return handle;
+        ptr<ObjectType> object = std::make_shared<ObjectType>(std::forward<Args>(args)...);
+        initializeList.enqueue(object);
+        return object;
     }
 }

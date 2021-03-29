@@ -42,21 +42,23 @@ void Framebuffer::release()
     backendFramebuffer = nullptr;
 }
 
-DefaultFramebuffer::DefaultFramebuffer()
+BackbufferFramebuffer::BackbufferFramebuffer()
 {
 }
 
-void DefaultFramebuffer::bind(backend::BackendFramebufferUsage usage)
+void BackbufferFramebuffer::bind(backend::BackendFramebufferUsage usage)
 {
-    defaultFramebuffer->bind(usage);
+    backbuffer->bind(usage);
 }
 
-void DefaultFramebuffer::init()
+void BackbufferFramebuffer::init()
 {
-    defaultFramebuffer = backend::BackendObjectFactory<backend::BackendDefaultFramebuffer>::create();
+    Object::init();
+    backbuffer = backend::BackendObjectFactory<backend::BackendBackbufferFramebuffer>::create();
 }
 
-void DefaultFramebuffer::release()
+void BackbufferFramebuffer::release()
 {
-    defaultFramebuffer = nullptr;
+    Framebuffer::release();
+    backbuffer = nullptr;
 }

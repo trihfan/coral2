@@ -15,14 +15,14 @@ Material::Material(const std::vector<std::string>& renderQueueTags)
     }
 }
 
-Handle<Pipeline> Material::getPipeline() const
+ptr<Pipeline> Material::getPipeline() const
 {
     return pipeline;
 }
 
 void Material::setupLights(const RenderParameters& parameters)
 {
-    getPipeline()->setUniform("viewPosition", parameters.camera->getPosition());
+    pipeline->setUniform("viewPosition", parameters.camera->getWorldPosition());
 
     // Point lights
     size_t lightCount = std::min(parameters.lights.pointLights.size(), static_cast<size_t>(32));
@@ -31,7 +31,7 @@ void Material::setupLights(const RenderParameters& parameters)
     {
         const auto& light = parameters.lights.pointLights[i];
         std::string lightStr = "pointLights[" + std::to_string(i) + "]";
-        pipeline->setUniform(lightStr + ".position", light->getPosition());
+        pipeline->setUniform(lightStr + ".position", light->getWorldPosition());
         pipeline->setUniform(lightStr + ".color", light->color);
         pipeline->setUniform(lightStr + ".constant", light->constant);
         pipeline->setUniform(lightStr + ".linear", light->linear);
@@ -41,8 +41,8 @@ void Material::setupLights(const RenderParameters& parameters)
 
 void Material::use(const RenderParameters& parameters)
 {
-    getPipeline()->setUniform("projectionMatrix", parameters.camera->getProjectionMatrix());
-    getPipeline()->setUniform("viewMatrix", parameters.camera->getViewMatrix());
+    pipeline->setUniform("projectionMatrix", parameters.camera->getProjectionMatrix());
+    pipeline->setUniform("viewMatrix", parameters.camera->getViewMatrix());
 
     if (lighting)
     {
@@ -65,9 +65,9 @@ void Material::invalidatePipeline()
     }
 }
 
-void Material::setNode(Handle<Node> node)
+void Material::setNode(ptr<Node> node)
 {
-    getPipeline()->setUniform("modelMatrix", node->getMatrix());
+    pipeline->setUniform("modelMatrix", node->transform().getMatrix());
 }
 
 void Material::enableLighting()

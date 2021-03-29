@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base/Ptr.h"
 #include "resources/Framebuffer.h"
 #include "utils/Singleton.h"
 #include <memory>
@@ -16,12 +17,12 @@ namespace coral
         MAKE_SINGLETON(RenderPassFramebufferManager)
     public:
         static void clear();
-        static Handle<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
-        static Handle<Framebuffer> getBackbuffer();
+        static ptr<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
+        static ptr<Framebuffer> getBackbuffer();
 
     private:
-        RenderPassFramebufferManager();
-        std::vector<Handle<Framebuffer>> framebuffers;
-        Handle<Framebuffer> defaultFramebuffer;
+        RenderPassFramebufferManager(ptr<Framebuffer> defaultFramebuffer);
+        std::vector<ptr<Framebuffer>> framebuffers;
+        ptr<Framebuffer> defaultFramebuffer;
     };
 }

@@ -19,12 +19,8 @@ namespace coral
             position,
             normal,
             textCoords,
-            boneId0,
-            boneWeight0,
-            boneId1,
-            boneWeight1,
-            boneId2,
-            boneWeight2,
+            boneId,
+            boneWeight,
             count
         };
 
@@ -49,7 +45,7 @@ namespace coral
         /**
          * @brief Merge and copy the vertex buffer content to the a buffer
          */
-        std::vector<std::byte> pack() const;
+        std::vector<std::byte> pack();
 
         // Add data
         void addPosition(const glm::vec3& position);
@@ -76,10 +72,13 @@ namespace coral
         std::vector<glm::vec3> positions;
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> texCoords;
-        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences0;
-        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences1;
-        std::vector<std::pair<glm::vec4, glm::vec4>> boneIncidences2;
-        bool boneIncidenceWarningSend;
+        std::vector<std::vector<std::pair<int, float>>> boneIncidences;
+        std::vector<std::pair<glm::vec4, glm::vec4>> packedBoneIncidences;
+
+        /**
+         * @brief Pack boneIncidences inside packedBoneIncidences
+         */
+        void packBoneIncidences();
 
         /**
          * @brief Return a ptr to the value of the given index for the given attribute

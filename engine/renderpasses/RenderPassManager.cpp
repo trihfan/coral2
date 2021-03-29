@@ -12,7 +12,7 @@ void RenderPassManager::release()
 {
 }
 
-void RenderPassManager::addRenderPass(Handle<RenderPass> renderPass)
+void RenderPassManager::addRenderPass(ptr<RenderPass> renderPass)
 {
     instance->renderPasses.push_back(renderPass);
     instance->orderedRenderPasses.clear();
@@ -20,7 +20,7 @@ void RenderPassManager::addRenderPass(Handle<RenderPass> renderPass)
 
 void RenderPassManager::removeRenderPass(const std::string& name)
 {
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const Handle<RenderPass> renderpass) { return renderpass->getName() == name; });
+    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const ptr<RenderPass> renderpass) { return renderpass->getName() == name; });
     if (it != instance->renderPasses.end())
     {
         instance->renderPasses.erase(it);
@@ -28,9 +28,9 @@ void RenderPassManager::removeRenderPass(const std::string& name)
     }
 }
 
-Handle<RenderPass> RenderPassManager::getRenderPassByName(const std::string& name)
+ptr<RenderPass> RenderPassManager::getRenderPassByName(const std::string& name)
 {
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const Handle<RenderPass> renderpass) { return renderpass->getName() == name; });
+    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const ptr<RenderPass> renderpass) { return renderpass->getName() == name; });
     if (it != instance->renderPasses.end())
     {
         return *it;
@@ -66,7 +66,7 @@ void RenderPassManager::invalidate()
     instance->orderedRenderPasses.clear();
 }
 
-const std::vector<Handle<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
+const std::vector<ptr<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
 {
     return instance->orderedRenderPasses;
 }

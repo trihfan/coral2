@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base/Object.h"
+#include "base/Ptr.h"
 #include "utils/Singleton.h"
 #include <map>
 #include <memory>
@@ -35,7 +36,7 @@ namespace coral
         /**
          * @brief Add a render pass
          */
-        static void addRenderPass(Handle<RenderPass> renderPass);
+        static void addRenderPass(ptr<RenderPass> renderPass);
 
         /**
          * @brief Remove a render pass
@@ -45,12 +46,12 @@ namespace coral
         /**
          * @brief Return the renderpass for the given id
          */
-        static Handle<RenderPass> getRenderPassByName(const std::string& name);
+        static ptr<RenderPass> getRenderPassByName(const std::string& name);
 
         /**
          * @brief Return the renderpasses ordered by render order
          */
-        static const std::vector<Handle<RenderPass>>& getOrderedRenderPasses();
+        static const std::vector<ptr<RenderPass>>& getOrderedRenderPasses();
 
     private:
         RenderPassManager() = default;
@@ -62,9 +63,9 @@ namespace coral
 
     private:
         // The renderpasses list
-        std::vector<Handle<RenderPass>> renderPasses;
+        std::vector<ptr<RenderPass>> renderPasses;
 
         // Ordered renderpasses by render priority
-        std::vector<Handle<RenderPass>> orderedRenderPasses;
+        std::vector<ptr<RenderPass>> orderedRenderPasses;
     };
 }

@@ -2,6 +2,7 @@
 
 #include "base/Object.h"
 #include <sstream>
+#include <vector>
 
 namespace coral
 {

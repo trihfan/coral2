@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Material.h"
+#include "base/Ptr.h"
 #include "resources/Resource.h"
 #include "scene/mesh/Bone.h"
+#include <array>
 #include <vector>
 
 namespace coral
@@ -31,7 +33,7 @@ namespace coral
         /**
          * @brief Maximum number of bones per model
          */
-        static constexpr int maxBones = 100;
+        static constexpr int maxBones = 150;
 
         MeshMaterial(const std::vector<std::string>& renderQueueTags);
 
@@ -43,27 +45,25 @@ namespace coral
         void setRenderType(MeshMaterialRenderType type);
         void enableTexturing();
         void enableSkining();
-        void setBoneIncidenceCount(int count);
 
         // Uniforms
         void setAmbientColor(const glm::vec3& color);
         void setDiffuseColor(const glm::vec3& color);
         void setSpecularColor(const glm::vec3& color);
         void setShininess(float shininess);
-        void addTexture(MeshTextureType type, Handle<Resource> resource);
+        void addTexture(MeshTextureType type, ptr<Resource> resource);
 
         // Set a bone
-        void setBone(int id, Handle<Bone> bone);
+        void setBone(int id, ptr<Bone> bone);
 
     protected:
-        virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
+        virtual ptr<Pipeline> createPipelineFor(const std::string& renderpass) override;
         virtual std::string getPipelineName() const override;
 
     private:
         MeshMaterialRenderType renderType;
         bool skining;
         bool texturing;
-        int boneIncidenceCount;
         std::vector<ShaderAttribute> attributes;
 
         // Uniforms
@@ -71,10 +71,10 @@ namespace coral
         glm::vec3 diffuse;
         glm::vec3 specular;
         float shininess;
-        std::array<std::vector<Handle<Resource>>, MeshTextureType::count> textures;
+        std::array<std::vector<ptr<Resource>>, MeshTextureType::count> textures;
 
         // Bones
-        std::array<Handle<Bone>, maxBones> bones;
+        std::array<ptr<Bone>, maxBones> bones;
 
         std::string getTextureName(MeshTextureType type, int id);
     };

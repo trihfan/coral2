@@ -7,7 +7,7 @@ Animation::Animation(double duration)
 {
 }
 
-void Animation::addChannel(Handle<ChannelInterface> channel)
+void Animation::addChannel(ptr<ChannelInterface> channel)
 {
     channels.push_back(channel);
 }

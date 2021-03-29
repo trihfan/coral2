@@ -28,7 +28,7 @@ void PipelineManager::update()
 {
 }
 
-Handle<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
+ptr<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
 {
     auto it = std::find_if(instance->pipelines.begin(), instance->pipelines.end(), [&name](const auto& pair) { return pair.first.params.name == name; });
     if (it != instance->pipelines.end())
@@ -38,7 +38,7 @@ Handle<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
     return nullptr;
 }
 
-Handle<Pipeline> PipelineManager::createPipeline(const PipelineParams& params)
+ptr<Pipeline> PipelineManager::createPipeline(const PipelineParams& params)
 {
     auto pipeline = ObjectFactory::createWithName<Pipeline>(params.params.name, params);
     instance->pipelines.push_back(std::make_pair(params, pipeline));

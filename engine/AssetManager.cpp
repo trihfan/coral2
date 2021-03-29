@@ -1,57 +1,44 @@
 #include "AssetManager.h"
 #include "Backend.h"
+#include "FileUtils.h"
 #include "Logs.h"
-//#include "assets.h"
+#include <filesystem>
 #include <vector>
 
 using namespace coral;
 
-std::unordered_map<std::string, std::vector<ShaderAsset>> AssetManager::shaders;
+std::unordered_map<std::string, Asset> AssetManager::assets;
 
-void AssetManager::init()
+void AssetManager::addDirectory(const std::string& directory)
 {
-    /*for (const ShaderAsset& shaderAsset : SHADER_ASSETS_LIST)
+    for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(directory))
     {
-        // Update relative url
-        //asset.url = asset.url;
-
-        shaders[shaderAsset.asset.name] = shaderAsset;
-    }*/
-}
-
-ShaderAsset AssetManager::getShader(const std::string& name, ShaderType type)
-{
-    ShaderAsset asset;
-    asset.backend = backend::Backend::current()->getName();
-    asset.type = type;
-
-    asset.asset.name = name;
-    asset.asset.url = "assets/shaders/" + backend::Backend::current()->getName() + "/" + name;
-
-    switch (type)
-    {
-    case ShaderType::vertex:
-        asset.asset.url += ".vert";
-        break;
-
-    case ShaderType::fragment:
-        asset.asset.url += ".frag";
-        break;
-    }
-
-    return asset;
-    /*auto it = shaders.find(name);
-    if (it != shaders.end())
-    {
-        for (const ShaderAsset& shaderAsset : it->second)
+        if (entry.is_regular_file())
         {
-            if (shaderAsset.type == type && shaderAsset.backend == backend::Backend::currentBackend()->getname())
-            {
-                return shaderAsset;
-            }
+            auto path = entry.path();
+
+            // Add new asset
+            Asset asset;
+            asset.name = path.string();
+            asset.name = asset.name.erase(asset.name.find(directory), directory.length() + 1);
+
+            asset.url = path.string();
+            asset.size = std::filesystem::file_size(entry);
+
+            const std::string fullname = directory + ":" + asset.name;
+            assets[fullname] = asset;
         }
     }
+}
 
-    Logs(error) << "shader asset " << name << " not found";
-    return ShaderAsset();*/
+Asset AssetManager::get(const std::string& parent, const std::string& name)
+{
+    const std::string fullname = parent + ":" + name;
+
+    auto it = assets.find(fullname);
+    if (it != assets.end())
+    {
+        return it->second;
+    }
+    return Asset();
 }

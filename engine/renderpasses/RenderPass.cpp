@@ -77,7 +77,7 @@ void RenderPass::invalidate()
     outputResources.clear();
 }
 
-Handle<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
+ptr<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
 {
     auto allocatedResource = RenderPassResourceManager::getResourceByName(resource.name);
     if (!allocatedResource)

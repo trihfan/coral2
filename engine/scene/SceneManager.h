@@ -25,9 +25,9 @@ namespace coral
      */
     struct RenderQueue
     {
-        std::vector<Handle<DrawableNode>> nodes;
-        std::map<Handle<Pipeline>, std::set<Handle<Material>>> pipelineMap;
-        std::map<Handle<Material>, std::vector<Handle<DrawableNode>>> materialMap;
+        std::vector<ptr<DrawableNode>> nodes;
+        std::map<ptr<Pipeline>, std::set<ptr<Material>>> pipelineMap;
+        std::map<ptr<Material>, std::vector<ptr<DrawableNode>>> materialMap;
     };
 
     /**
@@ -40,12 +40,12 @@ namespace coral
         /**
          * @brief Set the current scene
          */
-        static void setCurrentScene(Handle<Scene> scene);
+        static void setCurrentScene(ptr<Scene> scene);
 
         /**
          * @brief Return the cameras
          */
-        static const std::vector<Handle<Camera>>& getCameras();
+        static const std::vector<ptr<Camera>>& getCameras();
 
         /**
          * @brief Update all nodes of the scene
@@ -63,16 +63,16 @@ namespace coral
         /**
          * @brief The current scene
          */
-        Handle<Scene> currentScene;
+        ptr<Scene> currentScene;
 
         /**
          * @brief List of camera in the currrent scene
          */
-        std::vector<Handle<Camera>> cameras;
+        std::vector<ptr<Camera>> cameras;
 
         /**
          * @brief List of lights in the currrent scene
          */
-        std::vector<Handle<Light>> lights;
+        std::vector<ptr<Light>> lights;
     };
 }

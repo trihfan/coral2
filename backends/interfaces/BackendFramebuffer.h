@@ -34,10 +34,10 @@ namespace backend
         virtual void bind(BackendFramebufferUsage usage) = 0;
     };
 
-    class BackendDefaultFramebuffer
+    class BackendBackbufferFramebuffer
     {
     public:
-        virtual ~BackendDefaultFramebuffer() = default;
+        virtual ~BackendBackbufferFramebuffer() = default;
         virtual void bind(BackendFramebufferUsage usage) = 0;
     };
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base/Ptr.h"
 #include "resources/Resource.h"
 #include "utils/Singleton.h"
 #include <memory>
@@ -16,13 +17,13 @@ namespace coral
 
     public:
         static void clear();
-        static Handle<Resource> getResourceByName(const std::string& name);
+        static ptr<Resource> getResourceByName(const std::string& name);
 
         // Register named resources
-        static void registerResource(Handle<Resource> resource);
+        static void registerResource(ptr<Resource> resource);
 
     private:
         RenderPassResourceManager() = default;
-        std::unordered_map<std::string, Handle<Resource>> resourceByName;
+        std::unordered_map<std::string, ptr<Resource>> resourceByName;
     };
 }

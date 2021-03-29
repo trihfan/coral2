@@ -70,7 +70,7 @@ void OpenglFramebuffer::bind(BackendFramebufferUsage usage)
     CHECK_OPENGL_ERROR
 }
 
-void OpenglDefaultFramebuffer::bind(BackendFramebufferUsage usage)
+void OpenglBackendBackbufferFramebuffer::bind(BackendFramebufferUsage usage)
 {
     switch (usage)
     {

@@ -2,6 +2,7 @@
 
 #include "resources/Resource.h"
 #include <ft2build.h>
+#include <glm/glm.hpp>
 #include <string>
 #include <unordered_map>
 #include FT_FREETYPE_H

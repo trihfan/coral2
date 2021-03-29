@@ -1,94 +1,89 @@
-#include "Handle.h"
-#include "HandleImpl.h"
-// /\ Must be included before: ||
-// || ------------------------ \/
+#include "ObjectFactory.h"
 #include "Logs.h"
 #include "Object.h"
-#include "ObjectFactory.h"
-#include "ObjectFactoryData.h"
 #include <algorithm>
 
 using namespace coral;
 
-bool ObjectFactoryData::isDestroyed = false;
-#define internalData ObjectFactoryData::get()
-
-DEFINE_SINGLETON(ObjectFactoryData)
 DEFINE_SINGLETON(ObjectFactory)
 
-void ObjectFactoryData::release()
-{
-}
+moodycamel::ConcurrentQueue<ptr<Object>> ObjectFactory::initializeList;
+moodycamel::ConcurrentQueue<ptr<Object>> ObjectFactory::releaseList;
+std::vector<ptr<Object>> ObjectFactory::objects;
+std::list<size_t> ObjectFactory::freePositions;
 
 ObjectFactory::ObjectFactory()
 {
-    ObjectFactoryData::create();
+    objects.reserve(1000);
 }
 
 void ObjectFactory::release()
 {
-    // Destroy all objects
-    ObjectFactoryData::isDestroyed = true;
-    for (const auto& object : internalData->objects)
+    std::vector<ptr<Object>> toRelease;
+    toRelease.reserve(objects.size());
+    for (auto object : objects)
     {
-        if (object.sharedMemory)
+        if (object)
         {
-            internalData->releaseList.enqueue(object);
+            toRelease.push_back(object);
         }
     }
+    releaseList.enqueue_bulk(toRelease.begin(), toRelease.size());
+    objects.clear();
     update();
-
-    ObjectFactoryData::destroy();
 }
 
 void ObjectFactory::update()
 {
     // Initilize objects
-    Handle<Object> object;
-    while (internalData->initializeList.try_dequeue(object))
+    ptr<Object> object;
+    while (initializeList.try_dequeue(object))
     {
-        if (object->state == ObjectState::not_initialized)
+        if (object->state != ObjectState::not_initialized)
         {
-            object->init();
-            object->state = ObjectState::initialized;
+            Logs(error) << "Multiple initialization";
+        }
 
-            // Add space in the objects pool
-            if (internalData->freeIndex.empty())
-            {
-                internalData->extends();
-            }
+        object->init();
+        object->state = ObjectState::initialized;
 
-            // Insert the object
-            object.sharedMemory->index = internalData->freeIndex.front();
-            internalData->freeIndex.pop_front();
-            internalData->objects[object.sharedMemory->index] = object;
+        // Insert the object
+        if (!freePositions.empty())
+        {
+            objects[freePositions.front()] = object;
+            freePositions.pop_front();
+        }
+        else
+        {
+            objects.push_back(object);
+        }
+        object = nullptr;
+    }
+
+    // Check object for being realeased
+    std::vector<ptr<Object>> toRelease;
+    toRelease.reserve(100);
+    for (size_t i = 0; i > objects.size(); i++)
+    {
+        // If there is no other owner than the obejct factory, set the object to be released
+        if (objects[i] && objects[i].use_count() == 1)
+        {
+            toRelease.push_back(objects[i]);
+            objects[i] = nullptr;
+            freePositions.push_back(i);
         }
     }
+    releaseList.enqueue_bulk(toRelease.begin(), toRelease.size());
 
     // Release objects
-    std::vector<std::pair<HandleSharedMemory*, Object*>> toDelete;
-    while (internalData->releaseList.try_dequeue(object))
+    while (releaseList.try_dequeue(object))
     {
-        if (object->state == ObjectState::initialized)
+        if (object->state != ObjectState::initialized)
         {
-            object->release();
-            object->state = ObjectState::released;
-
-            // Unallocate
-            toDelete.push_back(std::make_pair(object.sharedMemory, object.data));
-
-            // Remove from object pool
-            uintptr_t index = object.sharedMemory->index;
-            internalData->objects[index] = nullptr;
-            internalData->freeIndex.push_back(index);
+            Logs(error) << "Multiple deletion";
         }
-    }
 
-    // Deallocate
-    object = nullptr;
-    for (const auto& pair : toDelete)
-    {
-        delete pair.first;
-        delete pair.second;
+        object->release();
+        object->state = ObjectState::released;
     }
 }

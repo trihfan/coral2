@@ -25,22 +25,17 @@ void SceneManager::update(const RenderParameters& parameters)
         return;
     }
 
-    // List cameras
+    // List objects of interests
     instance->cameras.clear();
     instance->lights.clear();
     traverse(
-        instance->currentScene->getTopNode(), +[](Handle<Node> node) {
+        instance->currentScene->getTopNode(), +[](ptr<Node> node) {
             if (node->isA<Camera>())
             {
-                instance->cameras.push_back(node->toHandle<Camera>());
+                instance->cameras.push_back(node->toPtr<Camera>());
             }
             return true;
         });
-
-    // Update animators
-
-    // Update matrices
-    instance->currentScene->getTopNode()->updateMatrix(glm::mat4(1), glm::vec3(0));
 
     // Update nodes
     NodeUpdateParameters updateParams;
@@ -49,13 +44,13 @@ void SceneManager::update(const RenderParameters& parameters)
     instance->currentScene->getTopNode()->update(updateParams);
 }
 
-void SceneManager::setCurrentScene(Handle<Scene> scene)
+void SceneManager::setCurrentScene(ptr<Scene> scene)
 {
     instance->currentScene = scene;
     instance->cameras.clear();
 }
 
-const std::vector<Handle<Camera>>& SceneManager::getCameras()
+const std::vector<ptr<Camera>>& SceneManager::getCameras()
 {
     return instance->cameras;
 }
@@ -71,10 +66,10 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     }
 
     // Fill queues with visible nodes
-    traverse(instance->currentScene->getTopNode(), [&queues, &parameters](Handle<Node> node) {
+    traverse(instance->currentScene->getTopNode(), [&queues, &parameters](ptr<Node> node) {
         if (node->isDrawable())
         {
-            auto drawableNode = node->toHandle<DrawableNode>();
+            auto drawableNode = node->toPtr<DrawableNode>();
             for (const auto& id : drawableNode->getRenderQueueTags())
             {
                 assert(drawableNode->getMaterial()->getPipeline());
@@ -88,7 +83,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
         // tmp while no culling
         if (node->isA<PointLight>())
         {
-            parameters.lights.pointLights.push_back(node->toHandle<PointLight>());
+            parameters.lights.pointLights.push_back(node->toPtr<PointLight>());
         }
         return true;
     });

@@ -4,12 +4,12 @@
 
 using namespace coral;
 
-void DrawableNode::setMaterial(Handle<Material> material)
+void DrawableNode::setMaterial(ptr<Material> material)
 {
     this->material = material;
 }
 
-Handle<Material> DrawableNode::getMaterial() const
+ptr<Material> DrawableNode::getMaterial() const
 {
     return material;
 }

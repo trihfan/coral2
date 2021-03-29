@@ -1,38 +1,29 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 
 namespace coral
 {
-    enum class ShaderType
-    {
-        vertex,
-        fragment
-    };
-
     struct Asset
     {
         std::string name;
         std::string url;
-    };
-
-    struct ShaderAsset
-    {
-        Asset asset;
-        ShaderType type;
-        std::string backend;
+        uint64_t size;
     };
 
     class AssetManager
     {
     public:
-        static void init();
+        // Add assets to the manager
+        static void addDirectory(const std::string& directory);
+        //static void addDictionnary(const std::string& dictionnary);
 
-        //
-        static ShaderAsset getShader(const std::string& name, ShaderType type);
+        // Get an asset
+        static Asset get(const std::string& parent, const std::string& name);
 
     private:
-        static std::unordered_map<std::string, std::vector<ShaderAsset>> shaders;
+        static std::unordered_map<std::string, Asset> assets;
     };
 }

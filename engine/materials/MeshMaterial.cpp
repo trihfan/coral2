@@ -1,4 +1,6 @@
 #include "MeshMaterial.h"
+#include "AssetManager.h"
+#include "FileUtils.h"
 #include "resources/Pipeline.h"
 #include "resources/PipelineManager.h"
 #include "resources/ShaderComposer.h"
@@ -11,7 +13,6 @@ MeshMaterial::MeshMaterial(const std::vector<std::string>& renderQueueTags)
     , renderType(MeshMaterialRenderType::basic_lighting)
     , skining(false)
     , texturing(false)
-    , boneIncidenceCount(0)
 {
     enableLighting();
 }
@@ -29,14 +30,15 @@ void MeshMaterial::setRenderType(MeshMaterialRenderType type)
 void MeshMaterial::use(const RenderParameters& parameters)
 {
     Material::use(parameters);
+    auto pipeline = getPipeline();
 
     // Basic shading
     if (renderType == MeshMaterialRenderType::basic_lighting)
     {
-        getPipeline()->setUniform("material.ambient", ambient);
-        getPipeline()->setUniform("material.diffuse", diffuse);
-        getPipeline()->setUniform("material.specular", specular);
-        getPipeline()->setUniform("material.shininess", shininess);
+        pipeline->setUniform("material.ambient", ambient);
+        pipeline->setUniform("material.diffuse", diffuse);
+        pipeline->setUniform("material.specular", specular);
+        pipeline->setUniform("material.shininess", shininess);
 
         int currentId = 0;
         for (size_t i = 0; i < textures.size(); i++)
@@ -44,7 +46,7 @@ void MeshMaterial::use(const RenderParameters& parameters)
             for (size_t j = 0; j < textures[i].size(); j++)
             {
                 textures[i][j]->bind(currentId);
-                getPipeline()->setUniform(getTextureName(static_cast<MeshTextureType>(i), static_cast<int>(j)), currentId);
+                pipeline->setUniform(getTextureName(static_cast<MeshTextureType>(i), static_cast<int>(j)), currentId);
                 currentId++;
             }
         }
@@ -56,13 +58,13 @@ void MeshMaterial::use(const RenderParameters& parameters)
         {
             if (bones[i])
             {
-                getPipeline()->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", bones[i]->getMatrix() * bones[i]->getOffset());
+                pipeline->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", bones[i]->getBoneMatrix());
             }
         }
     }
 }
 
-void MeshMaterial::setBone(int id, Handle<Bone> bone)
+void MeshMaterial::setBone(int id, ptr<Bone> bone)
 {
     if (id > maxBones)
     {
@@ -74,14 +76,15 @@ void MeshMaterial::setBone(int id, Handle<Bone> bone)
     }
 }
 
-Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
+ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
 {
     // Create pipeline
     PipelineParams params;
     params.params.name = getPipelineName();
     params.renderpass = renderpass;
 
-    ShaderComposer composer("assets/shaders/mesh_material.shader");
+    // To include in default dictionnary
+    ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url);
 
     // Attributes
     for (const auto& attribute : attributes)
@@ -100,10 +103,6 @@ Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
     {
         composer.addDefinition("SKINING");
         composer.addDefinition("MAX_BONES " + std::to_string(maxBones));
-        for (int i = 1; i <= boneIncidenceCount; i++)
-        {
-            composer.addDefinition("ENABLE_BONE_INCIDENCE_" + std::to_string(i));
-        }
     }
 
     // Process
@@ -144,11 +143,6 @@ void MeshMaterial::enableSkining()
     skining = true;
 }
 
-void MeshMaterial::setBoneIncidenceCount(int count)
-{
-    boneIncidenceCount = count;
-}
-
 void MeshMaterial::enableTexturing()
 {
     texturing = true;
@@ -174,7 +168,7 @@ void MeshMaterial::setShininess(float shininess)
     this->shininess = shininess;
 }
 
-void MeshMaterial::addTexture(MeshTextureType type, Handle<Resource> resource)
+void MeshMaterial::addTexture(MeshTextureType type, ptr<Resource> resource)
 {
     textures[size_t(type)].push_back(resource);
 }

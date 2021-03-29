@@ -27,7 +27,7 @@ bool OpenglBackend::internalInit()
 
     // Set creators
     creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };
-    creator<BackendDefaultFramebuffer> = []() { return std::make_unique<OpenglDefaultFramebuffer>(); };
+    creator<BackendBackbufferFramebuffer> = []() { return std::make_unique<OpenglBackendBackbufferFramebuffer>(); };
     creator<BackendPipeline, BackendPipelineParams> = [](const BackendPipelineParams& params) { return std::make_unique<OpenglPipeline>(params); };
     creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
     creator<BackendCommandBuffer> = []() { return std::make_unique<OpenglCommandBuffer>(); };

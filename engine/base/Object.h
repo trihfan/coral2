@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Handle.h"
-#include "Signal.h"
+#include "base/Ptr.h"
 #include <memory>
 #include <string>
-#include <string_view>
 
 namespace coral
 {
@@ -18,14 +16,18 @@ namespace coral
     };
 
     // The Object class represent an object in coral engine
-    class Object : public HandleFromThis
+    class Object : public std::enable_shared_from_this<Object>
     {
         friend class ObjectFactory;
 
     public:
         // construction
         Object();
-        virtual ~Object() override;
+        virtual ~Object();
+
+        // Handle
+        template <typename Type>
+        ptr<Type> toPtr();
 
         // type
         template <typename Type>
@@ -44,13 +46,16 @@ namespace coral
         // Release the resources
         virtual void release();
 
-    protected:
-        // state
-        ObjectState state;
-
     private:
         std::string name;
+        ObjectState state;
     };
+
+    template <typename Type>
+    ptr<Type> Object::toPtr()
+    {
+        return std::dynamic_pointer_cast<Type>(shared_from_this());
+    }
 
     template <typename Type>
     bool Object::isA() const

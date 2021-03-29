@@ -9,6 +9,7 @@
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
+#include "resources/Framebuffer.h"
 #include "resources/PipelineManager.h"
 #include "resources/stb_image.h"
 #include "scene/DrawableNode.h"
@@ -33,7 +34,6 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
-    AssetManager::init();
 
     // Setup stb image
     stbi_set_flip_vertically_on_load(true);
@@ -48,7 +48,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     PipelineManager::create();
     SceneManager::create();
     RenderPassManager::create();
-    RenderPassFramebufferManager::create();
+    RenderPassFramebufferManager::create(ObjectFactory::createWithName<BackbufferFramebuffer>("backbuffer"));
     RenderPassResourceManager::create();
 
     // Setup engine

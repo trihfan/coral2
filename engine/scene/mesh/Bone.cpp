@@ -4,6 +4,8 @@
 
 using namespace coral;
 
+static const glm::mat4 identity(1);
+
 Bone::Bone(int id, const glm::mat4& offset)
     : id(id)
     , offset(offset)
@@ -15,7 +17,7 @@ int Bone::getId()
     return id;
 }
 
-const glm::mat4& Bone::getOffset() const
+glm::mat4 Bone::getBoneMatrix() const
 {
-    return offset;
+    return transform().getMatrix() * offset;
 }

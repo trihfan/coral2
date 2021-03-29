@@ -15,71 +15,30 @@ out vec2 textCoords;
 #ifdef SKINING
 void computeSkining()
 {
-    vec4 totalPosition = vec4(0);
-    vec3 totalNormal = vec3(0);
+    vec4 totalPosition = vec4(0, 0, 0, 1);
     int count = 0;
-    bool finished = false;
 
     for (int i = 0; i < 4; i++)
     {
-        int boneId = floatBitsToInt(VERTEX.bone0[i]);
-        if (boneId == MAX_BONES) 
+        int boneId = floatBitsToInt(VERTEX.bone[i]);
+        if (boneId < MAX_BONES && boneId >= 0) 
         {
-            finished = true;
-            break;
+            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight[i];
+            count++;
         }
 
-        totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight0[i];
-        totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
-        count++;
-   }
+    }
 
-#ifdef ENABLE_BONE_INCIDENCE_1
-    if (!finished)
-    {
-       for (int i = 0; i < 4; i++)
-       {
-            int boneId = floatBitsToInt(VERTEX.bone1[i]);
-            if (boneId == MAX_BONES) 
-            {
-                finished = true;
-                break;
-            }
-
-            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight1[i];
-            totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
-            count++;
-       }
-   }
-#endif
-
-#ifdef ENABLE_BONE_INCIDENCE_2
-    if (!finished)
-    {
-       for (int i = 0; i < 4; i++)
-       {
-            int boneId = floatBitsToInt(VERTEX.bone2[i]);
-            if (boneId == MAX_BONES) 
-            {
-                break;
-            }
-
-            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight2[i];
-            totalNormal += mat3(finalBoneMatrices[boneId]) * VERTEX.normal;
-            count++;
-       }
-   }
-#endif
-
-    position = vec3(MODEL_MATRIX * totalPosition);
     if (count > 0)
     {
-        normal = mat3(transpose(inverse(MODEL_MATRIX))) * (totalNormal / float(count));
+        position = vec3(MODEL_MATRIX * totalPosition);
     }
-    else 
+    else
     {
-        normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
+    position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
     }
+
+    normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
 }
 #endif
 

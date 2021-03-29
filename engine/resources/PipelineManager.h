@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Pipeline.h"
+#include "base/Ptr.h"
 #include "utils/Singleton.h"
 #include <map>
+#include <vector>
 
 namespace coral
 {
@@ -12,13 +14,13 @@ namespace coral
     public:
         static void clear();
         static void update();
-        static Handle<Pipeline> getPipelineByName(const std::string& name);
-        static Handle<Pipeline> createPipeline(const PipelineParams& params);
+        static ptr<Pipeline> getPipelineByName(const std::string& name);
+        static ptr<Pipeline> createPipeline(const PipelineParams& params);
 
     protected:
         PipelineManager();
 
-        std::vector<std::pair<PipelineParams, Handle<Pipeline>>> pipelines;
-        std::vector<Handle<Pipeline>> pipelinesToAssign;
+        std::vector<std::pair<PipelineParams, ptr<Pipeline>>> pipelines;
+        std::vector<ptr<Pipeline>> pipelinesToAssign;
     };
 }

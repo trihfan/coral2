@@ -33,21 +33,21 @@ namespace coral
 
         // Animations
         std::vector<std::string> getAnimationNames() const;
-        Handle<Animation> getAnimation(const std::string& animationName) const;
+        ptr<Animation> getAnimation(const std::string& animationName) const;
 
     private:
         std::string directory;
-        std::vector<Handle<Animation>> animations;
+        std::vector<ptr<Animation>> animations;
         int boneCounter = 0;
-        std::unordered_map<std::string, Handle<Bone>> bones;
-        std::unordered_map<std::string, Handle<MeshMaterial>> materialByName;
-        Handle<Node> skeleton;
+        std::unordered_map<std::string, ptr<Bone>> bones;
+        std::unordered_map<std::string, ptr<MeshMaterial>> materialByName;
+        ptr<Node> skeleton;
 
-        void loadNode(Handle<Node> parent, aiNode* node, const aiScene* scene);
+        void loadNode(ptr<Node> parent, aiNode* node, const aiScene* scene);
         void loadAnimations(const aiScene* scene);
-        Handle<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
-        Handle<Material> loadMaterial(aiMaterial* mat, const aiScene* scene, const MeshVertexBuffer& vertexBuffer);
-        Handle<Resource> loadTexture(const aiScene* scene, const std::string& file);
+        ptr<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
+        ptr<Material> loadMaterial(aiMaterial* mat, const aiScene* scene, const MeshVertexBuffer& vertexBuffer);
+        ptr<Resource> loadTexture(const aiScene* scene, const std::string& file);
         void buildSkeleton(const aiScene* scene);
     };
 }

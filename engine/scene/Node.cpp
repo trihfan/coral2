@@ -5,17 +5,17 @@
 using namespace coral;
 
 Node::Node()
-    : translation(glm::vec3(0, 0, 0))
-    , scale(glm::vec3(1, 1, 1))
+    : parent(nullptr)
     , enabled(true)
-    , matrix(1)
-    , fixedMatrix(false)
-    , dirty(true)
 {
-    setRotationFromEulerAngles(glm::vec3(0, 0, 0));
-    connect(translation.modified, [this]() { dirty = true; useFixedMatrix = false; });
-    connect(rotation.modified, [this]() { dirty = true; useFixedMatrix = false; });
-    connect(scale.modified, [this]() { dirty = true; useFixedMatrix = false; });
+}
+
+Node::~Node()
+{
+    for (auto child : children)
+    {
+        child->setParent(nullptr);
+    }
 }
 
 bool Node::isDrawable() const
@@ -59,27 +59,37 @@ const std::vector<std::string>& Node::getRenderQueueTags() const
 void Node::setEnabled(bool enabled)
 {
     this->enabled = enabled;
-
     for (auto child : children)
     {
         child->setEnabled(enabled);
     }
 }
 
-void Node::addChild(Handle<Node> child)
+void Node::setParent(Node* parent)
 {
-    children.push_back(child);
-    child->dirty = true;
+    this->parent = parent;
+    nodeTransform.setDirty();
 }
 
-void Node::removeChild(Handle<Node> child)
+Node* Node::getParent() const
 {
-    auto it = std::find_if(children.begin(), children.end(), [&child](const Handle<Node>& other) {
+    return parent;
+}
+
+void Node::addChild(ptr<Node> child)
+{
+    children.push_back(child);
+    child->setParent(this);
+}
+
+void Node::removeChild(ptr<Node> child)
+{
+    auto it = std::find_if(children.begin(), children.end(), [&child](const ptr<Node>& other) {
         return child == other;
     });
     if (it != children.end())
     {
-        child->dirty = true;
+        child->setParent(nullptr);
         children.erase(it);
     }
 }
@@ -89,64 +99,15 @@ size_t Node::getChildCount() const
     return children.size();
 }
 
-Handle<Node> Node::getChild(size_t index) const
+ptr<Node> Node::getChild(size_t index) const
 {
     return children[index];
 }
 
-void Node::setRotationFromEulerAngles(const glm::vec3& eulerAngles)
-{
-    glm::quat quaternionX = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1.0, 0.0, 0.0));
-    glm::quat quaternionY = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0.0, 1.0, 0.0));
-    glm::quat quaternionZ = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0.0, 0.0, 1.0));
-    glm::quat finalOrientation = quaternionX * quaternionY * quaternionZ;
-    rotation.set(finalOrientation);
-}
-
-void Node::setMatrix(const glm::mat4& matrix)
-{
-    fixedMatrix = matrix;
-    dirty = true;
-    useFixedMatrix = true;
-}
-
-const glm::vec3& Node::getPosition() const
-{
-    return worldPosition;
-}
-
-const glm::mat4& Node::getMatrix() const
-{
-    return matrix;
-}
-
-void Node::updateMatrix(const glm::mat4& parentMatrix, const glm::vec3& parentPosition)
-{
-    if (dirty)
-    {
-        dirty = false;
-        if (useFixedMatrix)
-        {
-            matrix = parentMatrix * fixedMatrix;
-            worldPosition = glm::vec3(matrix * glm::vec4(0, 0, 0, 1)) + parentPosition;
-        }
-        else
-        {
-            matrix = parentMatrix * glm::translate(glm::mat4(1), translation.get()) * glm::toMat4(rotation.get()) * glm::scale(glm::mat4(1), scale.get());
-            worldPosition = translation.get() + parentPosition;
-        }
-
-        matrixChanged(matrix);
-    }
-
-    for (size_t i = 0; i < children.size(); i++)
-    {
-        children[i]->updateMatrix(matrix, getPosition());
-    }
-}
-
 void Node::update(const NodeUpdateParameters& parameters)
 {
+    nodeTransform.update(parent ? &parent->transform() : nullptr);
+
     for (size_t i = 0; i < children.size(); i++)
     {
         if (children[i]->isEnabled())
@@ -154,4 +115,54 @@ void Node::update(const NodeUpdateParameters& parameters)
             children[i]->update(parameters);
         }
     }
+}
+
+const Transform& Node::transform() const
+{
+    return nodeTransform;
+}
+
+Transform& Node::transform()
+{
+    return nodeTransform;
+}
+
+void Node::setTranslation(const glm::vec3& translation)
+{
+    nodeTransform.translation.set(translation);
+}
+
+const glm::vec3& Node::getTranslation() const
+{
+    return nodeTransform.translation.get();
+}
+
+void Node::setRotation(const glm::quat& rotation)
+{
+    nodeTransform.rotation.set(rotation);
+}
+
+void Node::setRotation(const glm::vec3& rotationEuler)
+{
+    nodeTransform.setRotationFromEulerAngles(rotationEuler);
+}
+
+const glm::quat& Node::getRotation() const
+{
+    return nodeTransform.rotation.get();
+}
+
+void Node::setScale(const glm::vec3& scale)
+{
+    nodeTransform.scale.set(scale);
+}
+
+const glm::vec3& Node::getScale() const
+{
+    return nodeTransform.scale.get();
+}
+
+const glm::vec3& Node::getWorldPosition() const
+{
+    return nodeTransform.getPosition();
 }

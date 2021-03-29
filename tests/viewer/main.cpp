@@ -6,11 +6,16 @@
 #ifndef __EMSCRIPTEN__
 #include "glad/glad.h"
 #endif
+#include "AssetManager.h"
+#include "FileUtils.h"
+#include "materials/MeshMaterial.h"
+#include "resources/ShaderComposer.h"
 #include "scene/Scene.h"
 #include "scene/SceneManager.h"
 #include "scene/animation/Animator.h"
 #include "scene/camera/OrbitCamera.h"
 #include "scene/light/PointLight.h"
+#include "scene/mesh/Mesh.h"
 #include "scene/mesh/Model.h"
 #include "scene/text/Text.h"
 #include <numeric>
@@ -27,8 +32,8 @@
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
+const unsigned int SCR_WIDTH = 1600;
+const unsigned int SCR_HEIGHT = 1200;
 static double lastX = SCR_WIDTH / 2.;
 static double lastY = SCR_HEIGHT / 2.;
 static bool firstMouse = true;
@@ -36,13 +41,12 @@ static bool mousePressed = false;
 static GLFWwindow* window;
 
 // Scene
-static Handle<OrbitCamera> camera;
-static std::vector<Handle<Model>> models;
-//static Handle<Text> text;
+static const std::string assetsDirectory = FileUtils::getAppDirectory() + "/assets";
+static ptr<OrbitCamera> camera;
 void setupScene();
 
 // Animation
-static std::vector<Handle<Animator>> animators;
+static std::vector<ptr<Animator>> animators;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -69,6 +73,7 @@ void mainloop()
     }
     catch (...)
     {
+        Logs(error) << "Unknown exception";
     }
 
     // Finish
@@ -157,6 +162,8 @@ int main()
 
 void setupScene()
 {
+    AssetManager::addDirectory(assetsDirectory);
+
     // scene
     auto scene = ObjectFactory::createWithName<Scene>("scene");
     SceneManager::setCurrentScene(scene);
@@ -164,33 +171,30 @@ void setupScene()
     // camera
     camera = ObjectFactory::createWithName<OrbitCamera>("camera");
     camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
-    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 10000));
-    camera->setView(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    camera->translation.set(glm::vec3(0, 1, 8));
+    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
+    camera->setView(glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
+    camera->setTranslation(glm::vec3(0, 1, 4));
     camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
     // Models
-    models = {
-        ObjectFactory::create<Model>("assets/models/Zombie/Zombie.fbx")
-    };
+    /*auto dog = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/robo-shiba/source/Shiba_Inu.fbx").url);
+    dog->setScale(glm::vec3(0.01, 0.01, 0.01));
+    scene->add(dog);*/
 
-    for (size_t i = 0; i < models.size(); i++)
-    {
-        // Setup model
-        scene->add(models[i]);
-        models[i]->scale.set(glm::vec3(0.01, 0.01, 0.01));
+    auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Capoeira1.fbx").url);
+    zombie->setScale(glm::vec3(0.01, 0.01, 0.01));
+    scene->add(zombie);
 
-        // Setup animator
-        animators.push_back(ObjectFactory::create<Animator>());
-        animators[i]->setAnimation(models[i]->getAnimation("Armature|ThrillerPart2"));
-        models[i]->addChild(animators[i]);
-    }
+    auto animator = ObjectFactory::create<Animator>();
+    animator->addAnimation({ zombie->getAnimation("Armature|Armature|mixamo.com|Layer0"), 0. });
+    animator->setLoopAnimation(true);
+    scene->add(animator);
 
     // Lights
     auto createLight = [scene](const glm::vec3& position) {
         auto light = ObjectFactory::create<PointLight>();
-        light->translation.set(position);
+        light->setTranslation(position);
         light->color = glm::vec3(1, 1, 1);
         light->constant = 1;
         light->linear = 0.09f;

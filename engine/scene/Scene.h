@@ -13,13 +13,13 @@ namespace coral
         Scene();
 
         // Objects
-        void add(Handle<Node> node);
-        void remove(Handle<Node> node);
+        void add(ptr<Node> node);
+        void remove(ptr<Node> node);
 
         // Get top node
-        Handle<Node> getTopNode() const;
+        ptr<Node> getTopNode() const;
 
     private:
-        Handle<Node> top_node;
+        ptr<Node> top_node;
     };
 }

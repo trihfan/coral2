@@ -9,17 +9,17 @@ Scene::Scene()
 {
 }
 
-void Scene::add(Handle<Node> node)
+void Scene::add(ptr<Node> node)
 {
     top_node->addChild(node);
 }
 
-void Scene::remove(Handle<Node> node)
+void Scene::remove(ptr<Node> node)
 {
     top_node->removeChild(node);
 }
 
-Handle<Node> Scene::getTopNode() const
+ptr<Node> Scene::getTopNode() const
 {
     return top_node;
 }

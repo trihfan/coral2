@@ -22,8 +22,8 @@ namespace coral
         bool isDrawable() const override;
 
         // material
-        void setMaterial(Handle<Material> material);
-        Handle<Material> getMaterial() const;
+        void setMaterial(ptr<Material> material);
+        ptr<Material> getMaterial() const;
 
         virtual void update(const NodeUpdateParameters& parameters) override;
 
@@ -31,6 +31,6 @@ namespace coral
         virtual void draw(const RenderParameters& parameters) = 0;
 
     protected:
-        Handle<Material> material;
+        ptr<Material> material;
     };
 }

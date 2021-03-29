@@ -1,5 +1,6 @@
 #include "Animator.h"
 #include "Animation.h"
+#include "Logs.h"
 
 using namespace coral;
 
@@ -8,6 +9,7 @@ Animator::Animator()
     , loop(false)
     , paused(false)
     , speed(1)
+    , totalDuration(0)
 {
 }
 
@@ -36,10 +38,27 @@ void Animator::setSpeed(double speed)
     this->speed = speed;
 }
 
-void Animator::setAnimation(Handle<Animation> animation)
+void Animator::addAnimation(AnimatorAnimation animation)
 {
-    this->animation = animation;
-    restart();
+    if (!animation.animation)
+    {
+        Logs(error) << "Null animation";
+        return;
+    }
+
+    animations.push_back(animation);
+
+    // Sort by start time
+    std::sort(animations.begin(), animations.end(), [](const auto& a, const auto& b) {
+        return a.startTime <= b.startTime;
+    });
+
+    // Update total duration
+    totalDuration = 0;
+    for (const auto& animation : animations)
+    {
+        totalDuration = std::max(totalDuration, animation.startTime + animation.animation->getDuration());
+    }
 }
 
 void Animator::setLoopAnimation(bool loop)
@@ -55,14 +74,30 @@ void Animator::update(const NodeUpdateParameters& parameters)
     if (!paused)
     {
         currentTime += parameters.deltaTime * speed;
+        currentTime = loop ? std::fmod(currentTime, getTotalDuration()) : std::clamp(currentTime, 0., getTotalDuration());
     }
 
-    if (animation)
+    // List current animations
+    std::vector<size_t> currentAnimations;
+    for (size_t i = 0; i < animations.size(); i++)
     {
-        // Clamp animation time
-        currentTime = loop ? std::fmod(currentTime, animation->getDuration()) : std::clamp(currentTime, 0., animation->getDuration());
-
-        // Update each properties
-        animation->update(currentTime);
+        if (currentTime >= animations[i].startTime && currentTime <= animations[i].startTime + animations[i].animation->getDuration())
+        {
+            currentAnimations.push_back(i);
+        }
     }
+
+    if (currentAnimations.size() == 1)
+    {
+        animations[currentAnimations[0]].animation->update(currentTime);
+    }
+    else if (currentAnimations.size() == 2)
+    {
+        // Interpolate both animations
+    }
+}
+
+double Animator::getTotalDuration() const
+{
+    return totalDuration;
 }

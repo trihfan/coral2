@@ -86,10 +86,13 @@
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
+      var container = document.getElementById ("canvas");
 
       var Module = {
         preRun: [],
-        postRun: [],
+        postRun: function(text) {
+          Module.setCanvasSize(container.clientWidth, container.clientHeight);
+        },
         printErr: function(text) {
           if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
           if (0) { // XXX disabled for safety typeof dump == 'function') {
@@ -147,11 +150,10 @@
         };
       };
 
-  	var container = document.getElementById ("canvas");
-	window.addEventListener ("resize", function (e) {
-        Module.setCanvasSize(container.clientWidth, container.clientHeight)
-
-    }, true);
+  	  
+	    window.addEventListener ("resize", function (e) {
+        Module.setCanvasSize(container.clientWidth, container.clientHeight);
+      }, true);
     </script>
     <script async type="text/javascript" src="viewer.js"></script>
   </body>
