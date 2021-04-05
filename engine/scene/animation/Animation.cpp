@@ -24,3 +24,11 @@ void Animation::update(double time)
         channel->update(time);
     }
 }
+
+void Animation::start()
+{
+}
+
+void Animation::stop()
+{
+}

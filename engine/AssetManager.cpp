@@ -11,6 +11,7 @@ std::unordered_map<std::string, Asset> AssetManager::assets;
 
 void AssetManager::addDirectory(const std::string& directory)
 {
+#ifndef __EMSCRIPTEN__ // <- todo for emscripten
     for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator(directory))
     {
         if (entry.is_regular_file())
@@ -29,10 +30,15 @@ void AssetManager::addDirectory(const std::string& directory)
             assets[fullname] = asset;
         }
     }
+#endif
 }
 
 Asset AssetManager::get(const std::string& parent, const std::string& name)
 {
+#ifdef __EMSCRIPTEN__
+    return Asset { name, parent + "/" + name, 0 };
+#endif
+
     const std::string fullname = parent + ":" + name;
 
     auto it = assets.find(fullname);
@@ -40,5 +46,6 @@ Asset AssetManager::get(const std::string& parent, const std::string& name)
     {
         return it->second;
     }
+
     return Asset();
 }

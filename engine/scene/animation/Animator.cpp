@@ -46,6 +46,7 @@ void Animator::addAnimation(AnimatorAnimation animation)
         return;
     }
 
+    animation.animation->start();
     animations.push_back(animation);
 
     // Sort by start time

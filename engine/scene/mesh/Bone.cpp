@@ -8,8 +8,14 @@ static const glm::mat4 identity(1);
 
 Bone::Bone(int id, const glm::mat4& offset)
     : id(id)
+    , animated(false)
     , offset(offset)
 {
+}
+
+void Bone::setAnimated(bool animated)
+{
+    this->animated = animated;
 }
 
 int Bone::getId()
@@ -19,5 +25,9 @@ int Bone::getId()
 
 glm::mat4 Bone::getBoneMatrix() const
 {
-    return transform().getMatrix() * offset;
+    if (animated)
+    {
+        return transform().getMatrix() * offset;
+    }
+    return transform().getMatrix();
 }

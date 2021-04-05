@@ -50,4 +50,15 @@ namespace coral
         ptr<Resource> loadTexture(const aiScene* scene, const std::string& file);
         void buildSkeleton(const aiScene* scene);
     };
+
+    class ModelAnimation : public Animation
+    {
+    public:
+        ModelAnimation(double duration, ptr<Node> skeleton);
+        void start() override;
+        void stop() override;
+
+    private:
+        ptr<Node> skeleton;
+    };
 }

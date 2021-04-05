@@ -16,6 +16,10 @@ namespace coral
         double getDuration() const;
         void update(double time);
 
+        // Mehods called when an animator start or stop animating
+        virtual void start();
+        virtual void stop();
+
     private:
         double duration;
         std::vector<ptr<ChannelInterface>> channels;

@@ -178,16 +178,16 @@ void setupScene()
     scene->add(camera);
 
     // Models
-    /*auto dog = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/robo-shiba/source/Shiba_Inu.fbx").url);
+    auto dog = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/robo-shiba/source/Shiba_Inu.fbx").url);
     dog->setScale(glm::vec3(0.01, 0.01, 0.01));
-    scene->add(dog);*/
+    //scene->add(dog);
 
-    auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Capoeira1.fbx").url);
+    auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
     zombie->setScale(glm::vec3(0.01, 0.01, 0.01));
     scene->add(zombie);
 
     auto animator = ObjectFactory::create<Animator>();
-    animator->addAnimation({ zombie->getAnimation("Armature|Armature|mixamo.com|Layer0"), 0. });
+    animator->addAnimation({ zombie->getAnimation("Armature|ThrillerPart1"), 0. });
     animator->setLoopAnimation(true);
     scene->add(animator);
 

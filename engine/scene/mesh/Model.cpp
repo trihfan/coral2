@@ -51,6 +51,7 @@ static std::vector<MeshTextureType> assimpToMeshTextureType {
 };
 
 Model::Model(const std::string& path)
+    : skeleton(ObjectFactory::create<Node>())
 {
     addRenderQueueTag(defaultRenderPassName);
 
@@ -136,7 +137,7 @@ void Model::loadAnimations(const aiScene* scene)
         Logs(info) << "Animation found: " << aiAnimation->mName.C_Str();
 
         // Create animation
-        ptr<Animation> animation = ObjectFactory::createWithName<Animation>(aiAnimation->mName.C_Str(), aiAnimation->mDuration / 1000.);
+        ptr<Animation> animation = ObjectFactory::createWithName<ModelAnimation>(aiAnimation->mName.C_Str(), aiAnimation->mDuration / 1000., skeleton);
 
         // Fill bones list
         for (unsigned int j = 0; j < aiAnimation->mNumChannels; j++)
@@ -416,7 +417,29 @@ void Model::buildSkeleton(const aiScene* scene)
         }
     };
 
-    skeleton = ObjectFactory::createWithName<Node>(scene->mRootNode->mName.C_Str());
+    skeleton->setName(scene->mRootNode->mName.C_Str());
     skeleton->transform().setMatrix(AssimpHelpers::convertMatrixToGLMFormat(scene->mRootNode->mTransformation));
     readAnimationNode(skeleton, scene->mRootNode);
+}
+
+ModelAnimation::ModelAnimation(double duration, ptr<Node> skeleton)
+    : Animation(duration)
+    , skeleton(skeleton)
+{
+}
+
+void ModelAnimation::start()
+{
+    for (auto bone : skeleton->getChildren<Bone>())
+    {
+        bone->setAnimated(true);
+    }
+}
+
+void ModelAnimation::stop()
+{
+    for (auto bone : skeleton->getChildren<Bone>())
+    {
+        bone->setAnimated(false);
+    }
 }
