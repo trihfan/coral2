@@ -43,6 +43,7 @@ static GLFWwindow* window;
 // Scene
 static const std::string assetsDirectory = FileUtils::getAppDirectory() + "/assets";
 static ptr<OrbitCamera> camera;
+static ptr<Text> text;
 void setupScene();
 
 // Animation
@@ -172,8 +173,8 @@ void setupScene()
     camera = ObjectFactory::createWithName<OrbitCamera>("camera");
     camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
     camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
-    camera->setView(glm::vec3(0, 1, 0), glm::vec3(0, 1, 0));
-    camera->setTranslation(glm::vec3(0, 1, 4));
+    camera->setView(glm::vec3(0, 0.5, 0), glm::vec3(0, 1, 0));
+    camera->setTranslation(glm::vec3(0, 0.5, 4));
     camera->setDistanceMinMax(0.3f, 100);
     scene->add(camera);
 
@@ -207,14 +208,14 @@ void setupScene()
     createLight(glm::vec3(-5, 1, 5));
 
     // Text
-    /*TextFormat format;
-    format.font = "assets/fonts/Ubuntu-C.ttf";
-    format.size = 28;
+    TextFormat format;
+    format.font = "assets/fonts/SukiYaki.otf";
+    format.size = 50;
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
-    text->setTranslation(glm::vec3(10, SCR_HEIGHT - 30, -1));
+    text->setTranslation(glm::vec3(15, SCR_HEIGHT - 35, -1));
     text->setText("coral 0.1");
-    scene->add(text);*/
+    scene->add(text);
 }
 
 void processInput(GLFWwindow* window)
@@ -233,7 +234,7 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width, height);
 
-    //text->setTranslation(glm::vec3(10, height - 30, 0));
+    text->setTranslation(glm::vec3(15, height - 35, 0));
 }
 
 void mouse_button(GLFWwindow*, int button, int action, int)

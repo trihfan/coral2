@@ -263,11 +263,11 @@ ptr<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, const M
 {
     // Check if the material is already loaded
     std::string name = mat->GetName().C_Str();
-    auto it = materialByName.find(name);
+    /*auto it = materialByName.find(name);
     if (it != materialByName.end())
     {
         return it->second;
-    }
+    }*/
 
     // Create material
     ptr<MeshMaterial> material = ObjectFactory::create<MeshMaterial>(getRenderQueueTags());

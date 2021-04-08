@@ -76,7 +76,8 @@ ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
 
     // Attributes
     composer.addAttribute(ShaderAttribute { "position", 0, "vec3" });
-    composer.addAttribute(ShaderAttribute { "textCoords", 1, "vec2" });
+    composer.addAttribute(ShaderAttribute { "normal", 1, "vec3" });
+    composer.addAttribute(ShaderAttribute { "textCoords", 2, "vec2" });
 
     // Process
     composer.process();
