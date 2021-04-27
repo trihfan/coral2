@@ -1,32 +1,17 @@
 #include "Engine.h"
-#include "AssetManager.h"
 #include "BackendCommandBuffer.h"
 #include "EngineConfig.h"
-#include "base/Object.h"
 #include "base/ObjectFactory.h"
-#include "materials/Material.h"
 #include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPassResourceManager.h"
-#include "resources/Framebuffer.h"
 #include "resources/PipelineManager.h"
 #include "resources/stb_image.h"
-#include "scene/DrawableNode.h"
-#include "scene/Node.h"
-#include "scene/Scene.h"
 #include "scene/SceneManager.h"
-#include "scene/camera/Camera.h"
 #include "utils/Freetype.h"
-#include <new>
 
 using namespace coral;
-
-void RenderParameters::clear()
-{
-    camera = nullptr;
-    lights = LightArray();
-}
 
 DEFINE_SINGLETON(Engine)
 

@@ -6,6 +6,8 @@ get_property(glm_path GLOBAL PROPERTY glm_path)
 get_property(utils_path GLOBAL PROPERTY utils_path)
 get_property(backend_interfaces_path GLOBAL PROPERTY backend_interfaces_path)
 get_property(assimp_path GLOBAL PROPERTY assimp_path)
+get_property(assimp_config_path GLOBAL PROPERTY assimp_config_path)
+get_property(assimp_lib_path GLOBAL PROPERTY assimp_lib_path)
 
 if(NOT EMSCRIPTEN)
     find_package(Freetype REQUIRED)
@@ -22,10 +24,11 @@ add_library(engine STATIC ${sources})
 set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Includes
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${utils_path} ${backend_interfaces_path} ${glm_path} ${assimp_path} ${FREETYPE_INCLUDE_DIRS})
+target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${utils_path} ${backend_interfaces_path} ${glm_path} ${assimp_path} ${assimp_config_path} ${FREETYPE_INCLUDE_DIRS})
 
 # Libraries
-target_link_libraries(engine PUBLIC utils backend_interfaces glm assimp)
+target_link_directories(engine PUBLIC ${assimp_lib_path})
+target_link_libraries(engine PUBLIC utils backend_interfaces assimp)
 
 if(NOT EMSCRIPTEN)
     target_link_libraries(engine PUBLIC Freetype::Freetype)

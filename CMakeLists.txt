@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Unity build
 if(NOT EMSCRIPTEN)
-    #set(CMAKE_UNITY_BUILD ON)
+    set(CMAKE_UNITY_BUILD ON)
 endif()
 
 # Project
@@ -47,7 +47,7 @@ if(EMSCRIPTEN)
 endif()
 
 # subdirectories
-add_subdirectory(externals) # Properties: glm_path, assimp_path
+add_subdirectory(externals)
 add_subdirectory(backends) # Properties: backend_interfaces_path, backend_opengl_path, backend_vulkan_path
 add_subdirectory(engine) # Properties: engine_path
 add_subdirectory(utils) # Properties: utils_path

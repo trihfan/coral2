@@ -27,6 +27,9 @@ namespace coral
         // Render the text
         virtual void release() override;
 
+        // Update the node, called each frame
+        virtual void update(const NodeUpdateParameters& parameters) override;
+
     private:
         TextFormat format;
         std::string text;

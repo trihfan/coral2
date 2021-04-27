@@ -36,22 +36,34 @@ namespace coral
         bool isEnabled() const;
         void setEnabled(bool enabled);
 
-        // Transform
+        // Update the node, called each frame
+        virtual void update(const NodeUpdateParameters& parameters);
+
+        /*
+         * --- Transform ------------------
+         */
         const Transform& transform() const;
         Transform& transform();
 
+        // Translation
         void setTranslation(const glm::vec3& translation);
         const glm::vec3& getTranslation() const;
 
+        // Rotation
         void setRotation(const glm::quat& rotation);
         void setRotation(const glm::vec3& rotationEuler);
         const glm::quat& getRotation() const;
 
+        // Scale
         void setScale(const glm::vec3& scale);
         const glm::vec3& getScale() const;
 
+        // Return the position in word coordinates
         const glm::vec3& getWorldPosition() const;
 
+        /*
+         * --- Hierarchy ------------------
+         */
         // Parent
         void setParent(Node* parent);
         Node* getParent() const;
@@ -63,9 +75,6 @@ namespace coral
         ptr<Node> getChild(size_t index) const;
         template <typename Type>
         std::vector<ptr<Type>> getChildren() const;
-
-        // Update the node, called each frame
-        virtual void update(const NodeUpdateParameters& parameters);
 
     private:
         // Params

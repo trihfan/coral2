@@ -32,13 +32,6 @@ namespace coral
         static void frame();
 
     private:
-        /**
-         * @brief Constructor
-         * @param config The engine config used to create the render graph
-         */
-        Engine(ptr<backend::Backend> backend);
-
-    private:
         // Time point of engine start
         std::chrono::steady_clock::time_point startTime;
 
@@ -47,5 +40,8 @@ namespace coral
 
         // Current render parameters
         RenderParameters currentParameters;
+
+        // Constructor
+        Engine(ptr<backend::Backend> backend);
     };
 }

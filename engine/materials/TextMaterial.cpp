@@ -26,14 +26,14 @@ TextMaterial::TextMaterial(const std::vector<std::string>& renderQueueTags, cons
 
 void TextMaterial::use(const RenderParameters& params)
 {
-    if (this->params.mode == TextMode::text2d && dirty)
+    /*if (this->params.mode == TextMode::text2d && dirty)
     {
         projection = glm::ortho(0.f, static_cast<float>(params.width), 0.f, static_cast<float>(params.height), 0.1f, 100.f);
         dirty = false;
-    }
+    }*/
 
     auto pipeline = getPipeline();
-    pipeline->setUniform("projectionMatrix", projection);
+    pipeline->setUniform("projectionMatrix", glm::ortho(0.f, static_cast<float>(params.width), 0.f, static_cast<float>(params.height), 0.1f, 100.f));
     pipeline->setUniform("color", color);
     pipeline->setUniform("glyph", 0);
     resource->bind(0);

@@ -16,7 +16,7 @@ set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(backend_interfaces PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${utils_path}" "${glm_path}")
 
 # Libraries
-target_link_libraries(backend_interfaces PUBLIC utils glm)
+target_link_libraries(backend_interfaces PUBLIC utils)
 
 # Set output directories
 set_target_properties(backend_interfaces PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${lib_output_directory})

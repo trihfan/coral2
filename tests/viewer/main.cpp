@@ -179,18 +179,25 @@ void setupScene()
     scene->add(camera);
 
     // Models
-    auto dog = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/robo-shiba/source/Shiba_Inu.fbx").url);
-    dog->setScale(glm::vec3(0.01, 0.01, 0.01));
-    //scene->add(dog);
-
     auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
     zombie->setScale(glm::vec3(0.01, 0.01, 0.01));
+    zombie->setTranslation(glm::vec3(-0.5, 0, 0));
     scene->add(zombie);
 
     auto animator = ObjectFactory::create<Animator>();
     animator->addAnimation({ zombie->getAnimation("Armature|ThrillerPart1"), 0. });
     animator->setLoopAnimation(true);
     scene->add(animator);
+
+    auto zombie2 = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie2.fbx").url);
+    zombie2->setScale(glm::vec3(0.01, 0.01, 0.01));
+    zombie2->setTranslation(glm::vec3(0.5, 0, 0));
+    scene->add(zombie2);
+
+    auto animator2 = ObjectFactory::create<Animator>();
+    animator2->addAnimation({ zombie2->getAnimation("mixamo.com"), 0. });
+    animator2->setLoopAnimation(true);
+    scene->add(animator2);
 
     // Lights
     auto createLight = [scene](const glm::vec3& position) {
@@ -213,7 +220,7 @@ void setupScene()
     format.size = 50;
     text = ObjectFactory::create<Text>(format);
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
-    text->setTranslation(glm::vec3(15, SCR_HEIGHT - 35, -1));
+    text->setTranslation(glm::vec3(15, 15, -1));
     text->setText("coral 0.1");
     scene->add(text);
 }
@@ -233,8 +240,6 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
     glViewport(0, 0, width, height);
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width, height);
-
-    text->setTranslation(glm::vec3(15, height - 35, 0));
 }
 
 void mouse_button(GLFWwindow*, int button, int action, int)

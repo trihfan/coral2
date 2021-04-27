@@ -41,6 +41,10 @@ namespace coral
         int width;
         int height;
 
-        void clear();
+        void clear()
+        {
+            camera = nullptr;
+            lights = LightArray();
+        }
     };
 }

@@ -41,7 +41,7 @@ if(backend_opengl_version STREQUAL "gl")
 endif()
 
 # Libraries
-target_link_libraries(backend_opengl PUBLIC utils glm)
+target_link_libraries(backend_opengl PUBLIC utils)
 if(NOT EMSCRIPTEN)
     target_link_libraries(backend_opengl PUBLIC OpenGL::GL)
 endif()

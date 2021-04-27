@@ -108,3 +108,8 @@ ptr<TextMaterial> Text::getMaterialFor(char character)
     dictionary[character] = material;
     return material;
 }
+
+void Text::update(const NodeUpdateParameters& parameters)
+{
+    Node::update(parameters);
+}
