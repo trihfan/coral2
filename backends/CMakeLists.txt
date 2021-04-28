@@ -10,5 +10,5 @@ endif()
 
 # Vulkan
 if(BACKEND_VULKAN_ENABLED)
-    #add_subdirectory(vulkan)
+    add_subdirectory(vulkan)
 endif()

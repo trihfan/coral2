@@ -1,13 +1,8 @@
+#include "AssetManager.h"
 #include "Engine.h"
-#include "OpenglBackend.h"
+#include "FileUtils.h"
 #include "base/Object.h"
 #include "base/ObjectFactory.h"
-//#include "VulkanBackend.h"
-#ifndef __EMSCRIPTEN__
-#include "glad/glad.h"
-#endif
-#include "AssetManager.h"
-#include "FileUtils.h"
 #include "materials/MeshMaterial.h"
 #include "resources/ShaderComposer.h"
 #include "scene/Scene.h"
@@ -20,14 +15,26 @@
 #include "scene/text/Text.h"
 #include <numeric>
 
-// Glfw3 include
-#ifdef EMSCRIPTEN
-#define GLFW_INCLUDE_GLEXT
-#include <GLFW/glfw3.h>
-#include <emscripten.h>
-#else
-#include <GLFW/glfw3.h>
+// Opengl specifics
+#ifdef ENABLE_OPENGL
+#include "OpenglBackend.h"
+#ifndef __EMSCRIPTEN__
+#include "glad/glad.h"
 #endif
+#endif
+
+// VUlkan specifics
+#ifdef ENABLE_VULKAN
+#include "VulkanBackend.h"
+#endif
+
+// Emscripten specifics
+#ifdef __EMSCRIPTEN__
+#define GLFW_INCLUDE_GLEXT
+#include <emscripten.h>
+#endif
+
+#include <GLFW/glfw3.h>
 
 using namespace coral;
 
@@ -237,7 +244,7 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height); // todo move to backend
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width, height);
 }

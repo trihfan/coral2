@@ -169,7 +169,7 @@ void VulkanBackend::createSwapchain()
     QueueFamilyIndices indices = getQueueFamilies(mainDevice.physicalDevice);
 
     // If graphics && presentation family are different, then swapchain image must be shared between queue families
-    if (indices.graphicsFamily != indices.graphicsFamily)
+    if (indices.graphicsFamily != indices.presentationFamily)
     {
         uint32_t queueFamilyIndices[] = { static_cast<uint32_t>(indices.graphicsFamily), static_cast<uint32_t>(indices.graphicsFamily) };
 

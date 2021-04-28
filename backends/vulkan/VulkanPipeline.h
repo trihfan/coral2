@@ -1,6 +1,6 @@
 #pragma once
 #include "BackendPipeline.h"
-#include "VulkanBackendStructures.h" an
+#include "VulkanBackendStructures.h"
 
 namespace backend::vulkan
 {

@@ -33,7 +33,7 @@ if(BACKEND_OPENGL_ENABLED)
     add_definitions(-DENABLE_OPENGL)
 endif()
 if(BACKEND_VULKAN_ENABLED)
-    #add_definitions(-DENABLE_VULKAN)
+    add_definitions(-DENABLE_VULKAN)
 endif()
 
 # define output directories
@@ -47,7 +47,7 @@ if(EMSCRIPTEN)
 endif()
 
 # subdirectories
-add_subdirectory(externals)
+add_subdirectory(externals) # Properties: glm_path, assimp_path
 add_subdirectory(backends) # Properties: backend_interfaces_path, backend_opengl_path, backend_vulkan_path
 add_subdirectory(engine) # Properties: engine_path
 add_subdirectory(utils) # Properties: utils_path

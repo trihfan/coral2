@@ -27,7 +27,7 @@ namespace coral
         ~Logs();
 
         // stream operator
-        template<typename type>
+        template <typename type>
         inline Logs& operator<<(const type& value)
         {
             write(value);
@@ -48,7 +48,7 @@ namespace coral
         void setColor(LogType type);
 
         // write to the standard output
-        template<typename type>
+        template <typename type>
         void write(const type& value)
         {
             std::cout << value;

@@ -11,7 +11,7 @@ endif()
 
 # Definitions
 if(BACKEND_VULKAN_ENABLED)
-    #add_definitions(-DGLFW_INCLUDE_VULKAN)
+    add_definitions(-DGLFW_INCLUDE_VULKAN)
 elseif(EMSCRIPTEN)
     add_definitions(-DGLFW_INCLUDE_ES3)
 endif()
@@ -33,7 +33,7 @@ if(BACKEND_OPENGL_ENABLED)
 endif()
 
 if(BACKEND_VULKAN_ENABLED)
-    #target_include_directories(viewer PUBLIC ${backend_vulkan_path})
+    target_include_directories(viewer PUBLIC ${backend_vulkan_path})
 endif()
 
 # Libraries
@@ -44,7 +44,7 @@ if(BACKEND_OPENGL_ENABLED)
 endif()
 
 if(BACKEND_VULKAN_ENABLED)
-    #target_link_libraries(viewer backend_vulkan)
+    target_link_libraries(viewer backend_vulkan)
 endif()
 
 if(NOT EMSCRIPTEN)
