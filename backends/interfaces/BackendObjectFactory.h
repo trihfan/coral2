@@ -6,7 +6,7 @@
 namespace backend
 {
     template <typename Object, typename... Args>
-    extern std::function<std::unique_ptr<Object>(const Args&...)> creator;
+    std::function<std::unique_ptr<Object>(const Args&...)> creator;
 
     /**
      * Generic factory used to create backend objects

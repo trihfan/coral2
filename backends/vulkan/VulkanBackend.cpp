@@ -554,3 +554,8 @@ VkImageView VulkanBackend::createImageView(VkImage image, VkFormat format, VkIma
 
     return imageView;
 }
+
+std::string VulkanBackend::getName() const
+{
+    return "vulkan";
+}

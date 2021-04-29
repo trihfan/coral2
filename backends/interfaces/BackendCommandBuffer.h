@@ -31,6 +31,7 @@ namespace backend
         //
         virtual void clearColor(float red, float green, float blue, float alpha) = 0;
         virtual void clearDepth() = 0;
+        virtual void setViewport(float x, float y, float width, float height) = 0;
 
         // Draw
         virtual void draw(int indexCount) = 0;

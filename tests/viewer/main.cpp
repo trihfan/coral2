@@ -18,9 +18,6 @@
 // Opengl specifics
 #ifdef ENABLE_OPENGL
 #include "OpenglBackend.h"
-#ifndef __EMSCRIPTEN__
-#include "glad/glad.h"
-#endif
 #endif
 
 // VUlkan specifics
@@ -89,9 +86,13 @@ void mainloop()
     glfwPollEvents();
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     BackendType type = opengl;
+    if (argc > 1 && std::string(argv[1]) == "-vulkan")
+    {
+        type = vulkan;
+    }
 
     // glfw: initialize and configure
     // ------------------------------0
@@ -144,7 +145,8 @@ int main()
     }
     else if (type == vulkan)
     {
-        //backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
+        backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
+        backend->init({ 1 });
         return 0;
     }
 
@@ -244,7 +246,6 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height)
 {
     // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height); // todo move to backend
     camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
     Engine::resize(width, height);
 }

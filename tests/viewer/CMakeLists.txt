@@ -17,7 +17,7 @@ elseif(EMSCRIPTEN)
 endif()
 
 if(EMSCRIPTEN)
-    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s ALLOW_MEMORY_GROWTH=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ERROR_ON_UNDEFINED_SYMBOLS=0")
 endif()
 
 # Make lib
@@ -25,30 +25,18 @@ file(GLOB_RECURSE sources *.h *.cpp)
 add_executable(viewer ${sources})
 set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Includes
+# Includes and libs
 target_include_directories(viewer PUBLIC ${engine_path})
-
-if(BACKEND_OPENGL_ENABLED)
-    target_include_directories(viewer PUBLIC ${backend_opengl_path})
-endif()
-
-if(BACKEND_VULKAN_ENABLED)
-    target_include_directories(viewer PUBLIC ${backend_vulkan_path})
-endif()
-
-# Libraries
 target_link_libraries(viewer engine)
 
 if(BACKEND_OPENGL_ENABLED)
+    target_include_directories(viewer PUBLIC ${backend_opengl_path})
     target_link_libraries(viewer backend_opengl)
 endif()
 
 if(BACKEND_VULKAN_ENABLED)
-    target_link_libraries(viewer backend_vulkan)
-endif()
-
-if(NOT EMSCRIPTEN)
-    target_link_libraries(viewer glfw)
+    target_include_directories(viewer PUBLIC ${backend_vulkan_path})
+    target_link_libraries(viewer glfw backend_vulkan)
 endif()
 
 # Set output directories

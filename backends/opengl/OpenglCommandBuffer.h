@@ -12,6 +12,7 @@ namespace backend::opengl
         void end() override;
 
         //
+        void setViewport(float x, float y, float width, float height) override;
         void clearColor(float red, float green, float blue, float alpha) override;
         void clearDepth() override;
 

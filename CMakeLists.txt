@@ -43,7 +43,7 @@ set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
 # Emscripten config
 if(EMSCRIPTEN)
     add_compile_options("-s" "USE_FREETYPE=1")
-    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s WASM=1 -s USE_FREETYPE=1 --preload-file ${bin_output_directory}/assets@/assets")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s WASM=1 -s USE_FREETYPE=1 -s --preload-file ${bin_output_directory}/assets@/assets")
 endif()
 
 # subdirectories
