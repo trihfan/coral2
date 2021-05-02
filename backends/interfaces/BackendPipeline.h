@@ -45,7 +45,6 @@ namespace backend
         virtual ~BackendPipeline() = default;
 
         virtual void use() = 0;
-        virtual void resize(int width, int height) = 0; // todo remove
 
         virtual void setUniform(const std::string& name, bool value) const = 0;
         virtual void setUniform(const std::string& name, int value) const = 0;

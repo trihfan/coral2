@@ -8,8 +8,8 @@ namespace backend::vulkan
     {
     public:
         VulkanPipeline(const BackendPipelineParams& params, VulkanDevice device);
+        ~VulkanPipeline() override;
         void use() override;
-        void resize(int width, int height) override;
 
         void setUniform(const std::string& name, bool value) const override;
         void setUniform(const std::string& name, int value) const override;
@@ -23,6 +23,7 @@ namespace backend::vulkan
 
     private:
         VulkanDevice device;
+        VkPipeline pipeline;
+        VkPipelineLayout layout;
     };
 }
-#pragma once

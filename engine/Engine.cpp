@@ -74,14 +74,14 @@ void Engine::frame()
     currentParameters.time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count()) / 1e6;
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
-    // Update the scene, lists cameras, lights, ...
-    SceneManager::update(currentParameters);
-
     // Bake the render graph when invalidated
     RenderPassManager::update(currentParameters);
 
     // Bind pipeline to the render passes
     PipelineManager::update();
+
+    // Update the scene, lists cameras, lights, ...
+    SceneManager::update(currentParameters);
 
     // Initialize / release all objects
     // This allocate and deallocate gpu data

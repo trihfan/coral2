@@ -1,8 +1,10 @@
 #include "VulkanBackend.h"
 #include "CoralException.h"
 #include "Logs.h"
+#include "VulkanCommandBuffer.h"
 #include "VulkanError.h"
 #include "VulkanPipeline.h"
+#include "VulkanRenderPass.h"
 #include "VulkanValidation.h"
 #include <algorithm>
 #include <cstring>
@@ -33,7 +35,16 @@ bool VulkanBackend::internalInit()
         return false;
     }
 
-    Backend::setCurrent(this);
+    // Set creators
+    creator<BackendRenderPass, BackendRenderPassParams> = [this](const BackendRenderPassParams& params) { return std::make_unique<VulkanRenderPass>(params, mainDevice, swapchainFormat); };
+    creator<BackendPipeline, BackendPipelineParams> = [this](const BackendPipelineParams& params) { return std::make_unique<VulkanPipeline>(params, mainDevice); };
+    creator<BackendCommandBuffer> = []() { return std::make_unique<VulkanCommandBuffer>(); };
+
+    /*creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };
+    creator<BackendBackbufferFramebuffer> = []() { return std::make_unique<OpenglBackendBackbufferFramebuffer>(); };
+    creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
+    creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };*/
+
     return true;
 }
 

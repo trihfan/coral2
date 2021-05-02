@@ -89,7 +89,7 @@ void mainloop()
 int main(int argc, char* argv[])
 {
     BackendType type = opengl;
-    if (argc > 1 && std::string(argv[1]) == "-vulkan")
+    //if (argc > 1 && std::string(argv[1]) == "-vulkan")
     {
         type = vulkan;
     }
@@ -139,16 +139,18 @@ int main(int argc, char* argv[])
     glfwSetScrollCallback(window, scroll_callback);
 
     std::unique_ptr<backend::Backend> backend;
+#ifdef ENABLE_OPENGL
     if (type == opengl)
     {
         backend = std::make_unique<backend::opengl::OpenglBackend>();
     }
-    else if (type == vulkan)
+#endif
+#ifdef ENABLE_VULKAN
+    if (type == vulkan)
     {
         backend = std::make_unique<backend::vulkan::VulkanBackend>(window);
-        backend->init({ 1 });
-        return 0;
     }
+#endif
 
     // setup engine
     Engine::create(std::move(backend));

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "BackendRenderPass.h"
 #include "base/Object.h"
 #include "resources/Framebuffer.h"
+#include <memory>
 
 namespace coral
 {
@@ -37,6 +39,8 @@ namespace coral
         void addOutput(const RenderPassResource& output);
         const std::vector<RenderPassResource>& getOutputs() const;
 
+        backend::BackendRenderPass* getBackendRenderPass() const;
+
     protected:
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) = 0;
 
@@ -45,14 +49,14 @@ namespace coral
         std::vector<ptr<Resource>> outputResources;
 
     private:
-        ptr<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
-
-    private:
         // Render pass resources
         std::vector<RenderPassResource> inputs;
         std::vector<RenderPassResource> outputs;
 
         // The output framebuffer
         ptr<Framebuffer> framebuffer;
+        std::unique_ptr<backend::BackendRenderPass> backendRenderPass;
+
+        ptr<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
     };
 }

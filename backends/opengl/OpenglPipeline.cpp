@@ -38,10 +38,6 @@ void OpenglPipeline::use()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void OpenglPipeline::resize(int, int)
-{
-}
-
 void OpenglPipeline::setUniform(const std::string& name, bool value) const
 {
     shader->setUniform(name, value);
