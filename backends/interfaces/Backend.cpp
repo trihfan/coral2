@@ -21,14 +21,13 @@ void Backend::setCurrent(Backend* backend)
 
 bool Backend::init(const BackendParams& params)
 {
-    bool result = internalInit();
     setCurrent(this);
-    BackendCommandBuffer::init(params);
+    threadCount = params.threadCount;
+    bool result = internalInit();
     return result;
 }
 
 bool Backend::release()
 {
-    BackendCommandBuffer::release();
     return internalRelease();
 }

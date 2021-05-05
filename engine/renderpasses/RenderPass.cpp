@@ -8,8 +8,6 @@
 
 using namespace coral;
 
-const std::string& RenderPassResource::backbuffer = "backbuffer";
-
 void RenderPass::render(RenderQueue& queue, const RenderParameters& parameters)
 {
     if (framebuffer)
@@ -51,24 +49,16 @@ void RenderPass::prepare(const RenderParameters& parameters)
     }
 
     // Outputs
-    if (outputs.size() == 1 && outputs[0].name == RenderPassResource::backbuffer)
+    std::vector<FramebufferResource> framebufferResources;
+    outputResources.resize(outputs.size());
+    for (size_t i = 0; i < outputs.size(); i++)
     {
-        framebuffer = RenderPassFramebufferManager::getBackbuffer();
-    }
-    else
-    {
-        std::vector<FramebufferResource> framebufferResources;
-        outputResources.resize(outputs.size());
-        for (size_t i = 0; i < outputs.size(); i++)
-        {
-            outputResources[i] = getResource(outputs[i], parameters);
-            framebufferResources.push_back(FramebufferResource { outputs[i].role, outputResources[i] });
-        }
-
-        // Get the framebuffer
-        framebuffer = RenderPassFramebufferManager::getFramebufferFor(framebufferResources);
+        outputResources[i] = getResource(outputs[i], parameters);
+        framebufferResources.push_back(FramebufferResource { outputs[i].role, outputResources[i] });
     }
 
+    // Get the framebuffer
+    framebuffer = RenderPassFramebufferManager::getFramebufferFor(toPtr<RenderPass>(), framebufferResources);
     backendRenderPass = backend::BackendObjectFactory<backend::BackendRenderPass>::create(backend::BackendRenderPassParams());
 }
 

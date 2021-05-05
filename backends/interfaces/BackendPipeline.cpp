@@ -5,8 +5,3 @@ using namespace backend;
 
 template <>
 std::function<std::unique_ptr<BackendPipeline>(const BackendPipelineParams&)> creator<BackendPipeline, BackendPipelineParams> = nullptr;
-
-BackendPipeline::BackendPipeline(const BackendPipelineParams& params)
-    : params(params)
-{
-}

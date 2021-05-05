@@ -28,11 +28,8 @@ namespace backend
     class BackendVertexBuffer
     {
     public:
-        BackendVertexBuffer(const BackendVertexBufferData& data);
+        BackendVertexBuffer(const BackendVertexBufferData& data) { }
         virtual ~BackendVertexBuffer() = default;
         virtual void draw() = 0;
-
-    protected:
-        BackendVertexBufferData data;
     };
 }

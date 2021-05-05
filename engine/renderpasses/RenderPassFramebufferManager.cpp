@@ -31,7 +31,7 @@ void RenderPassFramebufferManager::clear()
     instance->framebuffers.clear();
 }
 
-ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::vector<FramebufferResource>& resources)
+ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const ptr<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources)
 {
     if (resources.empty())
     {
@@ -46,7 +46,7 @@ ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::vect
         }
     }
 
-    ptr<Framebuffer> framebuffer = ObjectFactory::create<Framebuffer>();
+    ptr<Framebuffer> framebuffer = ObjectFactory::create<Framebuffer>(renderpass);
     for (const auto& resource : resources)
     {
         framebuffer->addResource(resource);
@@ -55,12 +55,6 @@ ptr<Framebuffer> RenderPassFramebufferManager::getFramebufferFor(const std::vect
     return framebuffer;
 }
 
-ptr<Framebuffer> RenderPassFramebufferManager::getBackbuffer()
-{
-    return instance->defaultFramebuffer;
-}
-
-RenderPassFramebufferManager::RenderPassFramebufferManager(ptr<Framebuffer> defaultFramebuffer)
-    : defaultFramebuffer(defaultFramebuffer)
+RenderPassFramebufferManager::RenderPassFramebufferManager()
 {
 }

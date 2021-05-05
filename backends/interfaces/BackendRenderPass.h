@@ -9,10 +9,7 @@ namespace backend
     class BackendRenderPass
     {
     public:
-        BackendRenderPass(const BackendRenderPassParams& params);
+        BackendRenderPass(const BackendRenderPassParams& params) { }
         virtual ~BackendRenderPass() = default;
-
-    protected:
-        const BackendRenderPassParams params;
     };
 }

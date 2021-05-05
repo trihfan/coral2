@@ -15,7 +15,7 @@ using namespace coral;
 
 DEFINE_SINGLETON(Engine)
 
-Engine::Engine(std::shared_ptr<backend::Backend> backend)
+Engine::Engine(std::shared_ptr<backend::Backend> backend, int width, int height)
     : backend(std::move(backend))
 {
     startTime = std::chrono::steady_clock::now();
@@ -33,12 +33,15 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend)
     PipelineManager::create();
     SceneManager::create();
     RenderPassManager::create();
-    RenderPassFramebufferManager::create(ObjectFactory::createWithName<BackbufferFramebuffer>("backbuffer"));
+    RenderPassFramebufferManager::create();
     RenderPassResourceManager::create();
 
     // Setup engine
     Freetype::init();
     EngineConfig::setup();
+
+    // Finally resize
+    resizeInternal(width, height);
 }
 
 void Engine::release()
@@ -58,9 +61,14 @@ void Engine::release()
 
 void Engine::resize(int width, int height)
 {
+    instance->resizeInternal(width, height);
+}
+
+void Engine::resizeInternal(int width, int height)
+{
     Logs(info) << "update size: " << width << ", " << height;
-    instance->currentParameters.width = width;
-    instance->currentParameters.height = height;
+    currentParameters.width = width;
+    currentParameters.height = height;
     RenderPassManager::invalidate();
     PipelineManager::clear();
 }
@@ -88,7 +96,7 @@ void Engine::frame()
     ObjectFactory::update();
 
     // Submit objects updates
-    backend::BackendCommandBuffer::submit(backend::BackendCommandBufferStage::staging);
+    backend::BackendCommandBufferManager::submit(backend::BackendCommandBufferStage::staging);
 
     // Render for each active camera
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
@@ -108,5 +116,5 @@ void Engine::frame()
         currentParameters.clear();
     }
 
-    backend::BackendCommandBuffer::submit(backend::BackendCommandBufferStage::draw);
+    backend::BackendCommandBufferManager::submit(backend::BackendCommandBufferStage::draw);
 }

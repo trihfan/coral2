@@ -8,7 +8,7 @@
 using namespace coral;
 using namespace backend::vulkan;
 
-VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, VulkanDevice device)
+VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, const VulkanDevice& device, const VkExtent2D& extend)
     : BackendPipeline(params)
     , device(device)
 {
@@ -53,14 +53,14 @@ VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, VulkanDevice
     VkViewport viewport {};
     viewport.x = 0.f;
     viewport.y = 0.f;
-    //viewport.width = 100;
-    //viewport.height = 100;
+    viewport.width = extend.width;
+    viewport.height = extend.height;
     viewport.minDepth = 0.f;
     viewport.maxDepth = 1.f;
 
     VkRect2D scissor {};
     scissor.offset = { 0, 0 };
-    //scissor.extent = swapchainExtent;
+    scissor.extent = extend;
 
     VkPipelineViewportStateCreateInfo viewportCreateInfo {};
     viewportCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

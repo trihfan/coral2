@@ -14,15 +14,9 @@ namespace backend
     class BackendCommandBuffer
     {
     public:
+        // Construction
         BackendCommandBuffer() = default;
         virtual ~BackendCommandBuffer() = default;
-
-        // Manage
-        // Return the command buffer for the current thread
-        static BackendCommandBuffer* getCommandBuffer();
-
-        // Submit the command buffers to the given stage
-        static void submit(BackendCommandBufferStage stage);
 
         // Use
         virtual void begin() = 0;
@@ -35,13 +29,26 @@ namespace backend
 
         // Draw
         virtual void draw(int indexCount) = 0;
+    };
 
-    private:
-        friend class Backend;
-        static std::vector<std::unique_ptr<backend::BackendCommandBuffer>> commandBuffers;
-        static std::vector<bool> usedCommandBuffers;
+    class BackendCommandBufferManager
+    {
+    public:
+        static void setInstance(std::unique_ptr<BackendCommandBufferManager> newInstance);
 
-        static void init(const BackendParams& params);
-        static void release();
+        // Return the command buffer for the current thread
+        static BackendCommandBuffer* getCommandBuffer();
+
+        // Submit the command buffers to the given stage
+        static void submit(BackendCommandBufferStage stage);
+
+    public:
+        virtual ~BackendCommandBufferManager() = default;
+
+        virtual BackendCommandBuffer* internalGetCommandBuffer() = 0;
+        virtual void internalSubmit(BackendCommandBufferStage stage) = 0;
+
+    protected:
+        static std::unique_ptr<BackendCommandBufferManager> instance;
     };
 }

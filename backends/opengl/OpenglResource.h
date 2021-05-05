@@ -16,9 +16,11 @@ namespace backend::opengl
         virtual void bind(int index) override;
 
         GLuint getId() const;
+        int getSamplesCount() const;
 
     private:
         GLuint id;
+        int samples;
 
         static GLint getInternalFormatFrom(BackendResourceFormat format);
         static GLenum getFormatFrom(BackendResourceFormat format);

@@ -9,6 +9,8 @@
 
 namespace coral
 {
+    class RenderPass;
+
     struct FramebufferResource
     {
         backend::BackendFramebufferResourceRole role;
@@ -18,34 +20,23 @@ namespace coral
     class Framebuffer : public Object
     {
     public:
-        Framebuffer();
+        // Constructor with the renderpass to make it compatible with
+        Framebuffer(const ptr<RenderPass>& renderpass);
 
+        // Framebuffer resources
         void addResource(const FramebufferResource& resource);
         const std::vector<FramebufferResource>& getResources() const;
 
+        // Bind the framebuffer
         virtual void bind(backend::BackendFramebufferUsage usage);
 
+        // Initialize
         virtual void init() override;
         virtual void release() override;
 
     private:
+        ptr<RenderPass> renderpass;
         std::unique_ptr<backend::BackendFramebuffer> backendFramebuffer;
         std::vector<FramebufferResource> resources;
-    };
-
-    /**
-     * Special framebuffer for binding to the backbuffer
-     */
-    class BackbufferFramebuffer : public Framebuffer
-    {
-    public:
-        BackbufferFramebuffer();
-        void bind(backend::BackendFramebufferUsage usage) override;
-
-        virtual void init() override;
-        virtual void release() override;
-
-    protected:
-        std::unique_ptr<backend::BackendBackbufferFramebuffer> backbuffer;
     };
 }

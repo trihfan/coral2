@@ -41,7 +41,7 @@ namespace backend
     class BackendPipeline
     {
     public:
-        BackendPipeline(const BackendPipelineParams& params);
+        BackendPipeline(const BackendPipelineParams& params) { }
         virtual ~BackendPipeline() = default;
 
         virtual void use() = 0;
@@ -55,8 +55,5 @@ namespace backend
         virtual void setUniform(const std::string& name, const glm::mat2& mat) const = 0;
         virtual void setUniform(const std::string& name, const glm::mat3& mat) const = 0;
         virtual void setUniform(const std::string& name, const glm::mat4& mat) const = 0;
-
-    protected:
-        const BackendPipelineParams params;
     };
 }

@@ -27,19 +27,19 @@ bool OpenglBackend::internalInit()
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     // Set creators
-    creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };
-    creator<BackendBackbufferFramebuffer> = []() { return std::make_unique<OpenglBackendBackbufferFramebuffer>(); };
+    creator<BackendFramebuffer, BackendFramebufferCreationParams> = [](const BackendFramebufferCreationParams& params) { return std::make_unique<OpenglFramebuffer>(params); };
     creator<BackendRenderPass, BackendRenderPassParams> = [](const BackendRenderPassParams& params) { return std::make_unique<OpenglRenderPass>(params); };
     creator<BackendPipeline, BackendPipelineParams> = [](const BackendPipelineParams& params) { return std::make_unique<OpenglPipeline>(params); };
     creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
-    creator<BackendCommandBuffer> = []() { return std::make_unique<OpenglCommandBuffer>(); };
     creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };
 
+    BackendCommandBufferManager::setInstance(std::make_unique<OpenglCommandBufferManager>());
     return true;
 }
 
 bool OpenglBackend::internalRelease()
 {
+    BackendCommandBufferManager::setInstance(nullptr);
     return true;
 }
 

@@ -56,6 +56,8 @@ namespace backend
         virtual bool resize(int width, int height) = 0;
 
     protected:
+        size_t threadCount = 1;
+
         // Set current backend
         static void setCurrent(Backend* backend);
 

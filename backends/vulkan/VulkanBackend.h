@@ -5,6 +5,8 @@
 
 namespace backend::vulkan
 {
+    class VulkanResource;
+
     class VulkanBackend : public backend::Backend
     {
     public:
@@ -15,8 +17,11 @@ namespace backend::vulkan
         bool resize(int width, int height) override;
         BackendCapabilities capabilities() const override;
 
+        QueueFamilyIndices getQueueFamilies();
+
     private:
         GLFWwindow* window;
+        size_t threadCount;
 
         // Main vulkan Components
         VkInstance instance;
@@ -25,7 +30,7 @@ namespace backend::vulkan
         VkQueue presentationQueue;
         VkSurfaceKHR surface;
         VkSwapchainKHR swapchain;
-        std::vector<SwapchainImage> swapchainImages;
+        size_t swapChainImageCount;
 
         // Utils vulkan components
         VkFormat swapchainFormat;

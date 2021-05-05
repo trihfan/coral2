@@ -7,7 +7,7 @@ namespace backend::vulkan
     class VulkanPipeline : public BackendPipeline
     {
     public:
-        VulkanPipeline(const BackendPipelineParams& params, VulkanDevice device);
+        VulkanPipeline(const BackendPipelineParams& params, const VulkanDevice& device, const VkExtent2D& extend);
         ~VulkanPipeline() override;
         void use() override;
 

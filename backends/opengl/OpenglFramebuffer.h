@@ -9,17 +9,11 @@ namespace backend::opengl
     class OpenglFramebuffer : public BackendFramebuffer
     {
     public:
-        OpenglFramebuffer(const std::vector<BackendFramebufferResource>& resources);
+        OpenglFramebuffer(const BackendFramebufferCreationParams& params);
         ~OpenglFramebuffer() override;
         void bind(BackendFramebufferUsage usage) override;
 
     private:
         GLuint framebufferId;
-    };
-
-    class OpenglBackendBackbufferFramebuffer : public BackendBackbufferFramebuffer
-    {
-    public:
-        void bind(BackendFramebufferUsage usage) override;
     };
 }

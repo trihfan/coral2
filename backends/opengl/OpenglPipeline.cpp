@@ -18,6 +18,9 @@ using namespace coral;
 
 OpenglPipeline::OpenglPipeline(const BackendPipelineParams& params)
     : BackendPipeline(params)
+    , depthTest(params.depthTest)
+    , cullFace(params.cullFace)
+    , blending(params.blending)
 {
     shader = std::make_unique<OpenglShader>(params.name);
     shader->addShaderData(OpenglShader::vertex, params.vertexShader);
@@ -29,12 +32,12 @@ void OpenglPipeline::use()
 {
     shader->use();
 
-    GL_ENABLE_OR_DISABLE(GL_DEPTH_TEST, params.depthTest)
+    GL_ENABLE_OR_DISABLE(GL_DEPTH_TEST, depthTest)
 
-    GL_ENABLE_OR_DISABLE(GL_CULL_FACE, params.cullFace != CullFace::none)
-    glCullFace(params.cullFace == CullFace::front ? GL_FRONT : GL_BACK);
+    GL_ENABLE_OR_DISABLE(GL_CULL_FACE, cullFace != CullFace::none)
+    glCullFace(cullFace == CullFace::front ? GL_FRONT : GL_BACK);
 
-    GL_ENABLE_OR_DISABLE(GL_BLEND, params.blending)
+    GL_ENABLE_OR_DISABLE(GL_BLEND, blending)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

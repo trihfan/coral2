@@ -19,4 +19,14 @@ namespace backend::opengl
         // Draw
         void draw(int indexCount) override;
     };
+
+    class OpenglCommandBufferManager : public BackendCommandBufferManager
+    {
+    public:
+        BackendCommandBuffer* internalGetCommandBuffer() override;
+        void internalSubmit(BackendCommandBufferStage stage) override;
+
+    private:
+        OpenglCommandBuffer commandBuffer;
+    };
 }

@@ -10,6 +10,10 @@ DEFINE_SINGLETON(RenderPassManager)
 
 void RenderPassManager::release()
 {
+    for (auto renderpass : instance->renderPasses)
+    {
+        renderpass->invalidate();
+    }
 }
 
 void RenderPassManager::addRenderPass(ptr<RenderPass> renderPass)

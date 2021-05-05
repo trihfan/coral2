@@ -8,6 +8,7 @@ using namespace coral;
 OpenglResource::OpenglResource(const backend::BackendResourceParams& params)
     : BackendResource(params)
     , id(0)
+    , samples(params.samples)
 {
     glGenTextures(1, &id);
     glBindTexture(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
@@ -28,7 +29,7 @@ OpenglResource::~OpenglResource()
 void OpenglResource::bind(int index)
 {
     glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + index));
-    glBindTexture(params.samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
+    glBindTexture(samples == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_MULTISAMPLE, id);
 }
 
 GLuint OpenglResource::getId() const
@@ -108,4 +109,9 @@ GLenum OpenglResource::getTypeFrom(backend::BackendResourceFormat format)
         Logs(error) << "Unimplemented type";
         return 0;
     }
+}
+
+int OpenglResource::getSamplesCount() const
+{
+    return samples;
 }

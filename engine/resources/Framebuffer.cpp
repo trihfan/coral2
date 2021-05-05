@@ -2,10 +2,12 @@
 #include "Engine.h"
 #include "Resource.h"
 #include "base/ObjectFactory.h"
+#include "renderpasses/RenderPass.h"
 
 using namespace coral;
 
-Framebuffer::Framebuffer()
+Framebuffer::Framebuffer(const ptr<RenderPass>& renderpass)
+    : renderpass(renderpass)
 {
 }
 
@@ -27,38 +29,20 @@ void Framebuffer::bind(backend::BackendFramebufferUsage usage)
 void Framebuffer::init()
 {
     Object::init();
-    std::vector<backend::BackendFramebufferResource> backendResources;
+
+    backend::BackendFramebufferCreationParams params;
+    params.renderPass = renderpass->getBackendRenderPass();
+
     for (const auto& resource : resources)
     {
-        backendResources.push_back(backend::BackendFramebufferResource { resource.role, resource.resource->getBackendResource() });
+        params.resources.push_back(backend::BackendFramebufferResource { resource.resource->getName(), resource.role, resource.resource->getBackendResource() });
     }
 
-    backendFramebuffer = backend::BackendObjectFactory<backend::BackendFramebuffer>::create(backendResources);
+    backendFramebuffer = backend::BackendObjectFactory<backend::BackendFramebuffer>::create(params);
 }
 
 void Framebuffer::release()
 {
     Object::release();
     backendFramebuffer = nullptr;
-}
-
-BackbufferFramebuffer::BackbufferFramebuffer()
-{
-}
-
-void BackbufferFramebuffer::bind(backend::BackendFramebufferUsage usage)
-{
-    backbuffer->bind(usage);
-}
-
-void BackbufferFramebuffer::init()
-{
-    Object::init();
-    backbuffer = backend::BackendObjectFactory<backend::BackendBackbufferFramebuffer>::create();
-}
-
-void BackbufferFramebuffer::release()
-{
-    Framebuffer::release();
-    backbuffer = nullptr;
 }

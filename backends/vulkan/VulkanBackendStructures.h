@@ -33,7 +33,7 @@ namespace backend::vulkan
         std::vector<VkPresentModeKHR> presentationModes; // List of supported presentation modes
     };
 
-    struct SwapchainImage
+    struct VulkanImage
     {
         VkImage image;
         VkImageView imageView;

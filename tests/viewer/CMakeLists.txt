@@ -31,7 +31,7 @@ target_link_libraries(viewer engine)
 
 if(BACKEND_OPENGL_ENABLED)
     target_include_directories(viewer PUBLIC ${backend_opengl_path})
-    target_link_libraries(viewer backend_opengl)
+    target_link_libraries(viewer glfw backend_opengl)
 endif()
 
 if(BACKEND_VULKAN_ENABLED)

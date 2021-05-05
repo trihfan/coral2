@@ -14,7 +14,7 @@ EngineParameters EngineConfig::parameters;
 void EngineConfig::setup()
 {
     RenderPassResource backbuffer;
-    backbuffer.name = RenderPassResource::backbuffer;
+    backbuffer.name = backend::BackendFramebuffer::backbufferName;
 
     // default
     auto defaultRenderPass = ObjectFactory::createWithName<RenderPassDefault>(coral::defaultRenderPassName);

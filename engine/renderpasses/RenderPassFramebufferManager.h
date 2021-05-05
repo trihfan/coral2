@@ -9,6 +9,7 @@
 namespace coral
 {
     class Engine;
+    class RenderPass;
     struct FramebufferResource;
 
     // The framebuffer manager
@@ -17,11 +18,10 @@ namespace coral
         MAKE_SINGLETON(RenderPassFramebufferManager)
     public:
         static void clear();
-        static ptr<Framebuffer> getFramebufferFor(const std::vector<FramebufferResource>& resources);
-        static ptr<Framebuffer> getBackbuffer();
+        static ptr<Framebuffer> getFramebufferFor(const ptr<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources);
 
     private:
-        RenderPassFramebufferManager(ptr<Framebuffer> defaultFramebuffer);
+        RenderPassFramebufferManager();
         std::vector<ptr<Framebuffer>> framebuffers;
         ptr<Framebuffer> defaultFramebuffer;
     };

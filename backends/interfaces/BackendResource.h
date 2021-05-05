@@ -43,14 +43,8 @@ namespace backend
     class BackendResource
     {
     public:
-        BackendResource(const BackendResourceParams& params);
+        BackendResource(const BackendResourceParams& params) { }
         virtual ~BackendResource() = default;
-
         virtual void bind(int index) = 0;
-
-        const BackendResourceParams& getParams() const;
-
-    protected:
-        const backend::BackendResourceParams params;
     };
 }

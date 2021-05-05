@@ -1,10 +1,13 @@
 #include "VulkanBackend.h"
 #include "CoralException.h"
 #include "Logs.h"
+#include "VulkanBackbuffer.h"
 #include "VulkanCommandBuffer.h"
 #include "VulkanError.h"
+#include "VulkanFramebuffer.h"
 #include "VulkanPipeline.h"
 #include "VulkanRenderPass.h"
+#include "VulkanResource.h"
 #include "VulkanValidation.h"
 #include <algorithm>
 #include <cstring>
@@ -27,6 +30,7 @@ bool VulkanBackend::internalInit()
         createSurface();
         getPhysicalDevice();
         createLogicalDevice();
+        createSwapchain();
 
         Logs(success) << "Engine initialized";
     }
@@ -37,13 +41,11 @@ bool VulkanBackend::internalInit()
 
     // Set creators
     creator<BackendRenderPass, BackendRenderPassParams> = [this](const BackendRenderPassParams& params) { return std::make_unique<VulkanRenderPass>(params, mainDevice, swapchainFormat); };
-    creator<BackendPipeline, BackendPipelineParams> = [this](const BackendPipelineParams& params) { return std::make_unique<VulkanPipeline>(params, mainDevice); };
-    creator<BackendCommandBuffer> = []() { return std::make_unique<VulkanCommandBuffer>(); };
+    creator<BackendPipeline, BackendPipelineParams> = [this](const BackendPipelineParams& params) { return std::make_unique<VulkanPipeline>(params, mainDevice, swapchainExtent); };
+    creator<BackendFramebuffer, BackendFramebufferCreationParams> = [this](const BackendFramebufferCreationParams& params) { return std::make_unique<VulkanFramebuffer>(params, mainDevice, swapchainExtent); };
+    creator<BackendResource, BackendResourceParams> = [this](const BackendResourceParams& params) { return std::make_unique<VulkanResource>(params, mainDevice); };
 
-    /*creator<BackendFramebuffer, std::vector<BackendFramebufferResource>> = [](const std::vector<BackendFramebufferResource>& resources) { return std::make_unique<OpenglFramebuffer>(resources); };
-    creator<BackendBackbufferFramebuffer> = []() { return std::make_unique<OpenglBackendBackbufferFramebuffer>(); };
-    creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
-    creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };*/
+    /*creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };*/
 
     return true;
 }
@@ -51,10 +53,8 @@ bool VulkanBackend::internalInit()
 bool VulkanBackend::resize(int, int)
 {
     // Clean
-    for (auto image : swapchainImages)
-    {
-        vkDestroyImageView(mainDevice.logicalDevice, image.imageView, nullptr);
-    }
+    BackendCommandBufferManager::setInstance(nullptr);
+    VulkanBackbuffer::release();
     if (swapchain)
     {
         vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
@@ -67,10 +67,8 @@ bool VulkanBackend::resize(int, int)
 
 bool VulkanBackend::internalRelease()
 {
-    for (auto image : swapchainImages)
-    {
-        vkDestroyImageView(mainDevice.logicalDevice, image.imageView, nullptr);
-    }
+    VulkanBackbuffer::release();
+    BackendCommandBufferManager::setInstance(nullptr);
     vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(mainDevice.logicalDevice, nullptr);
@@ -214,12 +212,17 @@ void VulkanBackend::createSwapchain()
     vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, images.data());
 
     // Create image views
-    swapchainImages.resize(images.size());
+    std::vector<std::unique_ptr<VulkanResource>> swapchainImages(images.size());
     for (size_t i = 0; i < images.size(); i++)
     {
-        swapchainImages[i].image = images[i];
-        swapchainImages[i].imageView = createImageView(images[i], swapchainFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+        VulkanImage image { images[i], createImageView(images[i], swapchainFormat, VK_IMAGE_ASPECT_COLOR_BIT) };
+        swapchainImages[i] = std::make_unique<VulkanResource>(image, mainDevice);
     }
+
+    swapChainImageCount = swapchainImages.size();
+    VulkanBackbuffer::setSwapChainImages(std::move(swapchainImages));
+
+    BackendCommandBufferManager::setInstance(std::make_unique<VulkanCommandBufferManager>(mainDevice, swapChainImageCount));
 }
 
 void VulkanBackend::getPhysicalDevice()
@@ -569,4 +572,47 @@ VkImageView VulkanBackend::createImageView(VkImage image, VkFormat format, VkIma
 std::string VulkanBackend::getName() const
 {
     return "vulkan";
+}
+
+QueueFamilyIndices VulkanBackend::getQueueFamilies()
+{
+    QueueFamilyIndices indices;
+
+    // Get all Queue Family Property info for the given device
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(mainDevice.physicalDevice, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilyList(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(mainDevice.physicalDevice, &queueFamilyCount, queueFamilyList.data());
+
+    // Go through each queue family and check if it has at least 1 of the required types of queue
+    int i = 0;
+    for (const auto& queueFamily : queueFamilyList)
+    {
+        // First check if queue family has at least 1 queue in that family (could have no queues)
+        // Queue can be multiple types defined through bitfield. Need to bitwise AND with VK_QUEUE_*_BIT to check if has required type
+        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphicsFamily = i; // If queue family is valid, then get index
+        }
+
+        // Check if Queue Family supports presentation
+        VkBool32 presentationSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(mainDevice.physicalDevice, i, surface, &presentationSupport);
+        // Check if queue is presentation type (can be both graphics and presentation)
+        if (queueFamily.queueCount > 0 && presentationSupport)
+        {
+            indices.presentationFamily = i;
+        }
+
+        // Check if queue family indices are in a valid state, stop searching if so
+        if (indices.isValid())
+        {
+            break;
+        }
+
+        i++;
+    }
+
+    return indices;
 }

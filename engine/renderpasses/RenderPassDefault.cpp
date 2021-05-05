@@ -13,7 +13,7 @@ using namespace coral;
 
 void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
-    auto commandBuffer = backend::BackendCommandBuffer::getCommandBuffer();
+    auto commandBuffer = backend::BackendCommandBufferManager::getCommandBuffer();
 
     // Camera viewport
     const auto& viewport = parameters.camera->getViewport();

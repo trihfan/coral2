@@ -54,7 +54,7 @@ OpenglVertexBuffer::~OpenglVertexBuffer()
 void OpenglVertexBuffer::draw()
 {
     glBindVertexArray(vao);
-    BackendCommandBuffer::getCommandBuffer()->draw(size);
+    BackendCommandBufferManager::getCommandBuffer()->draw(size);
     glBindVertexArray(0);
     CHECK_OPENGL_ERROR
 }

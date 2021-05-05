@@ -1,4 +1,5 @@
 #include "Resource.h"
+#include "BackendFramebuffer.h"
 #include "BackendObjectFactory.h"
 #include "stb_image.h"
 
@@ -105,6 +106,13 @@ backend::BackendResource* Resource::getBackendResource() const
 void Resource::init()
 {
     Object::init();
+
+    // When referencing the backbuffer, the resource become a mock for referencing the backbuffer resource
+    if (getName() == backend::BackendFramebuffer::backbufferName)
+    {
+        return;
+    }
+
     backend::BackendResourceParams params;
     params.type = this->params.type;
     params.format = this->params.format;

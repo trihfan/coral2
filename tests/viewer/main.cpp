@@ -153,8 +153,7 @@ int main(int argc, char* argv[])
 #endif
 
     // setup engine
-    Engine::create(std::move(backend));
-    Engine::resize(SCR_WIDTH, SCR_HEIGHT);
+    Engine::create(std::move(backend), SCR_WIDTH, SCR_HEIGHT);
     setupScene();
 
     // main loop
@@ -190,7 +189,7 @@ void setupScene()
     scene->add(camera);
 
     // Models
-    auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
+    /*auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
     zombie->setScale(glm::vec3(0.01, 0.01, 0.01));
     zombie->setTranslation(glm::vec3(-0.5, 0, 0));
     scene->add(zombie);
@@ -233,7 +232,7 @@ void setupScene()
     text->setColor(glm::vec3(0.1, 0.1, 0.1));
     text->setTranslation(glm::vec3(15, 15, -1));
     text->setText("coral 0.1");
-    scene->add(text);
+    scene->add(text);*/
 }
 
 void processInput(GLFWwindow* window)

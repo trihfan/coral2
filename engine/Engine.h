@@ -42,6 +42,8 @@ namespace coral
         RenderParameters currentParameters;
 
         // Constructor
-        Engine(ptr<backend::Backend> backend);
+        Engine(ptr<backend::Backend> backend, int width, int height);
+
+        void resizeInternal(int width, int height);
     };
 }

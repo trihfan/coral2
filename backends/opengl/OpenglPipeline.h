@@ -24,6 +24,9 @@ namespace backend::opengl
 
     private:
         std::unique_ptr<OpenglShader> shader;
+        bool depthTest;
+        CullFace cullFace;
+        bool blending;
     };
 }
 #pragma once
