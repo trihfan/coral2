@@ -27,12 +27,11 @@ namespace coral
         void addResource(const FramebufferResource& resource);
         const std::vector<FramebufferResource>& getResources() const;
 
-        // Bind the framebuffer
-        virtual void bind(backend::BackendFramebufferUsage usage);
-
         // Initialize
         virtual void init() override;
         virtual void release() override;
+
+        backend::BackendFramebuffer* getBackendFramebuffer() const;
 
     private:
         ptr<RenderPass> renderpass;

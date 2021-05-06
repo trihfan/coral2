@@ -1,44 +1,27 @@
 #pragma once
 
-#include "BackendCommandBuffer.h"
+#include "Singleton.h"
 #include "VulkanBackendStructures.h"
+
+#define CURRENT_VK_COMMAND_BUFFER VulkanCommandBufferManager::get()->getCommandBuffer()
 
 namespace backend::vulkan
 {
-    class VulkanCommandBuffer : public BackendCommandBuffer
+    class VulkanCommandBufferManager
     {
-    public:
-        VulkanCommandBuffer(const VkCommandBuffer& commandBuffer);
-
-        void begin() override;
-        void end() override;
-
-        //
-        void setViewport(float x, float y, float width, float height) override;
-        void clearColor(float red, float green, float blue, float alpha) override;
-        void clearDepth() override;
-
-        // Draw
-        void draw(int indexCount) override;
-
-    private:
-        VkCommandBuffer commandBuffer;
-    };
-
-    class VulkanCommandBufferManager : public BackendCommandBufferManager
-    {
+        MAKE_SINGLETON(VulkanCommandBufferManager)
     public:
         VulkanCommandBufferManager(const VulkanDevice& device, size_t count);
         ~VulkanCommandBufferManager();
 
-        BackendCommandBuffer* internalGetCommandBuffer() override;
-        void internalSubmit(BackendCommandBufferStage stage) override;
+        VkCommandBuffer& getCommandBuffer();
+        void begin();
+        void end();
 
     private:
         VulkanDevice device;
         size_t count;
-        size_t current;
         VkCommandPool graphicsCommandPool;
-        std::vector<VulkanCommandBuffer> commandBuffers;
+        std::vector<VkCommandBuffer> commandBuffers;
     };
 }

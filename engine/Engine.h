@@ -2,8 +2,8 @@
 
 #include "Backend.h"
 #include "RenderParameters.h"
+#include "Singleton.h"
 #include "base/Ptr.h"
-#include "utils/Singleton.h"
 #include <chrono>
 #include <memory>
 

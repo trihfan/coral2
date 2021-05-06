@@ -1,11 +1,11 @@
 #include "VulkanBackbuffer.h"
+#include "VulkanBackend.h"
 
 using namespace backend::vulkan;
 
 std::atomic<bool> VulkanBackbuffer::isInit = false;
 std::vector<std::unique_ptr<VulkanResource>> VulkanBackbuffer::images;
 std::vector<std::unique_ptr<VulkanFramebuffer>> VulkanBackbuffer::framebuffers;
-size_t VulkanBackbuffer::current;
 
 void VulkanBackbuffer::setSwapChainImages(std::vector<std::unique_ptr<VulkanResource>>&& swapchainImages)
 {
@@ -17,7 +17,6 @@ void VulkanBackbuffer::init(const BackendFramebufferCreationParams& params, cons
     bool expected = false;
     if (isInit.compare_exchange_weak(expected, true, std::memory_order_relaxed))
     {
-        current = 0;
         framebuffers.resize(images.size());
 
         for (size_t i = 0; i < framebuffers.size(); i++)
@@ -41,10 +40,5 @@ void VulkanBackbuffer::release()
 
 VulkanFramebuffer* VulkanBackbuffer::getCurrent()
 {
-    return framebuffers[current].get();
-}
-
-void VulkanBackbuffer::next()
-{
-    current = (current + 1) % framebuffers.size();
+    return framebuffers[CURRENT_IMAGE_INDEX].get();
 }

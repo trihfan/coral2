@@ -59,22 +59,8 @@ OpenglFramebuffer::~OpenglFramebuffer()
     }
 }
 
-void OpenglFramebuffer::bind(BackendFramebufferUsage usage)
+void OpenglFramebuffer::bind()
 {
-    switch (usage)
-    {
-    case BackendFramebufferUsage::read:
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebufferId);
-        break;
-
-    case BackendFramebufferUsage::write:
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebufferId);
-        break;
-
-    case BackendFramebufferUsage::readAndWrite:
-        glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
-        break;
-    }
-
+    glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
     CHECK_OPENGL_ERROR
 }

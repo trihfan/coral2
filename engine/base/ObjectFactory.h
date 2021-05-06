@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Ptr.h"
-#include "utils/Singleton.h"
+#include "Singleton.h"
 #include "utils/concurrentqueue.h"
 #include <list>
 #include <memory>

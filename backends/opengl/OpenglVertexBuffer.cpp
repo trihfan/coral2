@@ -1,5 +1,4 @@
 #include "OpenglVertexBuffer.h"
-#include "BackendCommandBuffer.h"
 #include "Logs.h"
 #include "OpenglError.h"
 #include "gl.h"
@@ -54,7 +53,7 @@ OpenglVertexBuffer::~OpenglVertexBuffer()
 void OpenglVertexBuffer::draw()
 {
     glBindVertexArray(vao);
-    BackendCommandBufferManager::getCommandBuffer()->draw(size);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(size), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     CHECK_OPENGL_ERROR
 }

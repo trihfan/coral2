@@ -23,50 +23,24 @@ namespace backend
         Backend() = default;
         virtual ~Backend() = default;
 
-        /**
-         * @brief Return the current backend
-         */
-        static Backend* current();
-
         // Backend initialization
-        /**
-         * @brief Initialize the backend with the given params
-         */
         bool init(const BackendParams& params);
-
-        /**
-         * @brief Release the backend
-         */
         bool release();
 
-        // Backend information
-        /**
-         * @brief Return the backend name (ex gl, gles, vulkan, ...)
-         */
-        virtual std::string getName() const = 0;
-
-        /**
-         * @brief Return the backend capabilities
-         */
-        virtual BackendCapabilities capabilities() const = 0;
-
-        /**
-         * @brief Resize backend resources
-         */
+        // Backend run
         virtual bool resize(int width, int height) = 0;
+        virtual void beginFrame() = 0;
+        virtual void endFrame() = 0;
+
+        // Backend information
+        virtual std::string getName() const = 0;
+        virtual BackendCapabilities capabilities() const = 0;
 
     protected:
         size_t threadCount = 1;
 
-        // Set current backend
-        static void setCurrent(Backend* backend);
-
         // Backend initialization
         virtual bool internalInit() = 0;
         virtual bool internalRelease() = 0;
-
-    private:
-        // Current backend
-        static Backend* currentBackend;
     };
 }

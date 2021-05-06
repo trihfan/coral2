@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Pipeline.h"
+#include "Singleton.h"
 #include "base/Ptr.h"
-#include "utils/Singleton.h"
 #include <map>
 #include <vector>
 

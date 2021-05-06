@@ -1,6 +1,5 @@
 #include "OpenglBackend.h"
 #include "Logs.h"
-#include "OpenglCommandBuffer.h"
 #include "OpenglFramebuffer.h"
 #include "OpenglPipeline.h"
 #include "OpenglRenderPass.h"
@@ -32,14 +31,11 @@ bool OpenglBackend::internalInit()
     creator<BackendPipeline, BackendPipelineParams> = [](const BackendPipelineParams& params) { return std::make_unique<OpenglPipeline>(params); };
     creator<BackendResource, BackendResourceParams> = [](const BackendResourceParams& params) { return std::make_unique<OpenglResource>(params); };
     creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };
-
-    BackendCommandBufferManager::setInstance(std::make_unique<OpenglCommandBufferManager>());
     return true;
 }
 
 bool OpenglBackend::internalRelease()
 {
-    BackendCommandBufferManager::setInstance(nullptr);
     return true;
 }
 
@@ -55,6 +51,14 @@ std::string OpenglBackend::getName() const
 bool OpenglBackend::resize(int, int)
 {
     return true;
+}
+
+void OpenglBackend::beginFrame()
+{
+}
+
+void OpenglBackend::endFrame()
+{
 }
 
 backend::BackendCapabilities OpenglBackend::capabilities() const

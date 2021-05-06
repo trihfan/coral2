@@ -32,19 +32,13 @@ VulkanFramebuffer::~VulkanFramebuffer()
     }
 }
 
-void VulkanFramebuffer::bind(BackendFramebufferUsage usage)
+VkFramebuffer VulkanFramebuffer::getHandle() const
 {
-    switch (usage)
+    if (linkWithBackbuffer)
     {
-    case BackendFramebufferUsage::read:
-        break;
-
-    case BackendFramebufferUsage::write:
-        break;
-
-    case BackendFramebufferUsage::readAndWrite:
-        break;
+        return VulkanBackbuffer::getCurrent()->getHandle();
     }
+    return framebuffer;
 }
 
 void VulkanFramebuffer::init(const BackendFramebufferCreationParams& params, const VkExtent2D& extend)

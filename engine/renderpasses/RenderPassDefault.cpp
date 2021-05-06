@@ -1,5 +1,4 @@
 #include "RenderPassDefault.h"
-#include "BackendCommandBuffer.h"
 #include "Engine.h"
 #include "materials/Material.h"
 #include "resources/Pipeline.h"
@@ -13,17 +12,6 @@ using namespace coral;
 
 void RenderPassDefault::internalRender(RenderQueue& queue, const RenderParameters& parameters)
 {
-    auto commandBuffer = backend::BackendCommandBufferManager::getCommandBuffer();
-
-    // Camera viewport
-    const auto& viewport = parameters.camera->getViewport();
-    commandBuffer->setViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-
-    // Clear buffers
-    const glm::vec4 clearColor = parameters.camera->getBackgroundColor();
-    commandBuffer->clearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-    commandBuffer->clearDepth();
-
     // for each shader
     for (auto& pipelinePair : queue.pipelineMap)
     {

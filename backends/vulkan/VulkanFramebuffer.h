@@ -13,7 +13,7 @@ namespace backend::vulkan
     public:
         VulkanFramebuffer(const BackendFramebufferCreationParams& params, const VulkanDevice& device, const VkExtent2D& extend);
         ~VulkanFramebuffer() override;
-        void bind(BackendFramebufferUsage usage) override;
+        VkFramebuffer getHandle() const;
 
     private:
         VulkanDevice device;

@@ -15,12 +15,10 @@ namespace backend::vulkan
         static void release();
 
         static VulkanFramebuffer* getCurrent();
-        static void next();
 
     private:
         static std::atomic<bool> isInit;
         static std::vector<std::unique_ptr<VulkanResource>> images;
         static std::vector<std::unique_ptr<VulkanFramebuffer>> framebuffers;
-        static size_t current;
     };
 }

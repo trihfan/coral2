@@ -1,5 +1,4 @@
 #include "Engine.h"
-#include "BackendCommandBuffer.h"
 #include "EngineConfig.h"
 #include "base/ObjectFactory.h"
 #include "renderpasses/RenderPass.h"
@@ -82,6 +81,8 @@ void Engine::frame()
     currentParameters.time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count()) / 1e6;
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
+    instance->backend->beginFrame();
+
     // Bake the render graph when invalidated
     RenderPassManager::update(currentParameters);
 
@@ -94,9 +95,6 @@ void Engine::frame()
     // Initialize / release all objects
     // This allocate and deallocate gpu data
     ObjectFactory::update();
-
-    // Submit objects updates
-    backend::BackendCommandBufferManager::submit(backend::BackendCommandBufferStage::staging);
 
     // Render for each active camera
     for (size_t i = 0; i < SceneManager::getCameras().size(); i++)
@@ -116,5 +114,5 @@ void Engine::frame()
         currentParameters.clear();
     }
 
-    backend::BackendCommandBufferManager::submit(backend::BackendCommandBufferStage::draw);
+    instance->backend->endFrame();
 }

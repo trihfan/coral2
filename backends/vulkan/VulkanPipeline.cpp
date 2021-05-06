@@ -1,6 +1,7 @@
 #include "VulkanPipeline.h"
 #include "Logs.h"
 #include "VulkanBackend.h"
+#include "VulkanCommandBuffer.h"
 #include "VulkanError.h"
 #include "VulkanRenderPass.h"
 #include "VulkanShader.h"
@@ -183,6 +184,7 @@ VulkanPipeline::~VulkanPipeline()
 
 void VulkanPipeline::use()
 {
+    vkCmdBindPipeline(CURRENT_VK_COMMAND_BUFFER, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }
 
 void VulkanPipeline::setUniform(const std::string& name, bool value) const

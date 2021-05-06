@@ -8,6 +8,8 @@ namespace backend::opengl
     {
     public:
         OpenglRenderPass(const BackendRenderPassParams& params);
+        void begin(const BeginRenderPassParams& params) override;
+        void end() override;
     };
 }
 #pragma once

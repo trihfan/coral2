@@ -9,6 +9,8 @@ namespace backend::opengl
     public:
         std::string getName() const override;
         bool resize(int width, int height) override;
+        void beginFrame() override;
+        void endFrame() override;
         BackendCapabilities capabilities() const override;
 
     private:

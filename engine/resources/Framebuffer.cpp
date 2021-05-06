@@ -21,9 +21,9 @@ const std::vector<FramebufferResource>& Framebuffer::getResources() const
     return resources;
 }
 
-void Framebuffer::bind(backend::BackendFramebufferUsage usage)
+backend::BackendFramebuffer* Framebuffer::getBackendFramebuffer() const
 {
-    backendFramebuffer->bind(usage);
+    return backendFramebuffer.get();
 }
 
 void Framebuffer::init()

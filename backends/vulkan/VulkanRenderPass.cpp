@@ -1,7 +1,9 @@
 #include "VulkanRenderPass.h"
 #include "Logs.h"
 #include "VulkanBackend.h"
+#include "VulkanCommandBuffer.h"
 #include "VulkanError.h"
+#include "VulkanFramebuffer.h"
 
 using namespace backend::vulkan;
 using namespace coral;
@@ -80,6 +82,41 @@ VulkanRenderPass::VulkanRenderPass(const BackendRenderPassParams& params, const 
 VulkanRenderPass::~VulkanRenderPass()
 {
     vkDestroyRenderPass(device.logicalDevice, renderPass, nullptr);
+}
+
+void VulkanRenderPass::begin(const BeginRenderPassParams& params)
+{
+    // Information about how to begin a render pass (only needed for graphical applications)
+    VkRenderPassBeginInfo renderPassBeginInfo = {};
+    renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.renderPass = renderPass; // Render Pass to begin
+    renderPassBeginInfo.renderArea.offset = { static_cast<int32_t>(params.viewport[0]), static_cast<int32_t>(params.viewport[1]) }; // Start point of render pass in pixels
+    renderPassBeginInfo.renderArea.extent = VkExtent2D { static_cast<uint32_t>(params.viewport[2]), static_cast<uint32_t>(params.viewport[3]) }; // Size of region to run render pass on (starting at offset)
+
+    std::vector<VkClearValue> clearValues;
+    renderPassBeginInfo.clearValueCount = 0;
+    if (params.clearColor)
+    {
+        renderPassBeginInfo.clearValueCount++;
+        VkClearValue clearValue;
+        clearValue.color = { params.clearColorValue[0], params.clearColorValue[1], params.clearColorValue[2], params.clearColorValue[3] };
+        clearValues.push_back(clearValue);
+    }
+    if (params.clearDepth)
+    {
+        renderPassBeginInfo.clearValueCount++;
+        VkClearValue clearValue;
+        clearValue.depthStencil = { 0, 0 };
+        clearValues.push_back(clearValue);
+    }
+    renderPassBeginInfo.pClearValues = clearValues.data(); // List of clear values (TODO: Depth Attachment Clear Value)
+    renderPassBeginInfo.framebuffer = static_cast<VulkanFramebuffer*>(params.framebuffer)->getHandle();
+    vkCmdBeginRenderPass(CURRENT_VK_COMMAND_BUFFER, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+void VulkanRenderPass::end()
+{
+    vkCmdEndRenderPass(CURRENT_VK_COMMAND_BUFFER);
 }
 
 VkRenderPass VulkanRenderPass::getHandle() const

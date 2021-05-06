@@ -11,7 +11,7 @@ namespace backend::opengl
     public:
         OpenglFramebuffer(const BackendFramebufferCreationParams& params);
         ~OpenglFramebuffer() override;
-        void bind(BackendFramebufferUsage usage) override;
+        void bind();
 
     private:
         GLuint framebufferId;

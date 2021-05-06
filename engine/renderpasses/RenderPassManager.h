@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Singleton.h"
 #include "base/Object.h"
 #include "base/Ptr.h"
-#include "utils/Singleton.h"
 #include <map>
 #include <memory>
 #include <vector>

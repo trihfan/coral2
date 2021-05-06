@@ -16,10 +16,23 @@
 using namespace coral;
 using namespace backend::vulkan;
 
+VulkanBackend* VulkanBackend::currentBackend = nullptr;
+
+VulkanBackend* VulkanBackend::getCurrent()
+{
+    return currentBackend;
+}
+
 VulkanBackend::VulkanBackend(GLFWwindow* window)
     : window(window)
     , swapchain(nullptr)
 {
+    currentBackend = this;
+}
+
+VulkanBackend::~VulkanBackend()
+{
+    currentBackend = nullptr;
 }
 
 bool VulkanBackend::internalInit()
@@ -31,6 +44,7 @@ bool VulkanBackend::internalInit()
         getPhysicalDevice();
         createLogicalDevice();
         createSwapchain();
+        createFrameSynchronization();
 
         Logs(success) << "Engine initialized";
     }
@@ -52,24 +66,81 @@ bool VulkanBackend::internalInit()
 
 bool VulkanBackend::resize(int, int)
 {
-    // Clean
-    BackendCommandBufferManager::setInstance(nullptr);
-    VulkanBackbuffer::release();
-    if (swapchain)
+    deleteFrameSynchronization();
+    deleteSwapchain();
+    createSwapchain();
+    createFrameSynchronization();
+    return true;
+}
+
+void VulkanBackend::beginFrame()
+{
+    // -- GET NEXT IMAGE --
+    // Wait for given fence to signal (open) from last draw before continuing
+    vkWaitForFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+
+    // Manually reset (close) fences
+    vkResetFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame]);
+
+    // Get index of next image to be drawn to, and signal semaphore when ready to be drawn to
+    vkAcquireNextImageKHR(mainDevice.logicalDevice, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+    VulkanCommandBufferManager::get()->begin();
+}
+
+void VulkanBackend::endFrame()
+{
+    VulkanCommandBufferManager::get()->end();
+
+    // -- SUBMIT COMMAND BUFFER TO RENDER --
+    // Queue submission information
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = 1; // Number of semaphores to wait on
+    submitInfo.pWaitSemaphores = &imageAvailable[CURRENT_FRAME_INDEX]; // List of semaphores to wait on
+    VkPipelineStageFlags waitStages[] = {
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+    };
+    submitInfo.pWaitDstStageMask = waitStages; // Stages to check semaphores at
+    submitInfo.commandBufferCount = 1; // Number of command buffers to submit
+    submitInfo.pCommandBuffers = &VulkanCommandBufferManager::get()->getCommandBuffer(); // Command buffer to submit
+    submitInfo.signalSemaphoreCount = 1; // Number of semaphores to signal
+    submitInfo.pSignalSemaphores = &renderFinished[CURRENT_FRAME_INDEX]; // Semaphores to signal when command buffer finishes
+
+    // Submit command buffer to queue
+    VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, drawFences[CURRENT_FRAME_INDEX]);
+    if (result != VK_SUCCESS)
     {
-        vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
+        throw std::runtime_error("Failed to submit Command Buffer to Queue!");
     }
 
-    // Setup swapchain
-    createSwapchain();
-    return true;
+    // -- PRESENT RENDERED IMAGE TO SCREEN --
+    VkPresentInfoKHR presentInfo = {};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1; // Number of semaphores to wait on
+    presentInfo.pWaitSemaphores = &renderFinished[currentFrame]; // Semaphores to wait on
+    presentInfo.swapchainCount = 1; // Number of swapchains to present to
+    presentInfo.pSwapchains = &swapchain; // Swapchains to present images to
+    presentInfo.pImageIndices = &imageIndex; // Index of images in swapchains to present
+
+    // Present image
+    if (!VERIFY(vkQueuePresentKHR(presentationQueue, &presentInfo)))
+    {
+        Logs(error) << "Failed to present Image!";
+    }
+
+    // Get next frame (use % MAX_FRAME_DRAWS to keep value below MAX_FRAME_DRAWS)
+    currentFrame = (currentFrame + 1) % swapChainImageCount;
 }
 
 bool VulkanBackend::internalRelease()
 {
-    VulkanBackbuffer::release();
-    BackendCommandBufferManager::setInstance(nullptr);
-    vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
+    // Wait until no actions being run on device before destroying
+    vkDeviceWaitIdle(mainDevice.logicalDevice);
+
+    deleteFrameSynchronization();
+    deleteSwapchain();
+
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyDevice(mainDevice.logicalDevice, nullptr);
     vkDestroyInstance(instance, nullptr);
@@ -221,8 +292,7 @@ void VulkanBackend::createSwapchain()
 
     swapChainImageCount = swapchainImages.size();
     VulkanBackbuffer::setSwapChainImages(std::move(swapchainImages));
-
-    BackendCommandBufferManager::setInstance(std::make_unique<VulkanCommandBufferManager>(mainDevice, swapChainImageCount));
+    VulkanCommandBufferManager::create(mainDevice, swapChainImageCount);
 }
 
 void VulkanBackend::getPhysicalDevice()
@@ -615,4 +685,74 @@ QueueFamilyIndices VulkanBackend::getQueueFamilies()
     }
 
     return indices;
+}
+
+void VulkanBackend::createFrameSynchronization()
+{
+    currentFrame = 0;
+    imageAvailable.resize(swapChainImageCount);
+    renderFinished.resize(swapChainImageCount);
+    drawFences.resize(swapChainImageCount);
+
+    // Semaphore creation information
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    // Fence creation information
+    VkFenceCreateInfo fenceCreateInfo = {};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    for (size_t i = 0; i < swapChainImageCount; i++)
+    {
+        if (!VERIFY(vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable[i])))
+        {
+            Logs(error) << "Failed to create image available semaphores";
+        }
+
+        if (!VERIFY(vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished[i])))
+        {
+            Logs(error) << "Failed to create render finished semaphores";
+        }
+
+        if (!VERIFY(vkCreateFence(mainDevice.logicalDevice, &fenceCreateInfo, nullptr, &drawFences[i])))
+        {
+            Logs(error) << "Failed to create a draw fences";
+        }
+    }
+}
+
+void VulkanBackend::deleteSwapchain()
+{
+    // Clean
+    VulkanCommandBufferManager::destroy();
+    VulkanBackbuffer::release();
+    if (swapchain)
+    {
+        vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
+    }
+}
+
+void VulkanBackend::deleteFrameSynchronization()
+{
+    for (size_t i = 0; i < swapChainImageCount; i++)
+    {
+        vkDestroySemaphore(mainDevice.logicalDevice, renderFinished[i], nullptr);
+        vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable[i], nullptr);
+        vkDestroyFence(mainDevice.logicalDevice, drawFences[i], nullptr);
+    }
+
+    renderFinished.clear();
+    imageAvailable.clear();
+    drawFences.clear();
+}
+
+uint32_t VulkanBackend::getCurrentImageIndex() const
+{
+    return imageIndex;
+}
+
+size_t VulkanBackend::getCurrentFrameIndex() const
+{
+    return currentFrame;
 }

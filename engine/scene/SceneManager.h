@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Singleton.h"
 #include "base/Object.h"
-#include "utils/Singleton.h"
 #include <functional>
 #include <map>
 #include <memory>

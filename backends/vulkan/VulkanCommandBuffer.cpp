@@ -1,53 +1,24 @@
 #include "VulkanCommandBuffer.h"
 #include "Logs.h"
+#include "VulkanBackbuffer.h"
 #include "VulkanBackend.h"
 #include "VulkanError.h"
 
 using namespace backend::vulkan;
 using namespace coral;
 
-VulkanCommandBuffer::VulkanCommandBuffer(const VkCommandBuffer& commandBuffer)
-    : commandBuffer(commandBuffer)
+DEFINE_SINGLETON(VulkanCommandBufferManager)
+
+void VulkanCommandBufferManager::release()
 {
 }
-
-void VulkanCommandBuffer::begin()
-{
-    //vkBeginCommandBuffer(commandBuffers[currentImage], &bufferBeginInfo);
-}
-
-void VulkanCommandBuffer::end()
-{
-    //vkEndCommandBuffer(commandBuffers[currentImage]);
-}
-
-void VulkanCommandBuffer::setViewport(float x, float y, float width, float height)
-{
-}
-
-void VulkanCommandBuffer::clearColor(float red, float green, float blue, float alpha)
-{
-}
-
-void VulkanCommandBuffer::clearDepth()
-{
-}
-
-void VulkanCommandBuffer::draw(int indexCount)
-{
-    //vkCmdDrawIndexed(commandBuffers[currentImage], thisModel.getMesh(k)->getIndexCount(), 1, 0, 0, 0);
-}
-
-/******************************************************/
 
 VulkanCommandBufferManager::VulkanCommandBufferManager(const VulkanDevice& device, size_t count)
     : device(device)
     , count(count)
 {
-    current = 0;
-
     // Get indices of queue families from device
-    QueueFamilyIndices queueFamilyIndices = static_cast<VulkanBackend*>(Backend::current())->getQueueFamilies();
+    QueueFamilyIndices queueFamilyIndices = VulkanBackend::getCurrent()->getQueueFamilies();
 
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -60,25 +31,19 @@ VulkanCommandBufferManager::VulkanCommandBufferManager(const VulkanDevice& devic
     }
 
     // Resize command buffer count to have one for each framebuffer
-    std::vector<VkCommandBuffer> vkCommandBuffers(count);
+    commandBuffers.resize(count);
 
     VkCommandBufferAllocateInfo cbAllocInfo = {};
     cbAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cbAllocInfo.commandPool = graphicsCommandPool;
     cbAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY; // VK_COMMAND_BUFFER_LEVEL_PRIMARY	: Buffer you submit directly to queue. Cant be called by other buffers.
         // VK_COMMAND_BUFFER_LEVEL_SECONARY	: Buffer can't be called directly. Can be called from other buffers via "vkCmdExecuteCommands" when recording commands in primary buffer
-    cbAllocInfo.commandBufferCount = static_cast<uint32_t>(vkCommandBuffers.size());
+    cbAllocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
     // Allocate command buffers and place handles in array of buffers
-    if (!VERIFY(vkAllocateCommandBuffers(device.logicalDevice, &cbAllocInfo, vkCommandBuffers.data())))
+    if (!VERIFY(vkAllocateCommandBuffers(device.logicalDevice, &cbAllocInfo, commandBuffers.data())))
     {
         Logs(error) << "Failed to allocate Command Buffers!";
-    }
-
-    // Create the command buffer
-    for (size_t i = 0; i < vkCommandBuffers.size(); i++)
-    {
-        commandBuffers.push_back(VulkanCommandBuffer(vkCommandBuffers[i]));
     }
 }
 
@@ -87,15 +52,28 @@ VulkanCommandBufferManager::~VulkanCommandBufferManager()
     vkDestroyCommandPool(device.logicalDevice, graphicsCommandPool, nullptr);
 }
 
-backend::BackendCommandBuffer* VulkanCommandBufferManager::internalGetCommandBuffer()
+VkCommandBuffer& VulkanCommandBufferManager::getCommandBuffer()
 {
-    return &commandBuffers[current];
+    return commandBuffers[CURRENT_IMAGE_INDEX];
 }
 
-void VulkanCommandBufferManager::internalSubmit(BackendCommandBufferStage stage)
+void VulkanCommandBufferManager::begin()
 {
-    if (stage == BackendCommandBufferStage::draw)
+    // Information about how to begin each command buffer
+    VkCommandBufferBeginInfo bufferBeginInfo = {};
+    bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    bufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT; // Buffer can be resubmitted when it has already been submitted and is awaiting execution
+
+    if (!VERIFY(vkBeginCommandBuffer(getCommandBuffer(), &bufferBeginInfo)))
     {
-        current = (current + 1) % commandBuffers.size();
+        Logs(error) << "Failed to start recording a Command Buffer!";
+    }
+}
+
+void VulkanCommandBufferManager::end()
+{
+    if (!VERIFY(vkEndCommandBuffer(getCommandBuffer())))
+    {
+        Logs(error) << "Failed to end recording a Command Buffer!";
     }
 }

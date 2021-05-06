@@ -5,16 +5,22 @@
 #include "base/ObjectFactory.h"
 #include "resources/Framebuffer.h"
 #include "resources/Resource.h"
+#include "scene/camera/Camera.h"
 
 using namespace coral;
 
 void RenderPass::render(RenderQueue& queue, const RenderParameters& parameters)
 {
-    if (framebuffer)
-    {
-        framebuffer->bind(backend::BackendFramebufferUsage::write);
-    }
+    backend::BeginRenderPassParams beginParams;
+    beginParams.framebuffer = framebuffer->getBackendFramebuffer();
+    beginParams.viewport = parameters.camera->getViewport();
+    beginParams.clearColor = true;
+    beginParams.clearDepth = true;
+    beginParams.clearColorValue = parameters.camera->getBackgroundColor();
+    backendRenderPass->begin(beginParams);
+
     internalRender(queue, parameters);
+    backendRenderPass->end();
 }
 
 void RenderPass::addInput(const RenderPassResource& input)

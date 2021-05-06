@@ -7,13 +7,6 @@ namespace backend
     class BackendResource;
     class BackendRenderPass;
 
-    enum class BackendFramebufferUsage
-    {
-        read,
-        write,
-        readAndWrite
-    };
-
     enum class BackendFramebufferResourceRole
     {
         color,
@@ -41,6 +34,5 @@ namespace backend
 
         BackendFramebuffer(const BackendFramebufferCreationParams& params) { }
         virtual ~BackendFramebuffer() = default;
-        virtual void bind(BackendFramebufferUsage usage) = 0;
     };
 }
