@@ -36,10 +36,9 @@
 using namespace coral;
 
 // variables
-const unsigned int SCR_WIDTH = 1600;
-const unsigned int SCR_HEIGHT = 1200;
-static double lastX = SCR_WIDTH / 2.;
-static double lastY = SCR_HEIGHT / 2.;
+static glm::ivec2 windowSize(1600, 1200);
+static glm::ivec2 framebufferSize;
+static glm::ivec2 lastMousePosition;
 static bool firstMouse = true;
 static bool mousePressed = false;
 static GLFWwindow* window;
@@ -95,7 +94,6 @@ int main(int argc, char* argv[])
     }
 
     // glfw: initialize and configure
-    // ------------------------------0
     glfwInit();
     if (type == opengl)
     {
@@ -124,8 +122,7 @@ int main(int argc, char* argv[])
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     // glfw window creation
-    // --------------------
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewer", nullptr, nullptr);
+    window = glfwCreateWindow(windowSize[0], windowSize[1], "viewer", nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -153,7 +150,9 @@ int main(int argc, char* argv[])
 #endif
 
     // setup engine
-    Engine::create(std::move(backend), SCR_WIDTH, SCR_HEIGHT);
+    int width, height;
+    glfwGetFramebufferSize(window, &framebufferSize[0], &framebufferSize[1]);
+    Engine::create(std::move(backend), framebufferSize[0], framebufferSize[1]);
     setupScene();
 
     // main loop
@@ -182,7 +181,7 @@ void setupScene()
     // camera
     camera = ObjectFactory::createWithName<OrbitCamera>("camera");
     camera->setBackgroundColor(glm::vec4(1, 1, 1, 1));
-    camera->setPerspective(45, glm::vec4(0, 0, SCR_WIDTH, SCR_HEIGHT), glm::vec2(0.1f, 100));
+    camera->setPerspective(45, glm::vec4(0, 0, framebufferSize[0], framebufferSize[1]), glm::vec2(0.1f, 100));
     camera->setView(glm::vec3(0, 0.5, 0), glm::vec3(0, 1, 0));
     camera->setTranslation(glm::vec3(0, 0.5, 4));
     camera->setDistanceMinMax(0.3f, 100);
@@ -245,10 +244,13 @@ void processInput(GLFWwindow* window)
 
 void framebuffer_size_callback(GLFWwindow*, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
-    camera->setPerspective(45, glm::vec4(0, 0, width, height), glm::vec2(0.1f, 100));
-    Engine::resize(width, height);
+    // Update size
+    windowSize = glm::ivec2(width, height);
+
+    // Resize the engine and camera viewport
+    glfwGetFramebufferSize(window, &framebufferSize[0], &framebufferSize[1]);
+    camera->setPerspective(45, glm::vec4(0, 0, framebufferSize[0], framebufferSize[1]), glm::vec2(0.1f, 100));
+    Engine::resize(framebufferSize[0], framebufferSize[1]);
 }
 
 void mouse_button(GLFWwindow*, int button, int action, int)
@@ -262,26 +264,21 @@ void mouse_button(GLFWwindow*, int button, int action, int)
 
 void mouse_callback(GLFWwindow*, double xpos, double ypos)
 {
-    if (!mousePressed)
+    if (mousePressed)
     {
-        return;
+        if (firstMouse)
+        {
+            lastMousePosition = glm::ivec2(xpos, ypos);
+            firstMouse = false;
+        }
+
+        double xoffset = xpos - lastMousePosition[0];
+        double yoffset = lastMousePosition[1] - ypos;
+        lastMousePosition = glm::ivec2(xpos, ypos);
+
+        // update camera.
+        camera->move(static_cast<float>(xoffset) * 0.1f, static_cast<float>(yoffset) * 0.1f);
     }
-
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    double xoffset = xpos - lastX;
-    double yoffset = lastY - ypos;
-
-    lastX = xpos;
-    lastY = ypos;
-
-    // update camera.
-    camera->move(static_cast<float>(xoffset) * 0.1f, static_cast<float>(yoffset) * 0.1f);
 }
 
 void scroll_callback(GLFWwindow*, double, double yoffset)

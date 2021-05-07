@@ -97,7 +97,7 @@ void VulkanBackend::endFrame()
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1; // Number of semaphores to wait on
-    submitInfo.pWaitSemaphores = &imageAvailable[CURRENT_FRAME_INDEX]; // List of semaphores to wait on
+    submitInfo.pWaitSemaphores = &imageAvailable[currentFrame]; // List of semaphores to wait on
     VkPipelineStageFlags waitStages[] = {
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
     };
@@ -105,10 +105,10 @@ void VulkanBackend::endFrame()
     submitInfo.commandBufferCount = 1; // Number of command buffers to submit
     submitInfo.pCommandBuffers = &VulkanCommandBufferManager::get()->getCommandBuffer(); // Command buffer to submit
     submitInfo.signalSemaphoreCount = 1; // Number of semaphores to signal
-    submitInfo.pSignalSemaphores = &renderFinished[CURRENT_FRAME_INDEX]; // Semaphores to signal when command buffer finishes
+    submitInfo.pSignalSemaphores = &renderFinished[currentFrame]; // Semaphores to signal when command buffer finishes
 
     // Submit command buffer to queue
-    VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, drawFences[CURRENT_FRAME_INDEX]);
+    VkResult result = vkQueueSubmit(graphicsQueue, 1, &submitInfo, drawFences[currentFrame]);
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to submit Command Buffer to Queue!");

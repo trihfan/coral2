@@ -81,6 +81,7 @@ VulkanRenderPass::VulkanRenderPass(const BackendRenderPassParams& params, const 
 
 VulkanRenderPass::~VulkanRenderPass()
 {
+    vkDeviceWaitIdle(device.logicalDevice);
     vkDestroyRenderPass(device.logicalDevice, renderPass, nullptr);
 }
 
