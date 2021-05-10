@@ -4,5 +4,6 @@ namespace backend
     struct BackendCapabilities
     {
         bool multithreadCapable = false;
+        int glslVersion;
     };
 }

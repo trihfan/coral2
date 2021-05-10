@@ -7,24 +7,24 @@
 
 namespace backend::opengl
 {
+    // supported shader types
+    enum ShaderType : int
+    {
+        vertex,
+        fragment,
+        geometry
+    };
+
     class OpenglShader
     {
     public:
-        // supported shader types
-        enum ShaderType : int
-        {
-            vertex,
-            fragment,
-            geometry
-        };
-
-        // add a shader data
-        void addShaderData(ShaderType type, const std::string& data);
-
         // initialization
         OpenglShader(const std::string& name);
         ~OpenglShader();
         void init();
+
+        // add a shader data
+        void addShaderData(ShaderType type, const std::string& data);
 
         // use the shader
         // ------------------------------------------------------------------------

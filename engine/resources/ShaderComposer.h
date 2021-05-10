@@ -1,6 +1,8 @@
 #pragma once
 
+#include "BackendCapabilities.h"
 #include "base/Object.h"
+#include <array>
 #include <sstream>
 #include <vector>
 
@@ -13,10 +15,16 @@ namespace coral
         std::string type;
     };
 
+    struct UniformBlock
+    {
+        std::string name;
+        int location;
+    };
+
     class ShaderComposer
     {
     public:
-        ShaderComposer(const std::string& shaderfile);
+        ShaderComposer(const std::string& shaderfile, int glslVersion);
         void addAttribute(const ShaderAttribute& attribute);
         void addDefinition(const std::string& definition);
 
@@ -27,11 +35,17 @@ namespace coral
         std::string getVertexShader() const;
         std::string getFragmentShader() const;
 
+        // Return the uniform block info
+        const std::vector<UniformBlock>& getVertexShaderUniformBlocks() const;
+        const std::vector<UniformBlock>& getVertexFragmentUniformBlocks() const;
+
     private:
         // Parameter
         std::string shaderFile;
+        int glslVersion;
         std::vector<ShaderAttribute> attributes;
         std::vector<std::string> definitions;
+        std::array<std::vector<UniformBlock>, 2> uniformBlocks;
 
         // Parser
         bool basicLighting;
@@ -44,5 +58,7 @@ namespace coral
         void parseParameters(const std::string& content);
         void parseVertexShader(const std::string& content);
         void parseFragmentShader(const std::string& content);
+        void parseUniformBlock(std::string& content, size_t index);
+        void parseInputOutput(std::string& content);
     };
 }

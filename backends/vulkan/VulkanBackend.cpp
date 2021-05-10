@@ -9,6 +9,7 @@
 #include "VulkanRenderPass.h"
 #include "VulkanResource.h"
 #include "VulkanValidation.h"
+#include "VulkanVertexBuffer.h"
 #include <algorithm>
 #include <cstring>
 #include <set>
@@ -58,8 +59,7 @@ bool VulkanBackend::internalInit()
     creator<BackendPipeline, BackendPipelineParams> = [this](const BackendPipelineParams& params) { return std::make_unique<VulkanPipeline>(params, mainDevice, swapchainExtent); };
     creator<BackendFramebuffer, BackendFramebufferCreationParams> = [this](const BackendFramebufferCreationParams& params) { return std::make_unique<VulkanFramebuffer>(params, mainDevice, swapchainExtent); };
     creator<BackendResource, BackendResourceParams> = [this](const BackendResourceParams& params) { return std::make_unique<VulkanResource>(params, mainDevice); };
-
-    /*creator<BackendVertexBuffer, BackendVertexBufferData> = [](const BackendVertexBufferData& data) { return std::make_unique<OpenglVertexBuffer>(data); };*/
+    creator<BackendVertexBuffer, BackendVertexBufferData> = [this](const BackendVertexBufferData& data) { return std::make_unique<VulkanVertexBuffer>(data, mainDevice, graphicsQueue); };
 
     return true;
 }
@@ -151,6 +151,7 @@ backend::BackendCapabilities VulkanBackend::capabilities() const
 {
     BackendCapabilities capabilities;
     capabilities.multithreadCapable = true;
+    capabilities.glslVersion = 450;
     return capabilities;
 }
 

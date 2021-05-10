@@ -58,6 +58,11 @@ VkCommandBuffer& VulkanCommandBufferManager::getCommandBuffer()
     return commandBuffers[CURRENT_IMAGE_INDEX];
 }
 
+VkCommandPool& VulkanCommandBufferManager::getCommandPool()
+{
+    return graphicsCommandPool;
+}
+
 void VulkanCommandBufferManager::begin()
 {
     // Information about how to begin each command buffer

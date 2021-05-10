@@ -116,3 +116,8 @@ void Engine::frame()
 
     instance->backend->endFrame();
 }
+
+const backend::Backend& Engine::getBackend()
+{
+    return *instance->backend;
+}
