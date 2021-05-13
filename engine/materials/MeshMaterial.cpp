@@ -80,9 +80,8 @@ void MeshMaterial::setBone(int id, ptr<Bone> bone)
 ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
 {
     // Create pipeline
-    PipelineParams params;
-    params.params.name = getPipelineName();
-    params.renderpass = renderpass;
+    backend::BackendPipelineParams params;
+    params.name = getPipelineName();
 
     // To include in default dictionnary
     ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url, Engine::getBackend().capabilities().glslVersion);
@@ -108,9 +107,12 @@ ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
 
     // Process
     composer.process();
-    params.params.vertexShader = composer.getVertexShader();
-    params.params.fragmentShader = composer.getFragmentShader();
-    return PipelineManager::createPipeline(params);
+    params.shader.vertexShader = composer.getVertexShader();
+    params.shader.vertexShaderUniformBlocks = composer.getVertexShaderUniformBlocks();
+    params.shader.fragmentShader = composer.getFragmentShader();
+    params.shader.fragmentShaderUniformBlocks = composer.getFragmentShaderUniformBlocks();
+
+    return PipelineManager::createPipeline(renderpass, params);
 }
 
 std::string MeshMaterial::getPipelineName() const

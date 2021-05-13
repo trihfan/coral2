@@ -7,22 +7,12 @@
 namespace coral
 {
     /**
-     * @brief The PipelineParams contains the creation parameters 
-     * for the pipeline
-     */
-    struct PipelineParams
-    {
-        std::string renderpass;
-        backend::BackendPipelineParams params;
-    };
-
-    /**
      * @brief The Pipeline class describe a pipeline configuration for rendering
      */
     class Pipeline : public Object
     {
     public:
-        Pipeline(const PipelineParams& params);
+        Pipeline(const std::string& renderpass, const backend::BackendPipelineParams& params);
         const std::string& getRenderPassName() const;
         void use();
 
@@ -37,7 +27,8 @@ namespace coral
         virtual void release() override;
 
     private:
-        const PipelineParams params;
+        std::string renderpass;
+        const backend::BackendPipelineParams params;
         std::unique_ptr<backend::BackendPipeline> backendPipeline;
         bool dirty;
     };

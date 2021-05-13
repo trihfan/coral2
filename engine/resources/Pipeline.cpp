@@ -4,15 +4,16 @@
 
 using namespace coral;
 
-Pipeline::Pipeline(const PipelineParams& params)
-    : params(params)
+Pipeline::Pipeline(const std::string& renderpass, const backend::BackendPipelineParams& params)
+    : renderpass(renderpass)
+    , params(params)
     , dirty(false)
 {
 }
 
 const std::string& Pipeline::getRenderPassName() const
 {
-    return params.renderpass;
+    return renderpass;
 }
 
 void Pipeline::use()
@@ -23,7 +24,7 @@ void Pipeline::use()
 void Pipeline::init()
 {
     Object::init();
-    backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(params.params);
+    backendPipeline = backend::BackendObjectFactory<backend::BackendPipeline>::create(params);
 }
 
 void Pipeline::release()

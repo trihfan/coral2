@@ -1,10 +1,8 @@
 #pragma once
 
-#include "BackendCapabilities.h"
-#include "base/Object.h"
 #include <array>
-#include <sstream>
 #include <vector>
+#include "BackendPipeline.h"
 
 namespace coral
 {
@@ -13,12 +11,6 @@ namespace coral
         std::string name;
         int location;
         std::string type;
-    };
-
-    struct UniformBlock
-    {
-        std::string name;
-        int location;
     };
 
     class ShaderComposer
@@ -36,8 +28,8 @@ namespace coral
         std::string getFragmentShader() const;
 
         // Return the uniform block info
-        const std::vector<UniformBlock>& getVertexShaderUniformBlocks() const;
-        const std::vector<UniformBlock>& getVertexFragmentUniformBlocks() const;
+        const std::vector<backend::BackendUniformBlock>& getVertexShaderUniformBlocks() const;
+        const std::vector<backend::BackendUniformBlock>& getFragmentShaderUniformBlocks() const;
 
     private:
         // Parameter
@@ -45,7 +37,7 @@ namespace coral
         int glslVersion;
         std::vector<ShaderAttribute> attributes;
         std::vector<std::string> definitions;
-        std::array<std::vector<UniformBlock>, 2> uniformBlocks;
+        std::array<std::vector<backend::BackendUniformBlock>, 2> uniformBlocks;
 
         // Parser
         bool basicLighting;

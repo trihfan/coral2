@@ -23,8 +23,8 @@ OpenglPipeline::OpenglPipeline(const BackendPipelineParams& params)
     , blending(params.blending)
 {
     shader = std::make_unique<OpenglShader>(params.name);
-    shader->addShaderData(vertex, params.vertexShader);
-    shader->addShaderData(fragment, params.fragmentShader);
+    shader->addShaderCode(vertex, params.shader.vertexShader);
+    shader->addShaderCode(fragment, params.shader.fragmentShader);
     shader->init();
 }
 

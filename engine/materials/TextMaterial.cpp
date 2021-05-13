@@ -68,9 +68,8 @@ void TextMaterial::setColor(const glm::vec3& color)
 ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
 {
     dirty = true;
-    PipelineParams params;
-    params.params.name = getPipelineName();
-    params.renderpass = renderpass;
+    backend::BackendPipelineParams params;
+    params.name = getPipelineName();
 
     ShaderComposer composer("assets/shaders/text_material.shader", Engine::getBackend().capabilities().glslVersion);
 
@@ -81,12 +80,12 @@ ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
 
     // Process
     composer.process();
-    params.params.vertexShader = composer.getVertexShader();
-    params.params.fragmentShader = composer.getFragmentShader();
+    params.shader.vertexShader = composer.getVertexShader();
+    params.shader.fragmentShader = composer.getFragmentShader();
 
-    params.params.depthTest = this->params.mode == TextMode::text3d;
-    params.params.blending = true;
-    return PipelineManager::createPipeline(params);
+    params.depthTest = this->params.mode == TextMode::text3d;
+    params.blending = true;
+    return PipelineManager::createPipeline(renderpass, params);
 }
 
 std::string TextMaterial::getPipelineName() const
