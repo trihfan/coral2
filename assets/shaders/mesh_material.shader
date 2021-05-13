@@ -4,7 +4,7 @@ basic_lighting
 
 // Uniforms
 #ifdef SKINING
-UNIFORM_BLOCK(Skeleton, 64)
+UNIFORM_BLOCK(Skeleton)
 {
     uniform mat4 finalBoneMatrices[MAX_BONES];
 } skeleton;
@@ -61,7 +61,7 @@ void main()
 [fragment]
 
 // Uniforms
-UNIFORM_BLOCK(Material, 40)
+UNIFORM_BLOCK(Material)
 {
     vec3 ambient;
     vec3 diffuse;
@@ -70,7 +70,7 @@ UNIFORM_BLOCK(Material, 40)
 } material;
 
 #ifdef TEXTURING
-UNIFORM_BLOCK(Textures, 12)
+UNIFORM_BLOCK(Textures)
 {
     uniform sampler2D texture_ambient0;
     uniform sampler2D texture_diffuse0;

@@ -38,18 +38,18 @@ ptr<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
     return nullptr;
 }
 
-ptr<Pipeline> PipelineManager::createPipeline(const std::string& renderpass, backend::BackendPipelineParams params)
+ptr<Pipeline> PipelineManager::createPipeline(PipelineParams params)
 {
     // Retrieve renderpass
-    auto rd = RenderPassManager::getRenderPassByName(renderpass);
-    if (!rd || !rd->getBackendRenderPass())
+    auto renderPass = RenderPassManager::getRenderPassByName(params.renderpass);
+    if (!renderPass || !renderPass->getBackendRenderPass())
     {
-        Logs(error) << "Can't find render pass " << renderpass;
+        Logs(error) << "Can't find render pass " << params.renderpass;
         return nullptr;
     }
 
-    params.renderpass = rd->getBackendRenderPass();
-    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.name, renderpass, params);
-    instance->pipelines.push_back(std::make_pair(PipelineParams { renderpass, params }, pipeline));
+    params.params.renderpass = renderPass->getBackendRenderPass();
+    auto pipeline = ObjectFactory::createWithName<Pipeline>(params.params.name, params);
+    instance->pipelines.push_back(std::make_pair(params, pipeline));
     return pipeline;
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <string>
-#include <vector>
 
 namespace backend
 {
@@ -12,24 +11,6 @@ namespace backend
         front,
         back,
         none
-    };
-
-    struct BackendUniformBlock
-    {
-        std::string name;
-        int location;
-        size_t size;
-    };
-
-    struct BackendShaderParams
-    {
-        // Vertex Shader
-        std::string vertexShader;
-        std::vector<BackendUniformBlock> vertexShaderUniformBlocks;
-
-        // Fragment Shader
-        std::string fragmentShader;
-        std::vector<BackendUniformBlock> fragmentShaderUniformBlocks;
     };
 
     struct BackendPipelineParams
@@ -51,7 +32,8 @@ namespace backend
         // Blending
 
         // Shader
-        BackendShaderParams shader;
+        std::string vertexShader;
+        std::string fragmentShader;
     };
 
     class BackendPipeline

@@ -16,13 +16,12 @@ struct PointLight
     float quadratic;
 };
 
-UNIFORM_BLOCK(Lighting, 16)
+UNIFORM_BLOCK(Lighting)
 {
     uniform vec3 viewPosition;
+    uniform PointLight pointLights[LIGHT_MAX];
     uniform int pointLightCount;
 } lighting;
-
-uniform PointLight pointLights[LIGHT_MAX];
 
 vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 normal, vec3 position)
 {
@@ -35,7 +34,7 @@ vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, f
     // Point lights
     for (int i = 0; i < lighting.pointLightCount; i++)
     {
-        vec3 lightDir = normalize(pointLights[i].position - position);
+        vec3 lightDir = normalize(lighting.pointLights[i].position - position);
 
         // diffuse
         float diff = max(dot(normal, lightDir), 0.);
@@ -45,11 +44,11 @@ vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, f
         float spec = pow(max(dot(viewDirection, reflectDir), 0.), shininess);
 
         // attenuation
-        float distance = length(pointLights[i].position - position);
-        float attenuation = 1. / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
+        float distance = length(lighting.pointLights[i].position - position);
+        float attenuation = 1. / (lighting.pointLights[i].constant + lighting.pointLights[i].linear * distance + lighting.pointLights[i].quadratic * (distance * distance));    
 
-        vec3 diffuse = pointLights[i].color * diff;
-        vec3 specular = pointLights[i].color * spec;
+        vec3 diffuse = lighting.pointLights[i].color * diff;
+        vec3 specular = lighting.pointLights[i].color * spec;
 
         result += diffuse * diffuseColor  + specular * specularColor * attenuation;
     }
@@ -168,12 +167,12 @@ std::string ShaderComposer::getFragmentShader() const
     return fragmentContent;
 }
 
-const std::vector<backend::BackendUniformBlock>& ShaderComposer::getVertexShaderUniformBlocks() const
+const std::vector<UniformBlock>& ShaderComposer::getVertexShaderUniformBlocks() const
 {
     return uniformBlocks[0];
 }
 
-const std::vector<backend::BackendUniformBlock>& ShaderComposer::getFragmentShaderUniformBlocks() const
+const std::vector<UniformBlock>& ShaderComposer::getVertexFragmentUniformBlocks() const
 {
     return uniformBlocks[1];
 }
@@ -217,7 +216,7 @@ void ShaderComposer::parseVertexShader(const std::string& content)
 
     // Uniforms
     finalContent << R"(
-    UNIFORM_BLOCK(Transform, 192)
+    UNIFORM_BLOCK(Transform)
     {
         uniform mat4 projectionMatrix;
         uniform mat4 viewMatrix;
@@ -269,14 +268,13 @@ void ShaderComposer::parseUniformBlock(std::string& content, size_t index)
     size_t startPos = 0;
     while ((startPos = content.find(uniformBlockString, startPos)) != std::string::npos)
     {
-        backend::BackendUniformBlock uniformBlock;
-        uniformBlock.location = bindingCount++;
+        int bindingIndex = bindingCount++;
 
         // Create binding
         std::stringstream binding;
         if (glslVersion >= 420)
         {
-            binding << "layout(std140, binding = " << uniformBlock.location << ") uniform ";
+            binding << "layout(binding = " << bindingIndex << ") uniform ";
         }
         else
         {
@@ -288,18 +286,12 @@ void ShaderComposer::parseUniformBlock(std::string& content, size_t index)
         startPos += bindingStr.length(); // Handles case where 'to' is a substring of 'from'
 
         // Get uniform name
-        auto nameEnd = content.find(",", startPos);
-        uniformBlock.name = content.substr(startPos, nameEnd - startPos);
+        auto nameEnd = content.find(")", startPos);
+        uniformBlocks[index].push_back({ content.substr(startPos, nameEnd - startPos), bindingIndex });
+
+        // Change ( -> {
+        content.replace(nameEnd, 1, "");
         startPos = nameEnd;
-
-        // Get size
-        auto sizeEnd = content.find(")", nameEnd);
-        uniformBlock.size = std::stoi(content.substr(startPos + 1, sizeEnd - startPos));
-
-        // Change ) -> {
-        content.replace(startPos, sizeEnd - startPos + 1, "");
-
-        uniformBlocks[index].push_back(uniformBlock);
     }
 }
 
