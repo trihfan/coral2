@@ -34,8 +34,6 @@ namespace backend
         // Shader
         std::string vertexShader;
         std::string fragmentShader;
-        std::string vertexShaderFile;
-        std::string fragmentShaderFile;
     };
 
     class BackendPipeline

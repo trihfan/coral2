@@ -3,7 +3,7 @@
 #include "Singleton.h"
 #include "VulkanBackendStructures.h"
 
-#define CURRENT_VK_COMMAND_BUFFER VulkanCommandBufferManager::get()->getCommandBuffer()
+#define CURRENT_COMMAND_BUFFER VulkanCommandBufferManager::get()->getCommandBuffer()
 
 namespace backend::vulkan
 {
@@ -15,6 +15,8 @@ namespace backend::vulkan
         ~VulkanCommandBufferManager();
 
         VkCommandBuffer& getCommandBuffer();
+        VkCommandPool& getCommandPool();
+
         void begin();
         void end();
 

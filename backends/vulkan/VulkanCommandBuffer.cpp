@@ -22,6 +22,7 @@ VulkanCommandBufferManager::VulkanCommandBufferManager(const VulkanDevice& devic
 
     VkCommandPoolCreateInfo poolInfo = {};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily; // Queue Family type that buffers from this command pool will use
 
     // Create a Graphics Queue Family Command Pool
@@ -76,4 +77,9 @@ void VulkanCommandBufferManager::end()
     {
         Logs(error) << "Failed to end recording a Command Buffer!";
     }
+}
+
+VkCommandPool& VulkanCommandBufferManager::getCommandPool()
+{
+    return graphicsCommandPool;
 }

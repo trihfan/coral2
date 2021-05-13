@@ -21,15 +21,9 @@ namespace coral
     {
         MAKE_SINGLETON(Engine)
     public:
-        /**
-         * @brief Resize the render
-         */
         static void resize(int width, int height);
-
-        /**
-         * @brief Render a frame
-         */
         static void frame();
+        static const backend::Backend& getBackend();
 
     private:
         // Time point of engine start
