@@ -4,7 +4,7 @@
 #include "VulkanCommandBuffer.h"
 #include "VulkanError.h"
 #include "VulkanRenderPass.h"
-#include "VulkanShaderLoader.h"
+#include "VulkanShader.h"
 
 using namespace coral;
 using namespace backend::vulkan;
@@ -14,23 +14,21 @@ VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, const Vulkan
     , device(device)
 {
     // Create Shader Modules
-    VulkanShaderLoader shaderLoader(device.logicalDevice);
-    shaderLoader.addShaderData(vertex, params.vertexShader);
-    shaderLoader.addShaderData(fragment, params.fragmentShader);
-    shaderLoader.load();
+    VulkanShader vertexShaderModule(params.vertexShaderFile, device.logicalDevice);
+    VulkanShader fragmentShaderModule(params.fragmentShaderFile, device.logicalDevice);
 
     // Vertex Stage creation information
     VkPipelineShaderStageCreateInfo vertexShaderCreateInfo = {};
     vertexShaderCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertexShaderCreateInfo.stage = VK_SHADER_STAGE_VERTEX_BIT; // Shader Stage name
-    vertexShaderCreateInfo.module = shaderLoader.getHandle(vertex); // Shader module to be used by stage
+    vertexShaderCreateInfo.module = vertexShaderModule; // Shader module to be used by stage
     vertexShaderCreateInfo.pName = "main"; // Entry point in to shader
 
     // Fragment Stage creation information
     VkPipelineShaderStageCreateInfo fragmentShaderCreateInfo = {};
     fragmentShaderCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragmentShaderCreateInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT; // Shader Stage name
-    fragmentShaderCreateInfo.module = shaderLoader.getHandle(fragment); // Shader module to be used by stage
+    fragmentShaderCreateInfo.module = fragmentShaderModule; // Shader module to be used by stage
     fragmentShaderCreateInfo.pName = "main"; // Entry point in to shader
 
     // Put shader stage creation info in to array
@@ -172,6 +170,10 @@ VulkanPipeline::VulkanPipeline(const BackendPipelineParams& params, const Vulkan
         Logs(error) << "Failed to create a Graphics Pipeline!";
         return;
     }
+
+    // Destroy Shader Modules, no longer needed after Pipeline created
+    vkDestroyShaderModule(device.logicalDevice, fragmentShaderModule, nullptr);
+    vkDestroyShaderModule(device.logicalDevice, vertexShaderModule, nullptr);
 }
 
 VulkanPipeline::~VulkanPipeline()
@@ -182,7 +184,7 @@ VulkanPipeline::~VulkanPipeline()
 
 void VulkanPipeline::use()
 {
-    vkCmdBindPipeline(CURRENT_COMMAND_BUFFER, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    vkCmdBindPipeline(CURRENT_VK_COMMAND_BUFFER, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 }
 
 void VulkanPipeline::setUniform(const std::string& name, bool value) const

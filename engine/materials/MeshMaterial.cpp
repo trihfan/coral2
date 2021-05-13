@@ -1,6 +1,5 @@
 #include "MeshMaterial.h"
 #include "AssetManager.h"
-#include "Engine.h"
 #include "FileUtils.h"
 #include "resources/Pipeline.h"
 #include "resources/PipelineManager.h"
@@ -85,7 +84,7 @@ ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
     params.renderpass = renderpass;
 
     // To include in default dictionnary
-    ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url, Engine::getBackend().capabilities().glslVersion);
+    ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url);
 
     // Attributes
     for (const auto& attribute : attributes)

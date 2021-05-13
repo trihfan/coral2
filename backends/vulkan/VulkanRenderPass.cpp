@@ -111,12 +111,12 @@ void VulkanRenderPass::begin(const BeginRenderPassParams& params)
     }
     renderPassBeginInfo.pClearValues = clearValues.data(); // List of clear values (TODO: Depth Attachment Clear Value)
     renderPassBeginInfo.framebuffer = static_cast<VulkanFramebuffer*>(params.framebuffer)->getHandle();
-    vkCmdBeginRenderPass(CURRENT_COMMAND_BUFFER, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(CURRENT_VK_COMMAND_BUFFER, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 void VulkanRenderPass::end()
 {
-    vkCmdEndRenderPass(CURRENT_COMMAND_BUFFER);
+    vkCmdEndRenderPass(CURRENT_VK_COMMAND_BUFFER);
 }
 
 VkRenderPass VulkanRenderPass::getHandle() const

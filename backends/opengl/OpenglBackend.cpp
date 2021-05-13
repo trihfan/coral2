@@ -64,6 +64,5 @@ void OpenglBackend::endFrame()
 backend::BackendCapabilities OpenglBackend::capabilities() const
 {
     BackendCapabilities capabilities;
-    capabilities.glslVersion = GLVersion.major * 100 + GLVersion.minor * 10;
     return capabilities;
 }

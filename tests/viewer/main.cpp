@@ -72,7 +72,14 @@ void mainloop()
     processInput(window);
 
     // render
-    Engine::frame();
+    try
+    {
+        Engine::frame();
+    }
+    catch (...)
+    {
+        Logs(error) << "Unknown exception";
+    }
 
     // Finish
     glfwSwapBuffers(window);
@@ -82,7 +89,7 @@ void mainloop()
 int main(int argc, char* argv[])
 {
     BackendType type = opengl;
-    if (argc > 1 && std::string(argv[1]) == "-vulkan")
+    //if (argc > 1 && std::string(argv[1]) == "-vulkan")
     {
         type = vulkan;
     }
@@ -182,7 +189,7 @@ void setupScene()
     scene->add(camera);
 
     // Models
-    auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
+    /*auto zombie = ObjectFactory::create<Model>(AssetManager::get(assetsDirectory, "models/Zombie.fbx").url);
     zombie->setScale(glm::vec3(0.01, 0.01, 0.01));
     zombie->setTranslation(glm::vec3(-0.5, 0, 0));
     scene->add(zombie);
@@ -218,7 +225,7 @@ void setupScene()
     createLight(glm::vec3(-5, 1, 5));
 
     // Text
-    /*TextFormat format;
+    TextFormat format;
     format.font = "assets/fonts/SukiYaki.otf";
     format.size = 50;
     text = ObjectFactory::create<Text>(format);

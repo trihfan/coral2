@@ -7,6 +7,8 @@
 using namespace coral;
 
 static const std::string basicLightingShader = R"(
+uniform vec3 viewPosition;
+
 struct PointLight
 {
     vec3 position;
@@ -16,25 +18,21 @@ struct PointLight
     float quadratic;
 };
 
-UNIFORM_BLOCK(Lighting)
-{
-    uniform vec3 viewPosition;
-    uniform PointLight pointLights[LIGHT_MAX];
-    uniform int pointLightCount;
-} lighting;
+uniform PointLight pointLights[LIGHT_MAX];
+uniform int pointLightCount;
 
 vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, float shininess, vec3 normal, vec3 position)
 {
     // properties
-    vec3 viewDirection = normalize(lighting.viewPosition - position);
+    vec3 viewDirection = normalize(viewPosition - position);
 
     // Ambien4
     vec3 result = ambientColor;
 
     // Point lights
-    for (int i = 0; i < lighting.pointLightCount; i++)
+    for (int i = 0; i < pointLightCount; i++)
     {
-        vec3 lightDir = normalize(lighting.pointLights[i].position - position);
+        vec3 lightDir = normalize(pointLights[i].position - position);
 
         // diffuse
         float diff = max(dot(normal, lightDir), 0.);
@@ -44,11 +42,11 @@ vec3 computeLighting(vec3 ambientColor, vec3 diffuseColor, vec3 specularColor, f
         float spec = pow(max(dot(viewDirection, reflectDir), 0.), shininess);
 
         // attenuation
-        float distance = length(lighting.pointLights[i].position - position);
-        float attenuation = 1. / (lighting.pointLights[i].constant + lighting.pointLights[i].linear * distance + lighting.pointLights[i].quadratic * (distance * distance));    
+        float distance = length(pointLights[i].position - position);
+        float attenuation = 1. / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));    
 
-        vec3 diffuse = lighting.pointLights[i].color * diff;
-        vec3 specular = lighting.pointLights[i].color * spec;
+        vec3 diffuse = pointLights[i].color * diff;
+        vec3 specular = pointLights[i].color * spec;
 
         result += diffuse * diffuseColor  + specular * specularColor * attenuation;
     }
@@ -63,7 +61,7 @@ enum class ParserCurrentPart
     fragment
 };
 
-static void replaceAll(std::string& str, const std::string& from, const std::string& to)
+static std::string replaceAll(std::string str, const std::string& from, const std::string& to)
 {
     size_t start_pos = 0;
     while ((start_pos = str.find(from, start_pos)) != std::string::npos)
@@ -71,27 +69,11 @@ static void replaceAll(std::string& str, const std::string& from, const std::str
         str.replace(start_pos, from.length(), to);
         start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
     }
+    return str;
 }
 
-static void replaceAllLayout(std::string& str, const std::string& from, const std::string& to)
-{
-    size_t startPos = 0;
-    size_t index = 0;
-
-    while ((startPos = str.find(from, startPos)) != std::string::npos)
-    {
-        std::stringstream st;
-        st << "layout(location = " << index++ << ") " << to;
-        std::string finalTo = st.str();
-
-        str.replace(startPos, from.length(), finalTo);
-        startPos += finalTo.length(); // Handles case where 'to' is a substring of 'from'
-    }
-}
-
-ShaderComposer::ShaderComposer(const std::string& shaderfile, int glslVersion)
+ShaderComposer::ShaderComposer(const std::string& shaderfile)
     : shaderFile(shaderfile)
-    , glslVersion(glslVersion)
     , basicLighting(false)
     , maxLightCount(32)
 {
@@ -167,16 +149,6 @@ std::string ShaderComposer::getFragmentShader() const
     return fragmentContent;
 }
 
-const std::vector<UniformBlock>& ShaderComposer::getVertexShaderUniformBlocks() const
-{
-    return uniformBlocks[0];
-}
-
-const std::vector<UniformBlock>& ShaderComposer::getVertexFragmentUniformBlocks() const
-{
-    return uniformBlocks[1];
-}
-
 void ShaderComposer::parseParameters(const std::string& content)
 {
     if (content.find("basic_lighting") != std::string::npos)
@@ -192,7 +164,7 @@ void ShaderComposer::parseVertexShader(const std::string& content)
     std::string str = content;
     for (const auto& attribute : attributes)
     {
-        replaceAll(str, "VERTEX." + attribute.name, "vertex_" + attribute.name);
+        str = replaceAll(str, "VERTEX." + attribute.name, "vertex_" + attribute.name);
     }
 
     std::stringstream finalContent;
@@ -203,33 +175,24 @@ void ShaderComposer::parseVertexShader(const std::string& content)
         finalContent << "#define " << definition << std::endl;
     }
 
-    finalContent << "#define MODEL_MATRIX transform.modelMatrix" << std::endl;
-    finalContent << "#define PROJECTION_MATRIX transform.projectionMatrix" << std::endl;
-    finalContent << "#define VIEW_MATRIX transform.viewMatrix" << std::endl;
-    finalContent << "#define POSITION gl_Position" << std::endl;
+    finalContent << "#define MODEL_MATRIX modelMatrix" << std::endl;
+    finalContent << "#define PROJECTION_MATRIX projectionMatrix" << std::endl;
+    finalContent << "#define VIEW_MATRIX viewMatrix" << std::endl;
 
     // Attributes
     for (const auto& attribute : attributes)
     {
-        finalContent << "IN " << attribute.type << " vertex_" << attribute.name << ";" << std::endl;
+        finalContent << "layout(location = " << attribute.location << ") in " << attribute.type << " vertex_" << attribute.name << ";" << std::endl;
     }
 
     // Uniforms
-    finalContent << R"(
-    UNIFORM_BLOCK(Transform)
-    {
-        uniform mat4 projectionMatrix;
-        uniform mat4 viewMatrix;
-        uniform mat4 modelMatrix;
-    } transform;
-    )";
+    finalContent << "uniform mat4 projectionMatrix;" << std::endl;
+    finalContent << "uniform mat4 viewMatrix;" << std::endl;
+    finalContent << "uniform mat4 modelMatrix;" << std::endl;
 
     // Finalize
     finalContent << str;
     vertexContent = finalContent.str();
-
-    parseUniformBlock(vertexContent, 0);
-    parseInputOutput(vertexContent);
 }
 
 void ShaderComposer::parseFragmentShader(const std::string& content)
@@ -241,7 +204,6 @@ void ShaderComposer::parseFragmentShader(const std::string& content)
     {
         finalContent << "#define " << definition << std::endl;
     }
-    finalContent << "#define COLOR_0 fragColor0" << std::endl;
 
     // Uniforms
     if (basicLighting)
@@ -250,53 +212,9 @@ void ShaderComposer::parseFragmentShader(const std::string& content)
     }
 
     // Output
-    finalContent << "OUT vec4 COLOR_0;" << std::endl;
+    finalContent << "out vec4 fragColor0;" << std::endl;
 
     // Finalize
     finalContent << content;
     fragmentContent = finalContent.str();
-
-    parseUniformBlock(fragmentContent, 1);
-    parseInputOutput(fragmentContent);
-}
-
-void ShaderComposer::parseUniformBlock(std::string& content, size_t index)
-{
-    static const std::string uniformBlockString = "UNIFORM_BLOCK(";
-
-    int bindingCount = 0;
-    size_t startPos = 0;
-    while ((startPos = content.find(uniformBlockString, startPos)) != std::string::npos)
-    {
-        int bindingIndex = bindingCount++;
-
-        // Create binding
-        std::stringstream binding;
-        if (glslVersion >= 420)
-        {
-            binding << "layout(binding = " << bindingIndex << ") uniform ";
-        }
-        else
-        {
-            binding << "layout(std140) uniform ";
-        }
-        std::string bindingStr = binding.str();
-
-        content.replace(startPos, uniformBlockString.length(), bindingStr);
-        startPos += bindingStr.length(); // Handles case where 'to' is a substring of 'from'
-
-        // Get uniform name
-        auto nameEnd = content.find(")", startPos);
-        uniformBlocks[index].push_back({ content.substr(startPos, nameEnd - startPos), bindingIndex });
-
-        // Change ( -> {
-        content.replace(nameEnd, 1, "");
-        startPos = nameEnd;
-    }
-}
-
-void ShaderComposer::parseInputOutput(std::string& content)
-{
-    replaceAllLayout(content, "IN ", "in ");
-    replaceAllLayout(content, "OUT ", "out ");
 }
