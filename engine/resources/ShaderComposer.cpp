@@ -6,6 +6,8 @@
 
 using namespace coral;
 
+static const std::string sStartUniform = "UNIFORM(";
+
 static const std::string basicLightingShader = R"(
 uniform vec3 viewPosition;
 
@@ -61,21 +63,21 @@ enum class ParserCurrentPart
     fragment
 };
 
-static std::string replaceAll(std::string str, const std::string& from, const std::string& to)
+static void replaceAll(std::string& str, const std::string& from, const std::string& to)
 {
-    size_t start_pos = 0;
-    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    size_t pos = 0;
+    while ((pos = str.find(from, pos)) != std::string::npos)
     {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+        str.replace(pos, from.length(), to);
+        pos += to.length();
     }
-    return str;
 }
 
-ShaderComposer::ShaderComposer(const std::string& shaderfile)
+ShaderComposer::ShaderComposer(const std::string& shaderfile, int glslVersion)
     : shaderFile(shaderfile)
+    , glslVersion(glslVersion)
     , basicLighting(false)
-    , maxLightCount(32)
+    , maxLightCount(MAX_LIGHTS_COUNT)
 {
 }
 
@@ -164,7 +166,7 @@ void ShaderComposer::parseVertexShader(const std::string& content)
     std::string str = content;
     for (const auto& attribute : attributes)
     {
-        str = replaceAll(str, "VERTEX." + attribute.name, "vertex_" + attribute.name);
+        replaceAll(str, "VERTEX." + attribute.name, "vertex_" + attribute.name);
     }
 
     std::stringstream finalContent;
@@ -174,10 +176,10 @@ void ShaderComposer::parseVertexShader(const std::string& content)
     {
         finalContent << "#define " << definition << std::endl;
     }
-
-    finalContent << "#define MODEL_MATRIX modelMatrix" << std::endl;
-    finalContent << "#define PROJECTION_MATRIX projectionMatrix" << std::endl;
-    finalContent << "#define VIEW_MATRIX viewMatrix" << std::endl;
+    
+    finalContent << "#define MODEL_MATRIX transform.modelMatrix" << std::endl;
+    finalContent << "#define PROJECTION_MATRIX transform.projectionMatrix" << std::endl;
+    finalContent << "#define VIEW_MATRIX transform.viewMatrix" << std::endl;
 
     // Attributes
     for (const auto& attribute : attributes)
@@ -186,13 +188,21 @@ void ShaderComposer::parseVertexShader(const std::string& content)
     }
 
     // Uniforms
-    finalContent << "uniform mat4 projectionMatrix;" << std::endl;
-    finalContent << "uniform mat4 viewMatrix;" << std::endl;
-    finalContent << "uniform mat4 modelMatrix;" << std::endl;
+    finalContent << R"(
+        UNIFORM(Transform, transform)
+        {
+            mat4 projectionMatrix;
+            mat4 viewMatrix;
+            mat4 modelMatrix;
+        };
+    )";
 
     // Finalize
     finalContent << str;
     vertexContent = finalContent.str();
+
+    parseInOut(vertexContent);
+    parseUniforms(vertexContent);
 }
 
 void ShaderComposer::parseFragmentShader(const std::string& content)
@@ -204,6 +214,7 @@ void ShaderComposer::parseFragmentShader(const std::string& content)
     {
         finalContent << "#define " << definition << std::endl;
     }
+    finalContent << "#define COLOR_0 fragColor0" << std::endl;
 
     // Uniforms
     if (basicLighting)
@@ -212,9 +223,44 @@ void ShaderComposer::parseFragmentShader(const std::string& content)
     }
 
     // Output
-    finalContent << "out vec4 fragColor0;" << std::endl;
+    finalContent << "OUT vec4 fragColor0;" << std::endl;
 
     // Finalize
     finalContent << content;
     fragmentContent = finalContent.str();
+
+    parseInOut(fragmentContent);
+    parseUniforms(fragmentContent);
+}
+
+void ShaderComposer::parseInOut(std::string& content)
+{
+    replaceAll(content, "IN ", "in ");
+    replaceAll(content, "OUT ", "out ");
+}
+
+void ShaderComposer::parseUniforms(std::string& content)
+{
+    size_t pos = 0;
+    while ((pos = content.find(sStartUniform, pos)) != std::string::npos)
+    {
+        // Type
+        size_t typeEnd = content.find_first_of(',', pos);
+        std::string type = content.substr(pos + sStartUniform.size(), typeEnd - pos - sStartUniform.size());
+
+        // Name
+        size_t nameEnd = content.find_first_of(')', pos);
+        std::string name = content.substr(typeEnd + 1, nameEnd - typeEnd - 1);
+
+        // Replace title
+        std::string title = std::string("struct ") + type;
+        size_t uniformStartSize = nameEnd - pos + 1;
+        content.replace(pos, uniformStartSize, title);
+        pos += uniformStartSize;
+
+        // Finalize
+        size_t uniformEnd = content.find_first_of("}", pos);
+        content.insert(uniformEnd + 2, "uniform " + type + " " + name + ";");
+        pos = uniformEnd + 1;
+    }
 }

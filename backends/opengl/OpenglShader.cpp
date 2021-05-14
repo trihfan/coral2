@@ -151,6 +151,7 @@ void OpenglShader::setUniform(const std::string& name, const glm::mat3& mat) con
 
 void OpenglShader::setUniform(const std::string& name, const glm::mat4& mat) const
 {
+    auto t = glGetUniformLocation(id, name.c_str());
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 

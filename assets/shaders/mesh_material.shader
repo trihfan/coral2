@@ -4,13 +4,16 @@ basic_lighting
 
 // Uniforms
 #ifdef SKINING
-uniform mat4 finalBoneMatrices[MAX_BONES];
+UNIFORM(Skeleton, skeleton)
+{
+    mat4 finalBoneMatrices[MAX_BONES];
+};
 #endif 
 
 // Varyings
-out vec3 position;
-out vec3 normal;
-out vec2 textCoords;
+OUT vec3 position;
+OUT vec3 normal;
+OUT vec2 textCoords;
 
 #ifdef SKINING
 void computeSkining()
@@ -23,7 +26,7 @@ void computeSkining()
         int boneId = floatBitsToInt(VERTEX.bone[i]);
         if (boneId < MAX_BONES && boneId >= 0) 
         {
-            totalPosition += finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight[i];
+            totalPosition += skeleton.finalBoneMatrices[boneId] * vec4(VERTEX.position, 1) * VERTEX.weight[i];
             count++;
         }
 
@@ -35,7 +38,7 @@ void computeSkining()
     }
     else
     {
-    position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
+        position = vec3(MODEL_MATRIX * vec4(VERTEX.position, 1));
     }
 
     normal = mat3(transpose(inverse(MODEL_MATRIX))) * VERTEX.normal;
@@ -58,7 +61,7 @@ void main()
 [fragment]
 
 // Uniforms
-struct Material
+UNIFORM(Material, material)
 {
     vec3 ambient;
     vec3 diffuse;
@@ -66,18 +69,16 @@ struct Material
     float shininess;
 };
 
-uniform Material material;
-
 #ifdef TEXTURING
-uniform sampler2D texture_ambient0;
-uniform sampler2D texture_diffuse0;
-uniform sampler2D texture_specular0;
+    uniform sampler2D texture_ambient0;
+    uniform sampler2D texture_diffuse0;
+    uniform sampler2D texture_specular0;
 #endif
 
 // Varyings
-in vec3 position;
-in vec3 normal;
-in vec2 textCoords;
+IN vec3 position;
+IN vec3 normal;
+IN vec2 textCoords;
 
 void main()
 {
@@ -97,5 +98,5 @@ void main()
 
     vec3 fragmentNormal = normalize(normal);
     vec3 result = computeLighting(material.ambient, diffuse, material.specular, material.shininess, fragmentNormal, position);
-    fragColor0 = vec4(result, 1);
+    COLOR_0 = vec4(result, 1);
 }

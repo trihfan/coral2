@@ -58,7 +58,7 @@ void MeshMaterial::use(const RenderParameters& parameters)
         {
             if (bones[i])
             {
-                pipeline->setUniform("finalBoneMatrices[" + std::to_string(i) + "]", bones[i]->getBoneMatrix());
+                pipeline->setUniform("skeleton.finalBoneMatrices[" + std::to_string(i) + "]", bones[i]->getBoneMatrix());
             }
         }
     }
@@ -84,7 +84,7 @@ ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
     params.renderpass = renderpass;
 
     // To include in default dictionnary
-    ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url);
+    ShaderComposer composer(AssetManager::get(FileUtils::getAppDirectory() + "/assets", "shaders/mesh_material.shader").url, 450);
 
     // Attributes
     for (const auto& attribute : attributes)

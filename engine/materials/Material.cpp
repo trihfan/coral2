@@ -41,8 +41,8 @@ void Material::setupLights(const RenderParameters& parameters)
 
 void Material::use(const RenderParameters& parameters)
 {
-    pipeline->setUniform("projectionMatrix", parameters.camera->getProjectionMatrix());
-    pipeline->setUniform("viewMatrix", parameters.camera->getViewMatrix());
+    pipeline->setUniform("transform.projectionMatrix", parameters.camera->getProjectionMatrix());
+    pipeline->setUniform("transform.viewMatrix", parameters.camera->getViewMatrix());
 
     if (lighting)
     {
@@ -67,7 +67,7 @@ void Material::invalidatePipeline()
 
 void Material::setNode(ptr<Node> node)
 {
-    pipeline->setUniform("modelMatrix", node->transform().getMatrix());
+    pipeline->setUniform("transform.modelMatrix", node->transform().getMatrix());
 }
 
 void Material::enableLighting()

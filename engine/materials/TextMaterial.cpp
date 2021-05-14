@@ -72,7 +72,7 @@ ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
     params.params.name = getPipelineName();
     params.renderpass = renderpass;
 
-    ShaderComposer composer("assets/shaders/text_material.shader");
+    ShaderComposer composer("assets/shaders/text_material.shader", 450);
 
     // Attributes
     composer.addAttribute(ShaderAttribute { "position", 0, "vec3" });

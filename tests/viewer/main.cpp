@@ -81,7 +81,7 @@ void mainloop()
 int main(int argc, char* argv[])
 {
     BackendType type = opengl;
-    //if (argc > 1 && std::string(argv[1]) == "-vulkan")
+    if (argc > 1 && std::string(argv[1]) == "-vulkan")
     {
         type = vulkan;
     }
