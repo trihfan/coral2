@@ -2,7 +2,6 @@ project(backend_opengl)
 set_property(GLOBAL PROPERTY backend_opengl_path ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Dependencies
-get_property(glm_path GLOBAL PROPERTY glm_path)
 get_property(utils_path GLOBAL PROPERTY utils_path)
 get_property(backend_interfaces_path GLOBAL PROPERTY backend_interfaces_path)
 find_package(OpenGL REQUIRED)
@@ -35,13 +34,13 @@ add_library(backend_opengl STATIC ${sources})
 set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Includes
-target_include_directories(backend_opengl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${utils_path}" "${backend_interfaces_path}" "${glm_path}")
+target_include_directories(backend_opengl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${utils_path}" "${backend_interfaces_path}")
 if(backend_opengl_version STREQUAL "gl")
     target_include_directories(backend_opengl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/glad")
 endif()
 
 # Libraries
-target_link_libraries(backend_opengl PUBLIC utils)
+target_link_libraries(backend_opengl PUBLIC utils glm::glm)
 if(NOT EMSCRIPTEN)
     target_link_libraries(backend_opengl PUBLIC OpenGL::GL)
 endif()

@@ -26,17 +26,17 @@ add_executable(viewer ${sources})
 set_folder_structure("${sources}" ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Includes and libs
-target_include_directories(viewer PUBLIC ${engine_path})
-target_link_libraries(viewer engine)
+target_include_directories(viewer PRIVATE ${engine_path})
+target_link_libraries(viewer PRIVATE engine)
 
 if(BACKEND_OPENGL_ENABLED)
-    target_include_directories(viewer PUBLIC ${backend_opengl_path})
-    target_link_libraries(viewer glfw backend_opengl)
+    target_include_directories(viewer PRIVATE ${backend_opengl_path})
+    target_link_libraries(viewer PRIVATE glfw backend_opengl)
 endif()
 
 if(BACKEND_VULKAN_ENABLED)
-    target_include_directories(viewer PUBLIC ${backend_vulkan_path})
-    target_link_libraries(viewer glfw backend_vulkan)
+    target_include_directories(viewer PRIVATE ${backend_vulkan_path})
+    target_link_libraries(viewer PRIVATE glfw backend_vulkan)
 endif()
 
 # Set output directories

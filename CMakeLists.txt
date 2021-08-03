@@ -23,6 +23,8 @@ include(folder_structure)
 # Dependencies
 find_package(OpenGL)
 find_package(Vulkan)
+find_package(glm CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 # Options
 option(BACKEND_OPENGL_ENABLED "enable opengl backend" ${OPENGL_FOUND})
@@ -47,7 +49,6 @@ if(EMSCRIPTEN)
 endif()
 
 # subdirectories
-add_subdirectory(externals) # Properties: glm_path, assimp_path
 add_subdirectory(backends) # Properties: backend_interfaces_path, backend_opengl_path, backend_vulkan_path
 add_subdirectory(engine) # Properties: engine_path
 add_subdirectory(utils) # Properties: utils_path
