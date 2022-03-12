@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BackendResource.h"
+#include "vulkan/VulkanBackendStructures.h"
 #include "base/Object.h"
 #include <memory>
 
@@ -8,10 +8,31 @@ namespace coral
 {
     class Engine;
 
+    /**
+     * @brief Texture type
+     */
+    enum class ResourceType
+    {
+        texture2d
+    };
+
+    /**
+     * @brief Texture internal format
+     */
+    enum class ResourceFormat
+    {
+        r8,
+        rg88,
+        rgb888,
+        rgba8888,
+        argb8888,
+        depth24_pencil8
+    };
+
     struct ResourceParams
     {
-        backend::BackendResourceType type;
-        backend::BackendResourceFormat format;
+        ResourceType type;
+        ResourceFormat format;
         int width;
         int height;
         int samples = 1;
@@ -33,8 +54,8 @@ namespace coral
         // Create resource from memory
         Resource(const unsigned char* buffer, int length);
 
+        const VulkanImage& getImage() const;
         void bind(int index);
-        backend::BackendResource* getBackendResource() const;
 
         virtual void init();
         virtual void release();
@@ -42,7 +63,10 @@ namespace coral
     private:
         ResourceParams params;
         unsigned char* fileData;
-        std::unique_ptr<backend::BackendResource> backendResource;
+        
+        VulkanDevice device;
+        VulkanImage image;
+        bool ownImage;
 
         void setFromMemory();
     };

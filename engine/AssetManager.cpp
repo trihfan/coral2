@@ -1,7 +1,6 @@
 #include "AssetManager.h"
-#include "Backend.h"
-#include "FileUtils.h"
-#include "Logs.h"
+#include "utils/FileUtils.h"
+#include "utils/Logs.h"
 #include <filesystem>
 #include <vector>
 

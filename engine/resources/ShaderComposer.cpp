@@ -1,6 +1,6 @@
 #include "ShaderComposer.h"
 #include "BackendObjectFactory.h"
-#include "Logs.h"
+#include "utils/Logs.h"
 #include <fstream>
 #include <sstream>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BackendVertexBuffer.h"
+#include "vulkan/VulkanVertexBuffer.h"
 #include "MeshVertexBuffer.h"
 #include "materials/Material.h"
 #include "scene/DrawableNode.h"

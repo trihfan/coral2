@@ -1,6 +1,4 @@
 #include "Resource.h"
-#include "BackendFramebuffer.h"
-#include "BackendObjectFactory.h"
 #include "stb_image.h"
 
 using namespace coral;
@@ -98,11 +96,6 @@ void Resource::bind(int index)
     backendResource->bind(index);
 }
 
-backend::BackendResource* Resource::getBackendResource() const
-{
-    return backendResource.get();
-}
-
 void Resource::init()
 {
     Object::init();
@@ -120,7 +113,12 @@ void Resource::init()
     params.height = this->params.height;
     params.samples = this->params.samples;
     params.data = this->params.data.empty() ? fileData : this->params.data.data();
-    backendResource = backend::BackendObjectFactory<backend::BackendResource>::create(params);
+
+        /*: BackendResource(BackendResourceParams())
+    , image(image)
+    , device(device)
+    , ownImage(false)
+    backendResource = backend::BackendObjectFactory<backend::BackendResource>::create(params);*/
 
     // Release memory
     this->params.data.clear();
@@ -134,6 +132,10 @@ void Resource::init()
 
 void Resource::release()
 {
+    vkDestroyImageView(device.logicalDevice, image.imageView, nullptr);
+    if (ownImage)
+    {
+        vkDestroyImage(device.logicalDevice, image.image, nullptr);
+    }
     Object::release();
-    backendResource = nullptr;
 }

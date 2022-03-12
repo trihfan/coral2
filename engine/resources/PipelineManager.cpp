@@ -5,16 +5,6 @@
 
 using namespace coral;
 
-DEFINE_SINGLETON(PipelineManager)
-
-PipelineManager::PipelineManager()
-{
-}
-
-void PipelineManager::release()
-{
-}
-
 void PipelineManager::clear()
 {
     for (const auto& pipeline : instance->pipelines)
@@ -22,10 +12,6 @@ void PipelineManager::clear()
         pipeline.second->setDirty();
     }
     instance->pipelines.clear();
-}
-
-void PipelineManager::update()
-{
 }
 
 ptr<Pipeline> PipelineManager::getPipelineByName(const std::string& name)

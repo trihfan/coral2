@@ -1,5 +1,5 @@
 #include "Freetype.h"
-#include "Logs.h"
+#include "utils/Logs.h"
 #include "base/ObjectFactory.h"
 #include "resources/Resource.h"
 

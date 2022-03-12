@@ -1,19 +1,44 @@
 #pragma once
 
-#include "BackendPipeline.h"
 #include "base/Object.h"
+#include "vulkan/VulkanBackendStructures.h"
 #include <memory>
+#include <glm/glm.hpp>
 
 namespace coral
 {
+    enum class CullFace
+    {
+        front,
+        back,
+        none
+    };
+
     /**
      * @brief The PipelineParams contains the creation parameters 
      * for the pipeline
      */
     struct PipelineParams
     {
+        std::string name;
+
+        // Renderpass
         std::string renderpass;
-        backend::BackendPipelineParams params;
+
+        // Rasterization
+        bool depthTest = true;
+        CullFace cullFace = CullFace::back;
+        bool blending = false;
+
+        // Multisampling
+
+        // Vertex input
+
+        // Blending
+
+        // Shader
+        std::string vertexShader;
+        std::string fragmentShader;
     };
 
     /**
@@ -30,15 +55,28 @@ namespace coral
         bool isDirty() const;
         void setDirty();
 
-        template <typename T>
-        void setUniform(const std::string& name, const T& value) { backendPipeline->setUniform(name, value); }
+        // Set uniform value
+        void setUniform(const std::string& name, bool value) const;
+        void setUniform(const std::string& name, int value) const;
+        void setUniform(const std::string& name, float value) const;
+        void setUniform(const std::string& name, const glm::vec2& value) const;
+        void setUniform(const std::string& name, const glm::vec3& value) const;
+        void setUniform(const std::string& name, const glm::vec4& value) const;
+        void setUniform(const std::string& name, const glm::mat2& mat) const;
+        void setUniform(const std::string& name, const glm::mat3& mat) const;
+        void setUniform(const std::string& name, const glm::mat4& mat) const;
 
+        // Init
         virtual void init() override;
         virtual void release() override;
 
     private:
         const PipelineParams params;
-        std::unique_ptr<backend::BackendPipeline> backendPipeline;
         bool dirty;
+
+        // Vulkan data
+        VulkanDevice device;
+        VkPipeline pipeline;
+        VkPipelineLayout layout;
     };
 }

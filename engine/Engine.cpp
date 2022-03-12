@@ -12,10 +12,7 @@
 
 using namespace coral;
 
-DEFINE_SINGLETON(Engine)
-
-Engine::Engine(std::shared_ptr<backend::Backend> backend, int width, int height)
-    : backend(std::move(backend))
+Engine::Engine(int width, int height)
 {
     startTime = std::chrono::steady_clock::now();
 
@@ -40,7 +37,7 @@ Engine::Engine(std::shared_ptr<backend::Backend> backend, int width, int height)
     EngineConfig::setup();
 
     // Finally resize
-    resizeInternal(width, height);
+    resize(width, height);
 }
 
 void Engine::release()
@@ -60,11 +57,6 @@ void Engine::release()
 
 void Engine::resize(int width, int height)
 {
-    instance->resizeInternal(width, height);
-}
-
-void Engine::resizeInternal(int width, int height)
-{
     Logs(info) << "update size: " << width << ", " << height;
     currentParameters.width = width;
     currentParameters.height = height;
@@ -81,7 +73,7 @@ void Engine::frame()
     currentParameters.time = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - instance->startTime).count()) / 1e6;
     currentParameters.deltaTime = currentParameters.time - lastTime;
 
-    instance->backend->beginFrame();
+    backend->beginFrame();
 
     // Bake the render graph when invalidated
     RenderPassManager::update(currentParameters);
@@ -114,10 +106,5 @@ void Engine::frame()
         currentParameters.clear();
     }
 
-    instance->backend->endFrame();
-}
-
-const backend::Backend& Engine::getBackend()
-{
-    return *instance->backend;
+    backend->endFrame();
 }
