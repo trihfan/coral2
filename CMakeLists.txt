@@ -1,56 +1,26 @@
 cmake_minimum_required(VERSION 3.16)
-
-# Unity build
-if(NOT EMSCRIPTEN)
-    set(CMAKE_UNITY_BUILD ON)
-endif()
-
-# Project
-set(version "1.0.0")
-project(coral VERSION ${version} LANGUAGES CXX)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-# Set c++17
+project(coral)
 set(CMAKE_CXX_STANDARD 17)
-if(UNIX AND NOT APPLE)
-        set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -lstdc++ -std=c++17")
-endif()
 
-# Modules
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
-include(folder_structure)
+# Download and include conan cmake
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+    message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+    file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.16.1/conan.cmake" "${CMAKE_BINARY_DIR}/conan.cmake"
+         EXPECTED_HASH SHA256=396e16d0f5eabdc6a14afddbcfff62a54a7ee75c6da23f32f7a31bc85db23484 TLS_VERIFY ON)
+endif()
+include(${CMAKE_BINARY_DIR}/conan.cmake)
+
+# Install dependencies
+conan_cmake_install(PATH_OR_REFERENCE ${CMAKE_SOURCE_DIR} GENERATOR cmake_find_package)
+
+# Add bin directory to search
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 
 # Dependencies
-find_package(OpenGL)
-find_package(Vulkan)
-find_package(glm CONFIG REQUIRED)
-find_package(assimp CONFIG REQUIRED)
+find_package(VulkanHeaders REQUIRED)
+find_package(glm REQUIRED)
+find_package(assimp REQUIRED)
+find_package(freetype REQUIRED)
 
-# Options
-option(BACKEND_OPENGL_ENABLED "enable opengl backend" ${OPENGL_FOUND})
-option(BACKEND_VULKAN_ENABLED "enable vulkan backend" ${VULKAN_FOUND})
-
-# Definitions
-if(BACKEND_OPENGL_ENABLED)
-    add_definitions(-DENABLE_OPENGL)
-endif()
-if(BACKEND_VULKAN_ENABLED)
-    add_definitions(-DENABLE_VULKAN)
-endif()
-
-# define output directories
-set(lib_output_directory ${PROJECT_BINARY_DIR}/lib)
-set(bin_output_directory ${PROJECT_BINARY_DIR}/bin)
-
-# Emscripten config
-if(EMSCRIPTEN)
-    add_compile_options("-s" "USE_FREETYPE=1")
-    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s USE_GLFW=3 -s USE_WEBGL2=1 -s FULL_ES3=1 -s WASM=1 -s USE_FREETYPE=1 -s -s USE_ZLIB=1 --preload-file ${bin_output_directory}/assets@/assets")
-endif()
-
-# subdirectories
-add_subdirectory(backends) # Properties: backend_interfaces_path, backend_opengl_path, backend_vulkan_path
-add_subdirectory(engine) # Properties: engine_path
-add_subdirectory(utils) # Properties: utils_path
-add_subdirectory(tests)
-add_subdirectory(assets_packager)
+# Modules
+add_subdirectory(engine)
