@@ -21,6 +21,8 @@ find_package(VulkanHeaders REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_package(freetype REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(boost REQUIRED)
 
 # Modules
 add_subdirectory(engine)

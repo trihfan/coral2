@@ -13,6 +13,8 @@ class coral(ConanFile):
         "glm/0.9.9.8",
         "assimp/5.1.0",
         "vulkan-headers/1.3.204.1",
-        "freetype/2.11.1"
+        "freetype/2.11.1",
+        "glfw/3.3.6",
+        "boost/1.78.0"
     ]
 
