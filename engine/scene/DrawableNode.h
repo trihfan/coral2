@@ -1,9 +1,5 @@
 #pragma once
-
 #include "Node.h"
-#include "renderpasses/RenderPassManager.h"
-#include <memory>
-#include <vector>
 
 namespace coral
 {
@@ -14,23 +10,15 @@ namespace coral
     class DrawableNode : public Node
     {
     public:
-        // construction
+        // Construction
         DrawableNode() = default;
         virtual ~DrawableNode() override = default;
 
-        // meta
-        bool isDrawable() const override;
+        // Properties
+        Property<Handle<Material>> material;
 
-        // material
-        void setMaterial(ptr<Material> material);
-        ptr<Material> getMaterial() const;
-
-        virtual void update(const NodeUpdateParameters& parameters) override;
-
-        // draw
-        virtual void draw(const RenderParameters& parameters) = 0;
-
-    protected:
-        ptr<Material> material;
+        // Update and draw
+        virtual void update() override;
+        virtual void draw() = 0;
     };
 }

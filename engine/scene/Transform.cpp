@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "Node.h"
 #include "utils/Logs.h"
 
 using namespace coral;
@@ -43,7 +44,7 @@ void Transform::setMatrix(const glm::mat4& matrix)
     useFixedMatrix = true;
 }
 
-const glm::vec3& Transform::getPosition() const
+const glm::vec3& Transform::getWorldPosition() const
 {
     return worldPosition;
 }
@@ -53,19 +54,19 @@ const glm::mat4& Transform::getMatrix() const
     return matrix;
 }
 
-void Transform::update(const Transform* parent)
+void Transform::update(const Handle<Node>& parent)
 {
     if (dirty)
     {
         if (useFixedMatrix)
         {
             matrix = (parent ? parent->getMatrix() : glm::mat4(1)) * fixedMatrix;
-            worldPosition = glm::vec3(matrix * glm::vec4(0, 0, 0, 1)) + (parent ? parent->getPosition() : glm::vec3(0));
+            worldPosition = glm::vec3(matrix * glm::vec4(0, 0, 0, 1)) + (parent ? parent->getWorldPosition() : glm::vec3(0));
         }
         else
         {
             matrix = (parent ? parent->getMatrix() : glm::mat4(1)) * glm::translate(glm::mat4(1), translation.get()) * glm::toMat4(rotation.get()) * glm::scale(glm::mat4(1), scale.get());
-            worldPosition = translation.get() + (parent ? parent->getPosition() : glm::vec3(0));
+            worldPosition = translation.get() + (parent ? parent->getWorldPosition() : glm::vec3(0));
         }
 
         dirty = false;

@@ -4,24 +4,11 @@
 
 using namespace coral;
 
-void DrawableNode::setMaterial(ptr<Material> material)
+void DrawableNode::update()
 {
-    this->material = material;
-}
+    Node::update();
 
-ptr<Material> DrawableNode::getMaterial() const
-{
-    return material;
-}
-
-bool DrawableNode::isDrawable() const
-{
-    return true;
-}
-
-void DrawableNode::update(const NodeUpdateParameters& parameters)
-{
-    Node::update(parameters);
+    // Update pipeline
     if (!material->getPipeline() || material->getPipeline()->isDirty())
     {
         material->invalidatePipeline();

@@ -275,7 +275,7 @@ void VulkanBackend::createSwapchain()
     vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, images.data());
 
     // Create image views
-    std::vector<std::unique_ptr<VulkanResource>> swapchainImages(images.size());
+    std::vector<std::unique_Handle<VulkanResource>> swapchainImages(images.size());
     for (size_t i = 0; i < images.size(); i++)
     {
         VulkanImage image { images[i], createImageView(images[i], swapchainFormat, VK_IMAGE_ASPECT_COLOR_BIT) };

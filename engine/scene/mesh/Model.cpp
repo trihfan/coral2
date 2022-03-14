@@ -98,10 +98,10 @@ void Model::update(const NodeUpdateParameters& parameters)
     skeleton->update(parameters);
 }
 
-void Model::loadNode(ptr<Node> parent, aiNode* node, const aiScene* scene)
+void Model::loadNode(Handle<Node> parent, aiNode* node, const aiScene* scene)
 {
     // Create node
-    ptr<Node> sceneNode = ObjectFactory::createWithName<Node>(node->mName.C_Str());
+    Handle<Node> sceneNode = ObjectFactory::createWithName<Node>(node->mName.C_Str());
     if (parent)
     {
         parent->addChild(sceneNode);
@@ -117,7 +117,7 @@ void Model::loadNode(ptr<Node> parent, aiNode* node, const aiScene* scene)
     // Meshes
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-        ptr<Mesh> mesh = loadMesh(scene->mMeshes[node->mMeshes[i]], scene);
+        Handle<Mesh> mesh = loadMesh(scene->mMeshes[node->mMeshes[i]], scene);
         sceneNode->addChild(mesh);
     }
 
@@ -137,7 +137,7 @@ void Model::loadAnimations(const aiScene* scene)
         Logs(info) << "Animation found: " << aiAnimation->mName.C_Str();
 
         // Create animation
-        ptr<Animation> animation = ObjectFactory::createWithName<ModelAnimation>(aiAnimation->mName.C_Str(), aiAnimation->mDuration / 1000., skeleton);
+        Handle<Animation> animation = ObjectFactory::createWithName<ModelAnimation>(aiAnimation->mName.C_Str(), aiAnimation->mDuration / 1000., skeleton);
 
         // Fill bones list
         for (unsigned int j = 0; j < aiAnimation->mNumChannels; j++)
@@ -150,7 +150,7 @@ void Model::loadAnimations(const aiScene* scene)
             {
                 bones[boneName] = ObjectFactory::createWithName<Bone>(boneName, boneCounter++);
             }
-            ptr<Bone> bone = bones[boneName];
+            Handle<Bone> bone = bones[boneName];
 
             // Each bone has 3 properties
             auto translationChannel = ObjectFactory::createWithName<Channel<glm::vec3>>(boneName + "-translation", bone->transform().translation);
@@ -188,7 +188,7 @@ void Model::loadAnimations(const aiScene* scene)
     }
 }
 
-ptr<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
+Handle<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
 {
     // Load vertices
     MeshVertexBuffer vertices;
@@ -232,7 +232,7 @@ ptr<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
         {
             bones[boneName] = ObjectFactory::createWithName<Bone>(boneName, boneCounter++, AssimpHelpers::convertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix));
         }
-        ptr<Bone> bone = bones[boneName];
+        Handle<Bone> bone = bones[boneName];
 
         // Get weights
         auto weights = mesh->mBones[boneIndex]->mWeights;
@@ -249,17 +249,17 @@ ptr<Mesh> Model::loadMesh(aiMesh* mesh, const aiScene* scene)
 
     // Create the mesh object
     std::string name = mesh->mName.C_Str();
-    ptr<Mesh> meshObject = ObjectFactory::createWithName<Mesh>(name, vertices, indices);
+    Handle<Mesh> meshObject = ObjectFactory::createWithName<Mesh>(name, vertices, indices);
 
     // Load the material
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-    ptr<Material> meshMaterial = loadMaterial(material, scene, vertices);
+    Handle<Material> meshMaterial = loadMaterial(material, scene, vertices);
     meshObject->setMaterial(meshMaterial);
 
     return meshObject;
 }
 
-ptr<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, const MeshVertexBuffer& vertexBuffer)
+Handle<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, const MeshVertexBuffer& vertexBuffer)
 {
     // Check if the material is already loaded
     std::string name = mat->GetName().C_Str();
@@ -270,7 +270,7 @@ ptr<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, const M
     }
 
     // Create material
-    ptr<MeshMaterial> material = ObjectFactory::create<MeshMaterial>(getRenderQueueTags());
+    Handle<MeshMaterial> material = ObjectFactory::create<MeshMaterial>(getRenderQueueTags());
     materialByName[name] = material;
     material->setRenderType(MeshMaterialRenderType::basic_lighting);
 
@@ -339,7 +339,7 @@ ptr<Material> Model::loadMaterial(aiMaterial* mat, const aiScene* scene, const M
     return material;
 }
 
-ptr<Resource> Model::loadTexture(const aiScene* scene, const std::string& file)
+Handle<Resource> Model::loadTexture(const aiScene* scene, const std::string& file)
 {
     auto texture = scene->GetEmbeddedTexture(file.c_str());
 
@@ -378,9 +378,9 @@ std::vector<std::string> Model::getAnimationNames() const
     return names;
 }
 
-ptr<Animation> Model::getAnimation(const std::string& animationName) const
+Handle<Animation> Model::getAnimation(const std::string& animationName) const
 {
-    auto it = std::find_if(animations.begin(), animations.end(), [&animationName](const ptr<Animation>& animation) {
+    auto it = std::find_if(animations.begin(), animations.end(), [&animationName](const Handle<Animation>& animation) {
         return animation->getName() == animationName;
     });
 
@@ -393,7 +393,7 @@ ptr<Animation> Model::getAnimation(const std::string& animationName) const
 
 void Model::buildSkeleton(const aiScene* scene)
 {
-    std::function<void(ptr<Node>, const aiNode*)> readAnimationNode = [&](ptr<Node> parent, const aiNode* aiParent) {
+    std::function<void(Handle<Node>, const aiNode*)> readAnimationNode = [&](Handle<Node> parent, const aiNode* aiParent) {
         for (unsigned int i = 0; i < aiParent->mNumChildren; i++)
         {
             auto aiChild = aiParent->mChildren[i];
@@ -422,7 +422,7 @@ void Model::buildSkeleton(const aiScene* scene)
     readAnimationNode(skeleton, scene->mRootNode);
 }
 
-ModelAnimation::ModelAnimation(double duration, ptr<Node> skeleton)
+ModelAnimation::ModelAnimation(double duration, Handle<Node> skeleton)
     : Animation(duration)
     , skeleton(skeleton)
 {

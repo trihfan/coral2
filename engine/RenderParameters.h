@@ -1,6 +1,5 @@
 #pragma once
-
-#include "base/Ptr.h"
+#include "Handle.h"
 #include "scene/light/AreaLight.h"
 #include "scene/light/DirectionalLight.h"
 #include "scene/light/PointLight.h"
@@ -18,10 +17,10 @@ namespace coral
 
     struct LightArray
     {
-        std::vector<ptr<PointLight>> pointLights;
-        std::vector<ptr<DirectionalLight>> directionalLights;
-        std::vector<ptr<SpotLight>> spotLights;
-        std::vector<ptr<AreaLight>> areaLights;
+        std::vector<Handle<PointLight>> pointLights;
+        std::vector<Handle<DirectionalLight>> directionalLights;
+        std::vector<Handle<SpotLight>> spotLights;
+        std::vector<Handle<AreaLight>> areaLights;
     };
 
     /**
@@ -30,7 +29,7 @@ namespace coral
     struct RenderParameters
     {
         // Scene
-        ptr<Camera> camera;
+        Handle<Camera> camera;
         LightArray lights;
 
         // Time (in seconds)
@@ -40,11 +39,5 @@ namespace coral
         // Viewport
         int width;
         int height;
-
-        void clear()
-        {
-            camera = nullptr;
-            lights = LightArray();
-        }
     };
 }

@@ -7,7 +7,7 @@ namespace coral
 {
     struct AnimatorAnimation
     {
-        ptr<Animation> animation;
+        Handle<Animation> animation;
         double startTime;
     };
 

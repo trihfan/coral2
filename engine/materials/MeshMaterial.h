@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Material.h"
-#include "base/Ptr.h"
+#include "Handle.h"
 #include "resources/Resource.h"
 #include "scene/mesh/Bone.h"
 #include <array>
@@ -51,13 +51,13 @@ namespace coral
         void setDiffuseColor(const glm::vec3& color);
         void setSpecularColor(const glm::vec3& color);
         void setShininess(float shininess);
-        void addTexture(MeshTextureType type, ptr<Resource> resource);
+        void addTexture(MeshTextureType type, Handle<Resource> resource);
 
         // Set a bone
-        void setBone(int id, ptr<Bone> bone);
+        void setBone(int id, Handle<Bone> bone);
 
     protected:
-        virtual ptr<Pipeline> createPipelineFor(const std::string& renderpass) override;
+        virtual Handle<Pipeline> createPipelineFor(const std::string& renderpass) override;
         virtual std::string getPipelineName() const override;
 
     private:
@@ -71,10 +71,10 @@ namespace coral
         glm::vec3 diffuse;
         glm::vec3 specular;
         float shininess;
-        std::array<std::vector<ptr<Resource>>, MeshTextureType::count> textures;
+        std::array<std::vector<Handle<Resource>>, MeshTextureType::count> textures;
 
         // Bones
-        std::array<ptr<Bone>, maxBones> bones;
+        std::array<Handle<Bone>, maxBones> bones;
 
         std::string getTextureName(MeshTextureType type, int id);
     };

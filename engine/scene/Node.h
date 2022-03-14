@@ -1,125 +1,92 @@
 #pragma once
-
 #include "Property.h"
+#include "PropertyArray.h"
 #include "Transform.h"
-#include "base/Object.h"
+#include "NodeManager.h"
+#include "Engine.h"
 #include <memory>
 #include <utility>
-#include <vector>
+#include <string>
 
 namespace coral
 {
-    struct NodeUpdateParameters
-    {
-        double time; // Time since engine start in seconds
-        double deltaTime; // Time of the last frame in seconds
-    };
-
     // A node represent an item in the scene
-    class Node : public Object
+    class Node : public std::enable_shared_from_this<Node>, public Transform
     {
+        friend class NodeManager;
     public:
-        // construction
-        Node();
-        virtual ~Node() override;
+        // Creation
+        template <typename NodeType, class... Args> static Handle<NodeType> createWithName(const std::string& name, Args&&... args);
+        template <typename NodeType, class... Args> static Handle<NodeType> create(Args&&... args);
+        virtual ~Node();
 
         // meta
-        virtual bool isDrawable() const;
+        template <typename Type> Handle<Type> toPtr();
+        template <typename Type> bool isA() const;
 
-        // Render queue
-        void addRenderQueueTag(const std::string& renderQueueId);
-        void removeRenderQueueTag(const std::string& renderQueueId);
-        bool isTagForRenderQueue(const std::string& renderQueueId) const;
-        const std::vector<std::string>& getRenderQueueTags() const;
-
-        // Enabled
-        bool isEnabled() const;
-        void setEnabled(bool enabled);
+        // Properties
+        Property<std::string> name;
+        Property<bool> enabled;
+        PropertyArray<std::string> renderTags;
+        Property<WeakHandle<Node>> parent;
+        PropertyArray<Handle<Node>> children;
 
         // Update the node, called each frame
-        virtual void update(const NodeUpdateParameters& parameters);
+        virtual void update();
 
-        /*
-         * --- Transform ------------------
-         */
-        const Transform& transform() const;
-        Transform& transform();
-
-        // Translation
-        void setTranslation(const glm::vec3& translation);
-        const glm::vec3& getTranslation() const;
-
-        // Rotation
-        void setRotation(const glm::quat& rotation);
-        void setRotation(const glm::vec3& rotationEuler);
-        const glm::quat& getRotation() const;
-
-        // Scale
-        void setScale(const glm::vec3& scale);
-        const glm::vec3& getScale() const;
-
-        // Return the position in word coordinates
-        const glm::vec3& getWorldPosition() const;
-
-        /*
-         * --- Hierarchy ------------------
-         */
-        // Parent
-        void setParent(Node* parent);
-        Node* getParent() const;
-
-        // Children
-        void addChild(ptr<Node> child);
-        void removeChild(ptr<Node> child);
-        size_t getChildCount() const;
-        ptr<Node> getChild(size_t index) const;
-        template <typename Type>
-        std::vector<ptr<Type>> getChildren() const;
+    protected:
+        // Initialization methods
+        virtual void init() {}
+        virtual void release() {}
 
     private:
-        // Params
-        bool enabled;
-        std::vector<std::string> renderQueueTags;
+        // Meta
+        enum class InitState { notInitialized, initialized, released };
+        InitState state;
 
-        // Hierarchy
-        Node* parent;
-        std::vector<ptr<Node>> children;
-
-        // Transform
-        Transform nodeTransform;
+        // Construction
+        Node();
     };
 
-    // Function: bool(ptr<Node>, Args&&...) -> return true to continue traversal, false to stop
+    // Function: bool(Handle<Node>, Args&&...) -> return true to continue traversal, false to stop
     template <typename Function, typename... Args>
-    static void traverse(ptr<Node> node, Function function, Args&&... args)
+    static void traverse(Handle<Node> node, Function function, Args&&... args)
     {
-        if (node->isEnabled() && function(node, std::forward<Args>(args)...))
+        if (node->enabled && function(node, std::forward<Args>(args)...))
         {
-            for (size_t i = 0; i < node->getChildCount(); i++)
+            for (auto& child : node->children)
             {
-                traverse(node->getChild(i), std::forward<decltype(function)>(function), std::forward<Args>(args)...);
+                traverse(child, std::forward<decltype(function)>(function), std::forward<Args>(args)...);
             }
         }
     }
 
-    template <typename Type>
-    std::vector<ptr<Type>> Node::getChildren() const
+    // -----------------------------------------------
+    template <typename NodeType, class... Args>
+    Handle<NodeType> Node::createWithName(const std::string& name, Args&&... args)
     {
-        std::vector<ptr<Type>> childrenList;
+        auto node = create<NodeType>(std::forward<Args>(args)...);
+        node->setName(name);
+        return node;
+    }
 
-        for (auto child : children)
-        {
-            if (child->isA<Type>())
-            {
-                childrenList.push_back(child->toPtr<Type>());
-            }
+    template <typename NodeType, class... Args>
+    Handle<NodeType> Node::create(Args&&... args)
+    {
+        static_assert (std::is_base_of<Node, NodeType>::value, "can only create Node objects");
+        auto node = std::make_shared<NodeType>(std::forward<Args>(args)...);
+        engine->nodeManager->add(node);
+        return node;
+    }
+    template <typename Type>
+    Handle<Type> Node::toPtr()
+    {
+        return std::dynamic_pointer_cast<Type>(shared_from_this());
+    }
 
-            for (auto subchild : child->getChildren<Type>())
-            {
-                childrenList.push_back(subchild);
-            }
-        }
-
-        return childrenList;
+    template <typename Type>
+    bool Node::isA() const
+    {
+        return dynamic_cast<const Type*>(this) != nullptr;
     }
 }

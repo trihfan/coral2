@@ -31,7 +31,7 @@ namespace coral
         std::vector<unsigned int> indices;
 
         // Buffers
-        std::unique_ptr<backend::BackendVertexBuffer> vertexBuffer;
+        std::unique_Handle<backend::BackendVertexBuffer> vertexBuffer;
 
         // initializes all the buffer objects/arrays
         void setupMesh();

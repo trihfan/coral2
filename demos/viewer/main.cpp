@@ -45,12 +45,12 @@ static GLFWwindow* window;
 
 // Scene
 static const std::string assetsDirectory = FileUtils::getAppDirectory() + "/assets";
-static ptr<OrbitCamera> camera;
-static ptr<Text> text;
+static Handle<OrbitCamera> camera;
+static Handle<Text> text;
 void setupScene();
 
 // Animation
-static std::vector<ptr<Animator>> animators;
+static std::vector<Handle<Animator>> animators;
 
 // callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
-    std::unique_ptr<backend::Backend> backend;
+    std::unique_Handle<backend::Backend> backend;
 #ifdef ENABLE_OPENGL
     if (type == opengl)
     {

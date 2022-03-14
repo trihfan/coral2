@@ -18,4 +18,10 @@ add_library(engine ${sources})
 target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Libraries
-target_link_libraries(engine PUBLIC Vulkan::Vulkan assimp::assimp glm::glm Freetype::Freetype glfw::glfw)
+target_link_libraries(engine PUBLIC
+    Vulkan::Vulkan
+    assimp::assimp
+    glm::glm
+    Freetype::Freetype
+    glfw::glfw
+    Boost::Boost)

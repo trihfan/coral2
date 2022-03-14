@@ -1,5 +1,5 @@
 #pragma once
-#include "base/Signal.h"
+#include "signals/Signal.h"
 
 namespace coral
 {
@@ -7,15 +7,20 @@ namespace coral
      * A property embedded a value
      */
     template <typename Type>
-    struct Property
+    class Property
     {
+    public:
         // Construction
         Property() = default;
         Property(const Type& defaultValue);
 
         // Access
         void set(const Type& value);
+        template <typename OtherType> void operator=(const OtherType& value) { set(value); }
         const Type& get() const;
+        const Type* operator->() const;
+        const Type& operator*() const;
+        operator const Type&() const;
 
         // Modified signal
         Signal<> modified;
@@ -42,6 +47,24 @@ namespace coral
 
     template <typename Type>
     const Type& Property<Type>::get() const
+    {
+        return value;
+    }
+
+    template <typename Type>
+    const Type* Property<Type>::operator->() const
+    {
+        return &value;
+    }
+
+    template <typename Type>
+    const Type& Property<Type>::operator*() const
+    {
+        return value;
+    }
+
+    template <typename Type>
+    Property<Type>::operator const Type&() const
     {
         return value;
     }

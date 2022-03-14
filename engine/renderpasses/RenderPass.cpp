@@ -64,7 +64,7 @@ void RenderPass::prepare(const RenderParameters& parameters)
     }
 
     // Get the framebuffer
-    framebuffer = RenderPassFramebufferManager::getFramebufferFor(toPtr<RenderPass>(), framebufferResources);
+    framebuffer = RenderPassFramebufferManager::getFramebufferFor(toHandle<RenderPass>(), framebufferResources);
     backendRenderPass = backend::BackendObjectFactory<backend::BackendRenderPass>::create(backend::BackendRenderPassParams());
 }
 
@@ -76,7 +76,7 @@ void RenderPass::invalidate()
     backendRenderPass = nullptr;
 }
 
-ptr<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
+Handle<Resource> RenderPass::getResource(const RenderPassResource& resource, const RenderParameters& parameters) const
 {
     auto allocatedResource = RenderPassResourceManager::getResourceByName(resource.name);
     if (!allocatedResource)

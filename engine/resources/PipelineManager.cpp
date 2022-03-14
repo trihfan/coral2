@@ -14,7 +14,7 @@ void PipelineManager::clear()
     instance->pipelines.clear();
 }
 
-ptr<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
+Handle<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
 {
     auto it = std::find_if(instance->pipelines.begin(), instance->pipelines.end(), [&name](const auto& pair) { return pair.first.params.name == name; });
     if (it != instance->pipelines.end())
@@ -24,7 +24,7 @@ ptr<Pipeline> PipelineManager::getPipelineByName(const std::string& name)
     return nullptr;
 }
 
-ptr<Pipeline> PipelineManager::createPipeline(PipelineParams params)
+Handle<Pipeline> PipelineManager::createPipeline(PipelineParams params)
 {
     // Retrieve renderpass
     auto renderPass = RenderPassManager::getRenderPassByName(params.renderpass);

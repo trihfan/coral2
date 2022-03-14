@@ -3,7 +3,7 @@
 #include "BackendFramebuffer.h"
 #include "Resource.h"
 #include "base/Object.h"
-#include "base/Ptr.h"
+#include "Handle.h"
 #include <memory>
 #include <vector>
 
@@ -14,14 +14,14 @@ namespace coral
     struct FramebufferResource
     {
         backend::BackendFramebufferResourceRole role;
-        ptr<Resource> resource;
+        Handle<Resource> resource;
     };
 
     class Framebuffer : public Object
     {
     public:
         // Constructor with the renderpass to make it compatible with
-        Framebuffer(const ptr<RenderPass>& renderpass);
+        Framebuffer(const Handle<RenderPass>& renderpass);
 
         // Framebuffer resources
         void addResource(const FramebufferResource& resource);
@@ -34,8 +34,8 @@ namespace coral
         backend::BackendFramebuffer* getBackendFramebuffer() const;
 
     private:
-        ptr<RenderPass> renderpass;
-        std::unique_ptr<backend::BackendFramebuffer> backendFramebuffer;
+        Handle<RenderPass> renderpass;
+        std::unique_Handle<backend::BackendFramebuffer> backendFramebuffer;
         std::vector<FramebufferResource> resources;
     };
 }

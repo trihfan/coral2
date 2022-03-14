@@ -34,9 +34,9 @@ namespace coral
         TextFormat format;
         std::string text;
         glm::vec3 color;
-        std::vector<ptr<Mesh>> glyphs;
-        std::unordered_map<char, ptr<TextMaterial>> dictionary;
+        std::vector<Handle<Mesh>> glyphs;
+        std::unordered_map<char, Handle<TextMaterial>> dictionary;
 
-        ptr<TextMaterial> getMaterialFor(char character);
+        Handle<TextMaterial> getMaterialFor(char character);
     };
 }

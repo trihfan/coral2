@@ -1,25 +1,22 @@
 #pragma once
-
-#include "base/Object.h"
+#include "Property.h"
+#include "Handle.h"
 
 namespace coral
 {
     class Node;
 
     //
-    class Scene : public Object
+    class Scene
     {
     public:
         Scene();
 
         // Objects
-        void add(ptr<Node> node);
-        void remove(ptr<Node> node);
+        void add(Handle<Node> node);
+        void remove(Handle<Node> node);
 
-        // Get top node
-        ptr<Node> getTopNode() const;
-
-    private:
-        ptr<Node> top_node;
+        // Properties
+        Property<Handle<Node>> topNode;
     };
 }

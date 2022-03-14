@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Pipeline.h"
-#include "EngineModule.h"
-#include "base/Ptr.h"
+#include "Module.h"
+#include "Handle.h"
 #include <map>
 #include <vector>
 
@@ -12,11 +12,11 @@ namespace coral
     {
     public:
         void clear();
-        ptr<Pipeline> getPipelineByName(const std::string& name);
-        ptr<Pipeline> createPipeline(PipelineParams params);
+        Handle<Pipeline> getPipelineByName(const std::string& name);
+        Handle<Pipeline> createPipeline(PipelineParams params);
 
     protected:
-        std::vector<std::pair<PipelineParams, ptr<Pipeline>>> pipelines;
-        std::vector<ptr<Pipeline>> pipelinesToAssign;
+        std::vector<std::pair<PipelineParams, Handle<Pipeline>>> pipelines;
+        std::vector<Handle<Pipeline>> pipelinesToAssign;
     };
 }

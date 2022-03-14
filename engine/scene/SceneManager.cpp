@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "RenderParameters.h"
 #include "Scene.h"
+#include "DrawableNode.h"
 #include "camera/Camera.h"
 #include "light/PointLight.h"
 #include "materials/Material.h"
@@ -11,48 +12,39 @@
 
 using namespace coral;
 
-DEFINE_SINGLETON(SceneManager)
-
-void SceneManager::release()
-{
-}
-
-void SceneManager::update(const RenderParameters& parameters)
+void SceneManager::update()
 {
     // Check scene
-    if (!instance->currentScene)
+    if (!currentScene)
     {
         return;
     }
 
     // List objects of interests
-    instance->cameras.clear();
-    instance->lights.clear();
-    traverse(
-        instance->currentScene->getTopNode(), +[](ptr<Node> node) {
-            if (node->isA<Camera>())
-            {
-                instance->cameras.push_back(node->toPtr<Camera>());
-            }
-            return true;
-        });
+    cameras.clear();
+    lights.clear();
+    traverse(currentScene->topNode, [this](Handle<Node> node)
+    {
+        if (node->isA<Camera>())
+        {
+            cameras.push_back(node->toPtr<Camera>());
+        }
+        return true;
+    });
 
     // Update nodes
-    NodeUpdateParameters updateParams;
-    updateParams.time = parameters.time;
-    updateParams.deltaTime = parameters.deltaTime;
-    instance->currentScene->getTopNode()->update(updateParams);
+    currentScene->topNode->update();
 }
 
-void SceneManager::setCurrentScene(ptr<Scene> scene)
+void SceneManager::setCurrentScene(Handle<Scene> scene)
 {
-    instance->currentScene = scene;
-    instance->cameras.clear();
+    currentScene = scene;
+    cameras.clear();
 }
 
-const std::vector<ptr<Camera>>& SceneManager::getCameras()
+const std::vector<Handle<Camera>>& SceneManager::getCameras()
 {
-    return instance->cameras;
+    return cameras;
 }
 
 std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(RenderParameters& parameters)
@@ -66,10 +58,10 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     }
 
     // Fill queues with visible nodes
-    traverse(instance->currentScene->getTopNode(), [&queues, &parameters](ptr<Node> node) {
-        if (node->isDrawable())
+    traverse(currentScene->topNode, [&queues, &parameters](Handle<Node> node) {
+        if (node->isA<DrawbleNode>())
         {
-            auto drawableNode = node->toPtr<DrawableNode>();
+            auto drawableNode = node->toHandle<DrawableNode>();
             for (const auto& id : drawableNode->getRenderQueueTags())
             {
                 assert(drawableNode->getMaterial()->getPipeline());
@@ -83,7 +75,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
         // tmp while no culling
         if (node->isA<PointLight>())
         {
-            parameters.lights.pointLights.push_back(node->toPtr<PointLight>());
+            parameters.lights.pointLights.push_back(node->toHandle<PointLight>());
         }
         return true;
     });

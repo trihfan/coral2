@@ -12,7 +12,7 @@ namespace coral
     {
     public:
         Animation(double duration);
-        void addChannel(ptr<ChannelInterface> channel);
+        void addChannel(Handle<ChannelInterface> channel);
         double getDuration() const;
         void update(double time);
 
@@ -22,6 +22,6 @@ namespace coral
 
     private:
         double duration;
-        std::vector<ptr<ChannelInterface>> channels;
+        std::vector<Handle<ChannelInterface>> channels;
     };
 }

@@ -1,5 +1,5 @@
 #include "RenderPassResourceManager.h"
-#include "base/Ptr.h"
+#include "Handle.h"
 
 using namespace coral;
 
@@ -14,7 +14,7 @@ void RenderPassResourceManager::clear()
     instance->resourceByName.clear();
 }
 
-ptr<Resource> RenderPassResourceManager::getResourceByName(const std::string& name)
+Handle<Resource> RenderPassResourceManager::getResourceByName(const std::string& name)
 {
     auto it = instance->resourceByName.find(name);
     if (it != instance->resourceByName.end())
@@ -25,7 +25,7 @@ ptr<Resource> RenderPassResourceManager::getResourceByName(const std::string& na
     return nullptr;
 }
 
-void RenderPassResourceManager::registerResource(ptr<Resource> resource)
+void RenderPassResourceManager::registerResource(Handle<Resource> resource)
 {
     auto it = instance->resourceByName.find(resource->getName());
     if (it != instance->resourceByName.end())

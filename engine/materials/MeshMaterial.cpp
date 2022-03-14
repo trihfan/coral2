@@ -64,7 +64,7 @@ void MeshMaterial::use(const RenderParameters& parameters)
     }
 }
 
-void MeshMaterial::setBone(int id, ptr<Bone> bone)
+void MeshMaterial::setBone(int id, Handle<Bone> bone)
 {
     if (id > maxBones)
     {
@@ -76,7 +76,7 @@ void MeshMaterial::setBone(int id, ptr<Bone> bone)
     }
 }
 
-ptr<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
+Handle<Pipeline> MeshMaterial::createPipelineFor(const std::string& renderpass)
 {
     // Create pipeline
     PipelineParams params;
@@ -168,7 +168,7 @@ void MeshMaterial::setShininess(float shininess)
     this->shininess = shininess;
 }
 
-void MeshMaterial::addTexture(MeshTextureType type, ptr<Resource> resource)
+void MeshMaterial::addTexture(MeshTextureType type, Handle<Resource> resource)
 {
     textures[size_t(type)].push_back(resource);
 }

@@ -7,6 +7,8 @@
 
 namespace coral
 {
+    class Node;
+
     /**
      * Transform contains tranformation information for a node
      */
@@ -25,12 +27,11 @@ namespace coral
         void setRotationFromEulerAngles(const glm::vec3& eulerAngles);
 
         // World transform values
-        const glm::vec3& getPosition() const;
+        const glm::vec3& getWorldPosition() const;
         const glm::mat4& getMatrix() const;
 
         // Update the tranform
         void setDirty();
-        void update(const Transform* parent);
 
         // Properties
         Property<glm::vec3> translation;
@@ -39,6 +40,9 @@ namespace coral
 
         // Signals
         Signal<const glm::mat4&> matrixChanged;
+
+    protected:
+        void update(const Handle<Node>& parent);
 
     private:
         // Computed transform

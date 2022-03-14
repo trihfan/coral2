@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Singleton.h"
+#include "utils/Singleton.h"
 #include "base/Object.h"
-#include "base/Ptr.h"
+#include "Handle.h"
 #include <map>
 #include <memory>
 #include <vector>
@@ -19,9 +19,8 @@ namespace coral
      * @brief The RenderPassManager contains all renderpasses and organize them
      * dpeending on their input / outputs
      */
-    class RenderPassManager
+    class RenderPassManager : public Singleton<RenderPassManager>
     {
-        MAKE_SINGLETON(RenderPassManager)
     public:
         /**
          * @brief Invalidate the render graph
@@ -36,7 +35,7 @@ namespace coral
         /**
          * @brief Add a render pass
          */
-        static void addRenderPass(ptr<RenderPass> renderPass);
+        static void addRenderPass(Handle<RenderPass> renderPass);
 
         /**
          * @brief Remove a render pass
@@ -46,12 +45,12 @@ namespace coral
         /**
          * @brief Return the renderpass for the given id
          */
-        static ptr<RenderPass> getRenderPassByName(const std::string& name);
+        static Handle<RenderPass> getRenderPassByName(const std::string& name);
 
         /**
          * @brief Return the renderpasses ordered by render order
          */
-        static const std::vector<ptr<RenderPass>>& getOrderedRenderPasses();
+        static const std::vector<Handle<RenderPass>>& getOrderedRenderPasses();
 
     private:
         RenderPassManager() = default;
@@ -63,9 +62,9 @@ namespace coral
 
     private:
         // The renderpasses list
-        std::vector<ptr<RenderPass>> renderPasses;
+        std::vector<Handle<RenderPass>> renderPasses;
 
         // Ordered renderpasses by render priority
-        std::vector<ptr<RenderPass>> orderedRenderPasses;
+        std::vector<Handle<RenderPass>> orderedRenderPasses;
     };
 }

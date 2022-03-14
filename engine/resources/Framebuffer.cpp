@@ -6,7 +6,7 @@
 
 using namespace coral;
 
-Framebuffer::Framebuffer(const ptr<RenderPass>& renderpass)
+Framebuffer::Framebuffer(const Handle<RenderPass>& renderpass)
     : renderpass(renderpass)
 {
 }

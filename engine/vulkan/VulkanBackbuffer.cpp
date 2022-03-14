@@ -4,10 +4,10 @@
 using namespace coral;
 
 std::atomic<bool> VulkanBackbuffer::isInit = false;
-std::vector<std::unique_ptr<VulkanResource>> VulkanBackbuffer::images;
-std::vector<std::unique_ptr<VulkanFramebuffer>> VulkanBackbuffer::framebuffers;
+std::vector<std::unique_Handle<VulkanResource>> VulkanBackbuffer::images;
+std::vector<std::unique_Handle<VulkanFramebuffer>> VulkanBackbuffer::framebuffers;
 
-void VulkanBackbuffer::setSwapChainImages(std::vector<std::unique_ptr<VulkanResource>>&& swapchainImages)
+void VulkanBackbuffer::setSwapChainImages(std::vector<std::unique_Handle<VulkanResource>>&& swapchainImages)
 {
     images = std::move(swapchainImages);
 }

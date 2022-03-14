@@ -5,8 +5,8 @@
 namespace coral
 {
     template <typename Type>
-    using ptr = std::shared_ptr<Type>;
+    using Handle = std::shared_ptr<Type>;
 
     template <typename Type>
-    using wptr = std::weak_ptr<Type>;
+    using WeakHandle = std::weak_ptr<Type>;
 }

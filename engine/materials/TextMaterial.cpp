@@ -65,7 +65,7 @@ void TextMaterial::setColor(const glm::vec3& color)
     this->color = color;
 }
 
-ptr<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
+Handle<Pipeline> TextMaterial::createPipelineFor(const std::string& renderpass)
 {
     dirty = true;
     PipelineParams params;

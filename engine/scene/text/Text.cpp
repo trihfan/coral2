@@ -67,7 +67,7 @@ void Text::setText(const std::string& text)
         const std::vector<unsigned int> indices { 0, 1, 2, 3, 4, 5 };
 
         // Create mesh
-        ptr<Mesh> character = ObjectFactory::create<Mesh>(vertices, indices);
+        Handle<Mesh> character = ObjectFactory::create<Mesh>(vertices, indices);
         character->setMaterial(material);
 
         // Set
@@ -89,7 +89,7 @@ void Text::release()
     dictionary.clear();
 }
 
-ptr<TextMaterial> Text::getMaterialFor(char character)
+Handle<TextMaterial> Text::getMaterialFor(char character)
 {
     auto it = dictionary.find(character);
     if (it != dictionary.end())

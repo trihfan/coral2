@@ -19,17 +19,17 @@ namespace coral
         /**
          * @brief Constructor with the signal and bind method
          */
-        Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionMethod<Args...>> internalConnection);
+        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionMethod<Args...>> internalConnection);
 
         /**
          * @brief Constructor with the signal and bind function
          */
-        Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionFunction<Args...>> internalConnection);
+        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionFunction<Args...>> internalConnection);
 
         /**
          * @brief Constructor with the signal and bind lambda
          */
-        Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionLambda<Args...>> internalConnection);
+        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionLambda<Args...>> internalConnection);
 
         /**
          * @brief Call the bind method
@@ -46,28 +46,28 @@ namespace coral
         const Signal<Args...>& signal;
 
         // Actual connections
-        std::unique_ptr<InternalConnectionMethod<Args...>> internalConnectionMethod;
-        std::unique_ptr<InternalConnectionFunction<Args...>> internalConnectionFunction;
-        std::unique_ptr<InternalConnectionLambda<Args...>> internalConnectionLambda;
+        std::unique_Handle<InternalConnectionMethod<Args...>> internalConnectionMethod;
+        std::unique_Handle<InternalConnectionFunction<Args...>> internalConnectionFunction;
+        std::unique_Handle<InternalConnectionLambda<Args...>> internalConnectionLambda;
     };
 
     // -- Implementation --
     template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionMethod<Args...>> internalConnection)
+    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionMethod<Args...>> internalConnection)
         : signal(signal)
         , internalConnectionMethod(std::move(internalConnection))
     {
     }
 
     template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionFunction<Args...>> internalConnection)
+    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionFunction<Args...>> internalConnection)
         : signal(signal)
         , internalConnectionFunction(std::move(internalConnection))
     {
     }
 
     template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_ptr<InternalConnectionLambda<Args...>> internalConnection)
+    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionLambda<Args...>> internalConnection)
         : signal(signal)
         , internalConnectionLambda(std::move(internalConnection))
     {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Singleton.h"
+#include "utils/Singleton.h"
 #include "VulkanBackendStructures.h"
 
 #define CURRENT_COMMAND_BUFFER VulkanCommandBufferManager::get()->getCommandBuffer()

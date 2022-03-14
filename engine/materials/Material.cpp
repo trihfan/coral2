@@ -15,7 +15,7 @@ Material::Material(const std::vector<std::string>& renderQueueTags)
     }
 }
 
-ptr<Pipeline> Material::getPipeline() const
+Handle<Pipeline> Material::getPipeline() const
 {
     return pipeline;
 }
@@ -65,7 +65,7 @@ void Material::invalidatePipeline()
     }
 }
 
-void Material::setNode(ptr<Node> node)
+void Material::setNode(Handle<Node> node)
 {
     pipeline->setUniform("transform.modelMatrix", node->transform().getMatrix());
 }

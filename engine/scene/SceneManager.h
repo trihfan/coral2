@@ -1,10 +1,6 @@
 #pragma once
-
-#include "Singleton.h"
-#include "base/Object.h"
-#include <functional>
+#include "Handle.h"
 #include <map>
-#include <memory>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -25,9 +21,9 @@ namespace coral
      */
     struct RenderQueue
     {
-        std::vector<ptr<DrawableNode>> nodes;
-        std::map<ptr<Pipeline>, std::set<ptr<Material>>> pipelineMap;
-        std::map<ptr<Material>, std::vector<ptr<DrawableNode>>> materialMap;
+        std::vector<Handle<DrawableNode>> nodes;
+        std::map<Handle<Pipeline>, std::set<Handle<Material>>> pipelineMap;
+        std::map<Handle<Material>, std::vector<Handle<DrawableNode>>> materialMap;
     };
 
     /**
@@ -35,44 +31,42 @@ namespace coral
      */
     class SceneManager
     {
-        MAKE_SINGLETON(SceneManager)
     public:
         /**
          * @brief Set the current scene
          */
-        static void setCurrentScene(ptr<Scene> scene);
+        void setCurrentScene(Handle<Scene> scene);
 
         /**
          * @brief Return the cameras
          */
-        static const std::vector<ptr<Camera>>& getCameras();
-
-        /**
-         * @brief Update all nodes of the scene
-         */
-        static void update(const RenderParameters& parameters);
+        const std::vector<Handle<Camera>>& getCameras();
 
         /**
          * @brief Build the render queues for the given parameters
          */
-        static std::unordered_map<std::string, RenderQueue> buildRenderQueuesFor(RenderParameters& parameters);
+        std::unordered_map<std::string, RenderQueue> buildRenderQueuesFor(RenderParameters& parameters);
+
+        /**
+         * @brief Update all nodes of the scene
+         */
+        void update();
 
     private:
-        SceneManager() = default;
 
         /**
          * @brief The current scene
          */
-        ptr<Scene> currentScene;
+        Handle<Scene> currentScene;
 
         /**
          * @brief List of camera in the currrent scene
          */
-        std::vector<ptr<Camera>> cameras;
+        std::vector<Handle<Camera>> cameras;
 
         /**
          * @brief List of lights in the currrent scene
          */
-        std::vector<ptr<Light>> lights;
+        std::vector<Handle<Light>> lights;
     };
 }
