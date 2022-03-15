@@ -1,4 +1,4 @@
-#include "MeshVertexBuffer.h"
+#include "VertexBuffer.h"
 #include "utils/Logs.h"
 #include "materials/MeshMaterial.h"
 
@@ -8,19 +8,30 @@ static const std::vector<size_t> componentCount {
     3, 3, 2, 4, 4
 };
 
-MeshVertexBuffer::MeshVertexBuffer()
+VertexBuffer::VertexBuffer()
 {
     assert(componentCount.size() == count);
 }
 
-void MeshVertexBuffer::reserve(size_t size)
+VertexBuffer::VertexBuffer(const VexterBufferParams& params)
+{
+    assert(componentCount.size() == count);
+    //todo
+}
+
+void VertexBuffer::operator=(const VexterBufferParams& params)
+{
+    //todo
+}
+
+void VertexBuffer::reserve(size_t size)
 {
     positions.reserve(size);
     normals.reserve(size);
     texCoords.reserve(size);
 }
 
-size_t MeshVertexBuffer::sizeOfVertex() const
+size_t VertexBuffer::sizeOfVertex() const
 {
     size_t size = 0;
     for (size_t i = 0; i < count; i++)
@@ -33,12 +44,12 @@ size_t MeshVertexBuffer::sizeOfVertex() const
     return size * sizeof(float);
 }
 
-size_t MeshVertexBuffer::vertexCount() const
+size_t VertexBuffer::vertexCount() const
 {
     return positions.size();
 }
 
-std::vector<std::byte> MeshVertexBuffer::pack()
+std::vector<std::byte> VertexBuffer::pack()
 {
     // Setup
     packBoneIncidences();
@@ -66,7 +77,7 @@ std::vector<std::byte> MeshVertexBuffer::pack()
     return buffer;
 }
 
-bool MeshVertexBuffer::hasAttribute(AttributeType type) const
+bool VertexBuffer::hasAttribute(AttributeType type) const
 {
     switch (type)
     {
@@ -76,7 +87,7 @@ bool MeshVertexBuffer::hasAttribute(AttributeType type) const
     case normal:
         return !normals.empty();
 
-    case textCoords:
+    case textCoord:
         return !texCoords.empty();
 
     case boneId:
@@ -88,7 +99,7 @@ bool MeshVertexBuffer::hasAttribute(AttributeType type) const
     }
 }
 
-int MeshVertexBuffer::getLocation(AttributeType type) const
+int VertexBuffer::getLocation(AttributeType type) const
 {
     int location = 0;
     for (size_t i = 0; i < type; i++)
@@ -101,27 +112,27 @@ int MeshVertexBuffer::getLocation(AttributeType type) const
     return location;
 }
 
-size_t MeshVertexBuffer::getComponentCount(AttributeType type) const
+size_t VertexBuffer::getComponentCount(AttributeType type) const
 {
     return componentCount[type];
 }
 
-void MeshVertexBuffer::addPosition(const glm::vec3& position)
+void VertexBuffer::addPosition(const glm::vec3& position)
 {
     positions.push_back(position);
 }
 
-void MeshVertexBuffer::addNormal(const glm::vec3& normal)
+void VertexBuffer::addNormal(const glm::vec3& normal)
 {
     normals.push_back(normal);
 }
 
-void MeshVertexBuffer::addTextCoord(const glm::vec2& textCoords)
+void VertexBuffer::addTextCoord(const glm::vec2& textCoords)
 {
     texCoords.push_back(textCoords);
 }
 
-void MeshVertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weight)
+void VertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weight)
 {
     if (id >= MeshMaterial::maxBones)
     {
@@ -139,7 +150,7 @@ void MeshVertexBuffer::addBoneIncidence(size_t verticeIndex, int id, float weigh
     boneIncidences[verticeIndex].push_back(std::make_pair(id, weight));
 }
 
-const void* MeshVertexBuffer::getPtrTo(AttributeType type, size_t index) const
+const void* VertexBuffer::getPtrTo(AttributeType type, size_t index) const
 {
     switch (type)
     {
@@ -163,7 +174,7 @@ const void* MeshVertexBuffer::getPtrTo(AttributeType type, size_t index) const
     }
 }
 
-void MeshVertexBuffer::packBoneIncidences()
+void VertexBuffer::packBoneIncidences()
 {
     if (boneIncidences.empty())
     {

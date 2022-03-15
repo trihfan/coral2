@@ -1,5 +1,4 @@
 #pragma once
-
 #include "resources/Resource.h"
 #include <ft2build.h>
 #include <glm/glm.hpp>
@@ -24,22 +23,26 @@ namespace coral
         std::vector<unsigned char> data;
     };
 
+    /**
+     * @brief Freetype loader
+     */
     class Freetype
     {
     public:
-        static void init();
-        static void release();
+        Freetype();
+        ~Freetype();
 
-        static FreetypeGlyph getGlyph(const FreetypeGlyphParams& params);
+        // Load and return the glyph
+        FreetypeGlyph getGlyph(const FreetypeGlyphParams& params);
 
     private:
         // Lib handle
-        static FT_Library freetype;
+        FT_Library freetype;
 
         // Face by font
-        static std::unordered_map<std::string, FT_Face> faces;
+        std::unordered_map<std::string, FT_Face> faces;
 
         // Get the face of the given font
-        static FT_Face getFace(const std::string& font);
+        FT_Face getFace(const std::string& font);
     };
 }

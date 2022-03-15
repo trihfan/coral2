@@ -39,6 +39,9 @@ namespace coral
         virtual void init() {}
         virtual void release() {}
 
+        // Discard current initialized data
+        void reset();
+
     private:
         // Meta
         enum class InitState { notInitialized, initialized, released };

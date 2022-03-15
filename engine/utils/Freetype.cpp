@@ -1,14 +1,10 @@
 #include "Freetype.h"
 #include "utils/Logs.h"
-#include "base/ObjectFactory.h"
 #include "resources/Resource.h"
 
 using namespace coral;
 
-FT_Library Freetype::freetype;
-std::unordered_map<std::string, FT_Face> Freetype::faces;
-
-void Freetype::init()
+Freetype::Freetype()
 {
     if (FT_Init_FreeType(&freetype))
     {
@@ -16,7 +12,7 @@ void Freetype::init()
     }
 }
 
-void Freetype::release()
+Freetype::~Freetype()
 {
     for (const auto& pair : faces)
     {

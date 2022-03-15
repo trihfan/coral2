@@ -1,12 +1,6 @@
 #pragma once
-
-#include "vulkan/VulkanVertexBuffer.h"
-#include "MeshVertexBuffer.h"
-#include "materials/Material.h"
+#include "resources/VertexBuffer.h"
 #include "scene/DrawableNode.h"
-#include <glm/glm.hpp>
-#include <memory>
-#include <string>
 #include <vector>
 
 namespace coral
@@ -18,24 +12,23 @@ namespace coral
     {
     public:
         // constructor
-        Mesh(const MeshVertexBuffer& vertices, const std::vector<unsigned int>& indices);
+        Mesh();
+
+        // Properties
+        Property<VertexBuffer> vertexBuffer;
 
         // render the mesh
-        virtual void draw(const RenderParameters& parameters) override;
         virtual void init() override;
         virtual void release() override;
+        virtual void draw() override;
 
     private:
         // Data holders
-        MeshVertexBuffer vertices;
         std::vector<unsigned int> indices;
 
-        // Buffers
-        std::unique_Handle<backend::BackendVertexBuffer> vertexBuffer;
-
         // initializes all the buffer objects/arrays
-        void setupMesh();
+        //void setupMesh();
 
-        std::vector<backend::BackendVertexAttribute> createAttributeArray() const;
+        //std::vector<backend::BackendVertexAttribute> createAttributeArray() const;
     };
 }

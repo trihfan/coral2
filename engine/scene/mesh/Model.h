@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Mesh.h"
 #include "materials/MeshMaterial.h"
 #include "scene/Node.h"
@@ -14,7 +13,7 @@ class aiMaterial;
 
 namespace coral
 {
-    class MeshVertexBuffer;
+    class VertexBuffer;
     class Resource;
 
     struct BoneInfo
@@ -29,7 +28,8 @@ namespace coral
         // Creation
         Model(const std::string& path);
 
-        void update(const NodeUpdateParameters& parameters) override;
+        // Update skeletal animation
+        void update() override;
 
         // Animations
         std::vector<std::string> getAnimationNames() const;
@@ -46,7 +46,7 @@ namespace coral
         void loadNode(Handle<Node> parent, aiNode* node, const aiScene* scene);
         void loadAnimations(const aiScene* scene);
         Handle<Mesh> loadMesh(aiMesh* mesh, const aiScene* scene);
-        Handle<Material> loadMaterial(aiMaterial* mat, const aiScene* scene, const MeshVertexBuffer& vertexBuffer);
+        Handle<Material> loadMaterial(aiMaterial* mat, const aiScene* scene, const VertexBuffer& vertexBuffer);
         Handle<Resource> loadTexture(const aiScene* scene, const std::string& file);
         void buildSkeleton(const aiScene* scene);
     };

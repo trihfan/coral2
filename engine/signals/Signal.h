@@ -19,7 +19,7 @@ namespace coral
      * usage: connect<method>(signal, object);
      */
     template <auto Function, typename From, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal, From* object);
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, From* object);
 
     /**
      * @brief Connect the signal to the function
@@ -27,7 +27,7 @@ namespace coral
      * usage: connect<method>(signal);
      */
     template <auto Function, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal);
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal);
 
     /**
      * @brief Connect the signal to the lambda
@@ -35,7 +35,7 @@ namespace coral
      * usage: connect(signal, lambda);
      */
     template <typename Function, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda);
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda);
 
     /**
      * @brief Disconnect the given connection
@@ -60,7 +60,7 @@ namespace coral
          * @return The connection object, can be used to disconnect from the signal
          */
         template <typename From, void (From::*Function)(Args...)>
-        std::shared_Handle<Connection<Args...>> connect(From* object) const
+        std::shared_ptr<Connection<Args...>> connect(From* object) const
         {
             auto connection = std::make_shared<Connection<Args...>>(*this,
                 std::make_unique<InternalConnectionMethod<Args...>>(object, reinterpret_cast<void*>(+[](void* object, Args... args) { ((*reinterpret_cast<From**>(object))->*Function)(std::forward<Args>(args)...); })));
@@ -73,7 +73,7 @@ namespace coral
          * @return The connection object, can be used to disconnect from the signal
          */
         template <typename From, void (From::*Function)()>
-        std::shared_Handle<Connection<Args...>> connect(typename std::enable_if<numberOfArgs, From*>::type object) const
+        std::shared_ptr<Connection<Args...>> connect(typename std::enable_if<numberOfArgs, From*>::type object) const
         {
             auto connection = std::make_shared<Connection<Args...>>(*this,
                 std::make_unique<InternalConnectionMethod<Args...>>(object, reinterpret_cast<void*>(+[](void* object, Args...) { ((*reinterpret_cast<From**>(object))->*Function)(); })));
@@ -86,7 +86,7 @@ namespace coral
          * @return The connection object, can be used to disconnect from the signal
          */
         template <void (*Function)(Args...)>
-        std::shared_Handle<Connection<Args...>> connect() const
+        std::shared_ptr<Connection<Args...>> connect() const
         {
             auto connection = std::make_shared<Connection<Args...>>(*this,
                 std::make_unique<InternalConnectionFunction<Args...>>(reinterpret_cast<void*>(+[](Args... args) { (*Function)(std::forward<Args>(args)...); })));
@@ -98,7 +98,7 @@ namespace coral
          * @brief Connect the signal to a lambda
          * @return The connection object, can be used to disconnect from the signal
          */
-        std::shared_Handle<Connection<Args...>> connect(std::function<void(Args...)>&& lambda) const
+        std::shared_ptr<Connection<Args...>> connect(std::function<void(Args...)>&& lambda) const
         {
             auto connection = std::make_shared<Connection<Args...>>(*this,
                 std::make_unique<InternalConnectionLambda<Args...>>(std::forward<std::function<void(Args && ...)>>(lambda)));
@@ -109,7 +109,7 @@ namespace coral
         /**
          * @brief Disconnect the given connection
          */
-        void disconnect(std::shared_Handle<Connection<Args...>> connection) const;
+        void disconnect(std::shared_ptr<Connection<Args...>> connection) const;
 
         /**
          * @brief Disconnect the given connection
@@ -123,12 +123,12 @@ namespace coral
 
     private:
         // List of connection connected to the signal
-        mutable std::list<std::shared_Handle<Connection<Args...>>> connections;
+        mutable std::list<std::shared_ptr<Connection<Args...>>> connections;
     };
 
     // -- Implementation --
     template <typename... Args>
-    void Signal<Args...>::disconnect(std::shared_Handle<Connection<Args...>> connection) const
+    void Signal<Args...>::disconnect(std::shared_ptr<Connection<Args...>> connection) const
     {
         disconnect(connection.get());
     }
@@ -136,7 +136,7 @@ namespace coral
     template <typename... Args>
     void Signal<Args...>::disconnect(Connection<Args...>* connection) const
     {
-        auto it = std::find_if(connections.begin(), connections.end(), [connection](const std::shared_Handle<Connection<Args...>>& c) { return c.get() == connection; });
+        auto it = std::find_if(connections.begin(), connections.end(), [connection](const std::shared_ptr<Connection<Args...>>& c) { return c.get() == connection; });
         if (it != connections.end())
         {
             connections.erase(it);
@@ -153,19 +153,19 @@ namespace coral
     }
 
     template <auto Function, typename From, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal, From* object)
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, From* object)
     {
         return signal.template connect<From, Function>(std::forward<From*>(object));
     }
 
     template <auto Function, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal)
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal)
     {
         return signal.template connect<Function>();
     }
 
     template <typename Function, typename... Args>
-    std::shared_Handle<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda)
+    std::shared_ptr<Connection<Args...>> connect(const Signal<Args...>& signal, Function&& lambda)
     {
         return signal.connect(std::forward<std::function<void(Args && ...)>>(lambda));
     }

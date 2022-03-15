@@ -1,6 +1,4 @@
 #pragma once
-
-#include "BackendVertexBuffer.h"
 #include <array>
 #include <glm/glm.hpp>
 #include <vector>
@@ -16,27 +14,6 @@ namespace coral
         boneId,
         boneWeight,
         count
-    };
-
-    struct VertexBufferAttribute
-    {
-        int location;
-        int size;
-    };
-
-    struct VertexBufferData
-    {
-        // Vertices
-        void* vertices;
-        int verticesCount;
-
-        // Indices
-        void* indices;
-        int indicesCount;
-
-        // Vertex description
-        int vertexSize;
-        std::vector<VertexBufferAttribute> vertexAttributes;
     };
 
     struct VexterBufferParams
@@ -55,7 +32,9 @@ namespace coral
     {
     public:
         // Constructor
+        VertexBuffer();
         VertexBuffer(const VexterBufferParams& params);
+        void operator=(const VexterBufferParams& params);
 
         /**
          * @brief Reserve data in each attribute array
@@ -114,5 +93,26 @@ namespace coral
          * @brief Return a ptr to the value of the given index for the given attribute
          */
         const void* getPtrTo(AttributeType type, size_t index) const;
+    };
+
+    struct VertexBufferAttribute
+    {
+        int location;
+        int size;
+    };
+
+    struct VertexBufferData
+    {
+        // Vertices
+        void* vertices;
+        int verticesCount;
+
+        // Indices
+        void* indices;
+        int indicesCount;
+
+        // Vertex description
+        int vertexSize;
+        std::vector<VertexBufferAttribute> vertexAttributes;
     };
 }

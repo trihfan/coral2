@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "BackendObjectFactory.h"
 #include "utils/Logs.h"
 #include "materials/Material.h"
 #include <glm/glm.hpp>
@@ -8,17 +7,18 @@
 
 using namespace coral;
 
-Mesh::Mesh(const MeshVertexBuffer& vertices, const std::vector<unsigned int>& indices)
-    : vertices(vertices)
+Mesh::Mesh(const VertexBuffer& vertexBuffer, const std::vector<unsigned int>& indices)
+    : vertexBuffer(vertexBuffer)
     , indices(indices)
 {
-    addRenderQueueTag(defaultRenderPassName);
+    //addRenderQueueTag(defaultRenderPassName);
+    connect<&Node::reset>(this->vertexBuffer.modified, this);
 }
 
-void Mesh::draw(const RenderParameters&)
+void Mesh::draw()
 {
     // Draw
-    vertexBuffer->draw();
+    //vertexBuffer.draw();
 }
 
 void Mesh::init()
@@ -26,7 +26,7 @@ void Mesh::init()
     DrawableNode::init();
 
     // Data
-    backend::BackendVertexBufferData data;
+    /*backend::BackendVertexBufferData data;
 
     // Copy vertices
     data.verticesCount = static_cast<int>(vertices.vertexCount());
@@ -42,10 +42,10 @@ void Mesh::init()
     data.vertexAttributes = createAttributeArray();
 
     // Create buffer
-    vertexBuffer = backend::BackendObjectFactory<backend::BackendVertexBuffer>::create(data);
+    vertexBuffer = backend::BackendObjectFactory<backend::BackendVertexBuffer>::create(data);*/
 }
 
-std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
+/*std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
 {
     std::vector<backend::BackendVertexAttribute> attributes;
     if (!material)
@@ -65,10 +65,10 @@ std::vector<backend::BackendVertexAttribute> Mesh::createAttributeArray() const
         }
     }
     return attributes;
-}
+}*/
 
 void Mesh::release()
 {
     DrawableNode::release();
-    vertexBuffer = nullptr;
+    //vertexBuffer = nullptr;
 }

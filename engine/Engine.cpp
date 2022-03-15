@@ -22,12 +22,10 @@ Engine::Engine(int width, int height)
     // Create modules
     sceneManager = std::make_unique<SceneManager>();
     nodeManager = std::make_unique<NodeManager>();
+    freetype = std::make_unique<Freetype>();
 
     // Setup stb image
     stbi_set_flip_vertically_on_load(true);
-
-    // Setup components
-    Freetype::init();
 
     // Finally resize
     resize(width, height);
@@ -39,6 +37,7 @@ Engine::Engine(int width, int height)
     //Freetype::release();
     sceneManager = nullptr;
     nodeManager = nullptr;
+    freetype = nullptr;
 }
 
 void Engine::resize(int width, int height)

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <assimp/material.h>
 #include <glm/glm.hpp>
 

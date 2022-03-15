@@ -33,7 +33,7 @@ void SceneManager::update()
     });
 
     // Update nodes
-    currentScene->topNode->update();
+    (*currentScene->topNode)->update();
 }
 
 void SceneManager::setCurrentScene(Handle<Scene> scene)
@@ -59,9 +59,9 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
 
     // Fill queues with visible nodes
     traverse(currentScene->topNode, [&queues, &parameters](Handle<Node> node) {
-        if (node->isA<DrawbleNode>())
+        if (node->isA<DrawableNode>())
         {
-            auto drawableNode = node->toHandle<DrawableNode>();
+            auto drawableNode = node->toPtr<DrawableNode>();
             for (const auto& id : drawableNode->getRenderQueueTags())
             {
                 assert(drawableNode->getMaterial()->getPipeline());
@@ -75,7 +75,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
         // tmp while no culling
         if (node->isA<PointLight>())
         {
-            parameters.lights.pointLights.push_back(node->toHandle<PointLight>());
+            parameters.lights.pointLights.push_back(node->toPtr<PointLight>());
         }
         return true;
     });

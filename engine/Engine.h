@@ -11,6 +11,7 @@ namespace coral
     class RenderParameters;
     class SceneManager;
     class NodeManager;
+    class Freetype;
 
     template<typename Type>
     using Module = std::unique_ptr<Type>;
@@ -53,6 +54,7 @@ namespace coral
         // Modules
         Module<SceneManager> sceneManager;
         Module<NodeManager> nodeManager;
+        Module<Freetype> freetype;
 
     private:
         // Time point of engine start

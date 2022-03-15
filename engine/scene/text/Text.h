@@ -19,24 +19,22 @@ namespace coral
     public:
         Text(const TextFormat& format);
 
-        // Set the text
-        void setTextFormat(const TextFormat& format);
-        void setText(const std::string& text);
-        void setColor(const glm::vec3& color);
+        // Properties
+        Property<TextFormat> format;
+        Property<std::string> text;
+        Property<glm::vec3> color;
 
         // Render the text
         virtual void release() override;
 
         // Update the node, called each frame
-        virtual void update(const NodeUpdateParameters& parameters) override;
+        virtual void update() override;
 
     private:
-        TextFormat format;
-        std::string text;
-        glm::vec3 color;
         std::vector<Handle<Mesh>> glyphs;
         std::unordered_map<char, Handle<TextMaterial>> dictionary;
 
+        // Create character material
         Handle<TextMaterial> getMaterialFor(char character);
     };
 }

@@ -54,3 +54,8 @@ void Node::update()
         }
     }
 }
+
+void Node::reset()
+{
+    engine->nodeManager->reset(toPtr<Node>());
+}

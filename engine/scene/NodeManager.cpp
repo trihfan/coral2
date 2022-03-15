@@ -28,8 +28,22 @@ NodeManager::~NodeManager()
 
 void NodeManager::update()
 {
-    // Initialize objects
+    // Release objects to be resets
     Handle<Node> node;
+    while (resetList.try_dequeue(node))
+    {
+        if (node->state != Node::InitState::initialized)
+        {
+            Logs(error) << "Wrong reset call";
+        }
+
+        node->release();
+        node->state = Node::InitState::notInitialized;
+        initializeList.enqueue(node);
+        node = nullptr;
+    }
+
+    // Initialize objects
     while (initializeList.try_dequeue(node))
     {
         if (node->state != Node::InitState::notInitialized)
@@ -84,4 +98,9 @@ void NodeManager::update()
 void NodeManager::add(const Handle<Node>& node)
 {
     initializeList.enqueue(node);
+}
+
+void NodeManager::reset(const Handle<Node>& node)
+{
+    resetList.enqueue(node);
 }
