@@ -1,6 +1,4 @@
 #pragma once
-
-#include "utils/Singleton.h"
 #include "Handle.h"
 #include "resources/Resource.h"
 #include <memory>
@@ -11,17 +9,16 @@ namespace coral
     class Engine;
 
     // The resource manager
-    class RenderPassResourceManager : public Singleton<RenderPassResourceManager>
+    class RenderPassResourceManager
     {
     public:
-        static void clear();
-        static Handle<Resource> getResourceByName(const std::string& name);
+        void clear();
+        Handle<Resource> getResourceByName(const std::string& name);
 
         // Register named resources
-        static void registerResource(Handle<Resource> resource);
+        void registerResource(Handle<Resource> resource);
 
     private:
-        RenderPassResourceManager() = default;
         std::unordered_map<std::string, Handle<Resource>> resourceByName;
     };
 }

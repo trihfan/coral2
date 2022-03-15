@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base/Object.h"
+#include "Object.h"
 #include "Handle.h"
 #include "resources/Pipeline.h"
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
 #include "Channel.h"
-#include "base/Object.h"
+#include "Object.h"
 #include <vector>
 
 namespace coral

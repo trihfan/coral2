@@ -27,7 +27,7 @@ void SceneManager::update()
     {
         if (node->isA<Camera>())
         {
-            cameras.push_back(node->toPtr<Camera>());
+            cameras.push_back(node->toHandle<Camera>());
         }
         return true;
     });
@@ -61,7 +61,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
     traverse(currentScene->topNode, [&queues, &parameters](Handle<Node> node) {
         if (node->isA<DrawableNode>())
         {
-            auto drawableNode = node->toPtr<DrawableNode>();
+            auto drawableNode = node->toHandle<DrawableNode>();
             for (const auto& id : drawableNode->getRenderQueueTags())
             {
                 assert(drawableNode->getMaterial()->getPipeline());
@@ -75,7 +75,7 @@ std::unordered_map<std::string, RenderQueue> SceneManager::buildRenderQueuesFor(
         // tmp while no culling
         if (node->isA<PointLight>())
         {
-            parameters.lights.pointLights.push_back(node->toPtr<PointLight>());
+            parameters.lights.pointLights.push_back(node->toHandle<PointLight>());
         }
         return true;
     });

@@ -1,6 +1,5 @@
 #pragma once
-
-#include "base/Object.h"
+#include "Object.h"
 #include "vulkan/VulkanBackendStructures.h"
 #include <memory>
 #include <glm/glm.hpp>
@@ -47,13 +46,12 @@ namespace coral
     class Pipeline : public Object
     {
     public:
-        Pipeline(const PipelineParams& params);
-        const std::string& getRenderPassName() const;
-        void use();
+        // Construction
+        Pipeline();
 
-        // Return true if the pipeline should be updated
-        bool isDirty() const;
-        void setDirty();
+        // Properties
+        Property<PipelineParams> params;
+        Property<bool> dirty;
 
         // Set uniform value
         void setUniform(const std::string& name, bool value) const;
@@ -66,14 +64,15 @@ namespace coral
         void setUniform(const std::string& name, const glm::mat3& mat) const;
         void setUniform(const std::string& name, const glm::mat4& mat) const;
 
+        // Use
+        const std::string& getRenderPassName() const;
+        void use();
+
         // Init
         virtual void init() override;
         virtual void release() override;
 
     private:
-        const PipelineParams params;
-        bool dirty;
-
         // Vulkan data
         VulkanDevice device;
         VkPipeline pipeline;

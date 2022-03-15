@@ -1,11 +1,9 @@
 #pragma once
-
-#include "utils/Singleton.h"
-#include "base/Object.h"
 #include "Handle.h"
 #include <map>
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace coral
 {
@@ -13,13 +11,13 @@ namespace coral
     struct RenderParameters;
 
     // Default renderpass ids used by the engine
-    static const std::string defaultRenderPassName = "default";
+    inline static const std::string defaultRenderPassName = "default";
 
     /**
      * @brief The RenderPassManager contains all renderpasses and organize them
      * dpeending on their input / outputs
      */
-    class RenderPassManager : public Singleton<RenderPassManager>
+    class RenderPassManager
     {
     public:
         /**

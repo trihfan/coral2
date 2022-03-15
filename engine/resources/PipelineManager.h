@@ -1,14 +1,12 @@
 #pragma once
-
 #include "Pipeline.h"
-#include "Module.h"
 #include "Handle.h"
 #include <map>
 #include <vector>
 
 namespace coral
 {
-    class PipelineManager : public EngineModule<PipelineManager>
+    class PipelineManager
     {
     public:
         void clear();

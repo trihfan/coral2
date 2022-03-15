@@ -1,6 +1,6 @@
 #include "Engine.h"
+#include "ObjectManager.h"
 #include "scene/SceneManager.h"
-#include "scene/NodeManager.h"
 /*#include "renderpasses/RenderPass.h"
 #include "renderpasses/RenderPassFramebufferManager.h"
 #include "renderpasses/RenderPassManager.h"
@@ -21,7 +21,7 @@ Engine::Engine(int width, int height)
 
     // Create modules
     sceneManager = std::make_unique<SceneManager>();
-    nodeManager = std::make_unique<NodeManager>();
+    objectManager = std::make_unique<ObjectManager>();
     freetype = std::make_unique<Freetype>();
 
     // Setup stb image
@@ -36,7 +36,7 @@ Engine::Engine(int width, int height)
     // Delete modules
     //Freetype::release();
     sceneManager = nullptr;
-    nodeManager = nullptr;
+    objectManager = nullptr;
     freetype = nullptr;
 }
 
@@ -60,7 +60,7 @@ void Engine::frame()
     sceneManager->update();
 
     // Initialize / release all objects, this allocate and deallocate gpu data
-    nodeManager->update();
+    objectManager->update();
 
     // Render for each active camera
     for (size_t i = 0; i < sceneManager->getCameras().size(); i++)

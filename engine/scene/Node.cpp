@@ -6,7 +6,6 @@
 using namespace coral;
 
 Node::Node() :
-    state(InitState::notInitialized),
     enabled(true)
 {
     connect<&Transform::setDirty>(parent.modified, this);
@@ -20,7 +19,7 @@ Node::~Node()
     {
         for (auto& child : parent->children)
         {
-            if (child == this)
+            if (child.get() == this)
             {
                 parent->children.remove(child);
                 break;
@@ -32,11 +31,6 @@ Node::~Node()
     for (auto& child : children)
     {
         child->parent = nullptr;
-    }
-
-    if (state == InitState::initialized)
-    {
-        Logs(warning) << "object '" << name.get() << "' (" << this << ") has not been released";
     }
 }
 
@@ -53,9 +47,4 @@ void Node::update()
             child->update();
         }
     }
-}
-
-void Node::reset()
-{
-    engine->nodeManager->reset(toPtr<Node>());
 }

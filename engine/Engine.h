@@ -10,7 +10,7 @@ namespace coral
     class Config;
     class RenderParameters;
     class SceneManager;
-    class NodeManager;
+    class ObjectManager;
     class Freetype;
 
     template<typename Type>
@@ -53,7 +53,7 @@ namespace coral
 
         // Modules
         Module<SceneManager> sceneManager;
-        Module<NodeManager> nodeManager;
+        Module<ObjectManager> objectManager;
         Module<Freetype> freetype;
 
     private:

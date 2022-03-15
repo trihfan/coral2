@@ -1,6 +1,4 @@
 #pragma once
-
-#include "utils/Singleton.h"
 #include "Handle.h"
 #include "resources/Framebuffer.h"
 #include <memory>
@@ -13,11 +11,11 @@ namespace coral
     struct FramebufferResource;
 
     // The framebuffer manager
-    class RenderPassFramebufferManager : public Singleton<RenderPassFramebufferManager>
+    class RenderPassFramebufferManager
     {
     public:
-        static void clear();
-        static Handle<Framebuffer> getFramebufferFor(const Handle<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources);
+        void clear();
+        Handle<Framebuffer> getFramebufferFor(const Handle<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources);
 
     private:
         RenderPassFramebufferManager();

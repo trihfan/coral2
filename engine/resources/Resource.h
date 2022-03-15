@@ -1,8 +1,8 @@
 #pragma once
-
 #include "vulkan/VulkanBackendStructures.h"
-#include "base/Object.h"
+#include "Object.h"
 #include <memory>
+#include <vector>
 
 namespace coral
 {
@@ -57,8 +57,8 @@ namespace coral
         const VulkanImage& getImage() const;
         void bind(int index);
 
-        virtual void init();
-        virtual void release();
+        virtual void init() override;
+        virtual void release() override;
 
     private:
         ResourceParams params;

@@ -1,8 +1,6 @@
 #pragma once
-
-#include "BackendFramebuffer.h"
+#include "Object.h"
 #include "Resource.h"
-#include "base/Object.h"
 #include "Handle.h"
 #include <memory>
 #include <vector>
@@ -13,7 +11,7 @@ namespace coral
 
     struct FramebufferResource
     {
-        backend::BackendFramebufferResourceRole role;
+        //backend::BackendFramebufferResourceRole role;
         Handle<Resource> resource;
     };
 
@@ -31,11 +29,11 @@ namespace coral
         virtual void init() override;
         virtual void release() override;
 
-        backend::BackendFramebuffer* getBackendFramebuffer() const;
+        //backend::BackendFramebuffer* getBackendFramebuffer() const;
 
     private:
         Handle<RenderPass> renderpass;
-        std::unique_Handle<backend::BackendFramebuffer> backendFramebuffer;
+        //std::unique_Handle<backend::BackendFramebuffer> backendFramebuffer;
         std::vector<FramebufferResource> resources;
     };
 }

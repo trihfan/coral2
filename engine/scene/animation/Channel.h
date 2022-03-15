@@ -1,6 +1,6 @@
 #pragma once
 #include "Interpolator.h"
-#include "base/Object.h"
+#include "Object.h"
 #include "scene/Property.h"
 
 namespace coral

@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 #include "Engine.h"
 #include "utils/FileUtils.h"
-#include "base/Object.h"
+#include "Object.h"
 #include "base/ObjectFactory.h"
 #include "materials/MeshMaterial.h"
 #include "resources/ShaderComposer.h"
