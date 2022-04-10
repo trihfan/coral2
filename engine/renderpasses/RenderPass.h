@@ -1,7 +1,5 @@
 #pragma once
-
-#include "BackendRenderPass.h"
-#include "Object.h"
+#include "ObjectInterface.h"
 #include "resources/Framebuffer.h"
 #include <memory>
 
@@ -20,7 +18,7 @@ namespace coral
         int sampleCount;
     };
 
-    class RenderPass : public Object
+    class RenderPass : public ObjectInterface
     {
     public:
         void invalidate();
@@ -37,14 +35,14 @@ namespace coral
         void addOutput(const RenderPassResource& output);
         const std::vector<RenderPassResource>& getOutputs() const;
 
-        backend::BackendRenderPass* getBackendRenderPass() const;
+        //backend::BackendRenderPass* getBackendRenderPass() const;
 
     protected:
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) = 0;
 
         // Loaded resouces
-        std::vector<Handle<Resource>> inputResources;
-        std::vector<Handle<Resource>> outputResources;
+        std::vector<Object<Resource>> inputResources;
+        std::vector<Object<Resource>> outputResources;
 
     private:
         // Render pass resources
@@ -52,9 +50,10 @@ namespace coral
         std::vector<RenderPassResource> outputs;
 
         // The output framebuffer
-        Handle<Framebuffer> framebuffer;
-        std::unique_Handle<backend::BackendRenderPass> backendRenderPass;
+        Object<Framebuffer> framebuffer;
+        VkRenderPass renderPass;
+        //std::unique_Handle<backend::BackendRenderPass> backendRenderPass;
 
-        Handle<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
+        Object<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
     };
 }

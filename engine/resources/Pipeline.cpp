@@ -3,15 +3,14 @@
 
 using namespace coral;
 
-Pipeline::Pipeline(const PipelineParams& params)
-    : params(params)
-    , dirty(false)
+Pipeline::Pipeline()
 {
+    connect(params.modified, &Pipeline::reset);
 }
 
 const std::string& Pipeline::getRenderPassName() const
 {
-    return params.renderpass;
+    return params->renderpass;
 }
 
 void Pipeline::use()
@@ -21,8 +20,6 @@ void Pipeline::use()
 
 void Pipeline::init()
 {
-    Object::init();
-    
     // Create Shader Modules
     VulkanShaderLoader shaderLoader(device.logicalDevice);
     shaderLoader.addShaderData(vertex, params.vertexShader);
@@ -66,14 +63,15 @@ void Pipeline::init()
     VkViewport viewport {};
     viewport.x = 0.f;
     viewport.y = 0.f;
-    viewport.width = extend.width;
+    viewport.width = param.extend.width;
     viewport.height = extend.height;
     viewport.minDepth = 0.f;
     viewport.maxDepth = 1.f;
 
     VkRect2D scissor {};
     scissor.offset = { 0, 0 };
-    scissor.extent = extend;
+    scissor.extent.width = extend.width;
+    scissor.extent.width = extend.height;
 
     VkPipelineViewportStateCreateInfo viewportCreateInfo {};
     viewportCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -169,7 +167,7 @@ void Pipeline::init()
     pipelineCreateInfo.pColorBlendState = &colourBlendingCreateInfo;
     pipelineCreateInfo.pDepthStencilState = nullptr;
     pipelineCreateInfo.layout = layout; // Pipeline Layout pipeline should use
-    pipelineCreateInfo.renderPass = static_cast<const VulkanRenderPass*>(params.renderpass)->getHandle(); // Render pass description the pipeline is compatible with
+    pipelineCreateInfo.renderPass = params->renderpass->getHandle(); // Render pass description the pipeline is compatible with
     pipelineCreateInfo.subpass = 0; // Subpass of render pass to use with pipeline
 
     // Pipeline Derivatives : Can create multiple pipelines that derive from one another for optimisation
@@ -188,15 +186,4 @@ void Pipeline::release()
 {
     vkDestroyPipeline(device.logicalDevice, pipeline, nullptr);
     vkDestroyPipelineLayout(device.logicalDevice, layout, nullptr);
-    Object::release();
-}
-
-bool Pipeline::isDirty() const
-{
-    return dirty;
-}
-
-void Pipeline::setDirty()
-{
-    dirty = true;
 }

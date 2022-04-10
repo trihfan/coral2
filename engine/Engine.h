@@ -1,22 +1,54 @@
 #pragma once
 #include <chrono>
-#include "Handle.h"
+#include <vulkan/vulkan.h>
 #include "RenderParameters.h"
 #include "Config.h"
 
+class GLFWwindow;
+
 namespace coral
 {
-    using Clock = std::chrono::high_resolution_clock;
     class Config;
     class RenderParameters;
     class SceneManager;
     class ObjectManager;
+    class RenderPassManager;
+    class PipelineManager;
+    class CommandBufferManager;
     class Freetype;
-
-    template<typename Type>
-    using Module = std::unique_ptr<Type>;
-
     class Engine;
+
+    using Clock = std::chrono::high_resolution_clock;
+    template<typename Type> using Module = std::unique_ptr<Type>;
+
+    struct VulkanDevice
+    {
+        VkPhysicalDevice physicalDevice;
+        VkDevice logicalDevice;
+    };
+
+    struct QueueFamilyIndices
+    {
+        int graphicsFamily = -1; // Location of the graphics family
+        int presentationFamily = -1; // Location of the presentation family
+
+        // Check if queue families are valid
+        bool isValid()
+        {
+            return graphicsFamily >= 0 && presentationFamily >= 0;
+        }
+    };
+
+    struct SwapchainDetails
+    {
+        VkSurfaceCapabilitiesKHR surfaceCapabilities; // Surface properties
+        std::vector<VkSurfaceFormatKHR> formats; // List of supported surface image formats
+        std::vector<VkPresentModeKHR> presentationModes; // List of supported presentation modes
+    };
+
+    /**
+     * @brief Static container for the currently running engine
+     */
     class CurrentEngine
     {
     public:
@@ -29,6 +61,7 @@ namespace coral
         static std::unique_ptr<Engine> engine;
     };
 
+    // The engine to use
     inline static CurrentEngine engine;
 
     /**
@@ -37,7 +70,7 @@ namespace coral
     class Engine
     {
     public:
-        //
+        // COnstruction
         Engine(int width, int height);
         ~Engine();
 
@@ -54,10 +87,74 @@ namespace coral
         // Modules
         Module<SceneManager> sceneManager;
         Module<ObjectManager> objectManager;
+        Module<RenderPassManager> renderPassManager;
+        Module<PipelineManager> pipelineManager;
+        Module<CommandBufferManager> commandBufferManager;
         Module<Freetype> freetype;
 
     private:
         // Time point of engine start
         Clock::time_point startTime;
+
+        //
+        GLFWwindow* window;
+
+        // Main vulkan Components
+        VkInstance instance;
+        VulkanDevice mainDevice;
+        VkQueue graphicsQueue;
+        VkQueue presentationQueue;
+        VkSurfaceKHR surface;
+        VkSwapchainKHR swapchain;
+        size_t swapChainImageCount;
+        uint32_t imageIndex;
+
+        // Frame synchronization
+        size_t currentFrame;
+        std::vector<VkSemaphore> imageAvailable;
+        std::vector<VkSemaphore> renderFinished;
+        std::vector<VkFence> drawFences;
+
+        // Utils vulkan components
+        VkFormat swapchainFormat;
+        VkExtent2D swapchainExtent;
+
+        // Vulkan init
+        void initVulkan();
+        void releaseVulkan();
+
+        // Handle frame
+        void beginFrame();
+        void endFrame();
+
+        // -- Vulkan creation
+        void createInstance();
+        void createLogicalDevice();
+        void createSurface();
+        void createSwapchain();
+        void createFrameSynchronization();
+
+        // -- Vulkan deletion
+        void deleteSwapchain();
+        void deleteFrameSynchronization();
+
+        // -- Vulkan support functions
+        // Get
+        void getPhysicalDevice();
+        QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+        SwapchainDetails getSwapChainDetails(VkPhysicalDevice device);
+
+        // Check
+        bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+        bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+        bool checkDeviceSuitable(VkPhysicalDevice device);
+
+        // Choose
+        VkSurfaceFormatKHR chooseBestSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& formats);
+        VkPresentModeKHR chooseBestPresentationMode(const std::vector<VkPresentModeKHR>& presentationModes);
+        VkExtent2D chooseSwapExtend(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
+
+        // Create
+        VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     };
 }

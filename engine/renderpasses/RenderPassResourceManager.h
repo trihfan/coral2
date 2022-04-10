@@ -1,5 +1,5 @@
 #pragma once
-#include "Handle.h"
+#include "Object.h"
 #include "resources/Resource.h"
 #include <memory>
 #include <unordered_map>
@@ -13,12 +13,12 @@ namespace coral
     {
     public:
         void clear();
-        Handle<Resource> getResourceByName(const std::string& name);
+        Object<Resource> getResourceByName(const std::string& name);
 
         // Register named resources
-        void registerResource(Handle<Resource> resource);
+        void registerResource(Object<Resource> resource);
 
     private:
-        std::unordered_map<std::string, Handle<Resource>> resourceByName;
+        std::unordered_map<std::string, Object<Resource>> resourceByName;
     };
 }

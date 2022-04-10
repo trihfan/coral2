@@ -1,20 +1,20 @@
 #pragma once
 #include "Pipeline.h"
-#include "Handle.h"
-#include <map>
-#include <vector>
+#include "Object.h"
+#include "PropertyMap.h"
 
 namespace coral
 {
     class PipelineManager
     {
     public:
-        void clear();
-        Handle<Pipeline> getPipelineByName(const std::string& name);
-        Handle<Pipeline> createPipeline(PipelineParams params);
+        // Properties
+        PropertyMap<PipelineParams, Object<Pipeline>> pipelines;
 
-    protected:
-        std::vector<std::pair<PipelineParams, Handle<Pipeline>>> pipelines;
-        std::vector<Handle<Pipeline>> pipelinesToAssign;
+        // Get a pipeline by its name
+        Object<Pipeline> getPipelineByName(const std::string& name);
+
+        // Create a new pipeline
+        Object<Pipeline> createPipeline(PipelineParams params);
     };
 }

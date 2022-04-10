@@ -1,98 +1,74 @@
 #pragma once
-
-#include "InternalConnection.h"
-#include <memory>
+#include "ConnectionHelpers.h"
 
 namespace coral
 {
-    // Declaration
-    template <typename... Args>
-    class Signal;
-
     /**
-     * @brief The Connection handle a connection to a signal
+     * @brief The type of connection
      */
-    template <typename... Args>
-    class Connection
+    enum class ConnectionType
     {
-    public:
-        /**
-         * @brief Constructor with the signal and bind method
-         */
-        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionMethod<Args...>> internalConnection);
-
-        /**
-         * @brief Constructor with the signal and bind function
-         */
-        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionFunction<Args...>> internalConnection);
-
-        /**
-         * @brief Constructor with the signal and bind lambda
-         */
-        Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionLambda<Args...>> internalConnection);
-
-        /**
-         * @brief Call the bind method
-         */
-        void operator()(Args... args) const;
-
-        /**
-         * @brief Disconnect the connection from the signal
-         */
-        void disconnect();
-
-    private:
-        // The signal
-        const Signal<Args...>& signal;
-
-        // Actual connections
-        std::unique_Handle<InternalConnectionMethod<Args...>> internalConnectionMethod;
-        std::unique_Handle<InternalConnectionFunction<Args...>> internalConnectionFunction;
-        std::unique_Handle<InternalConnectionLambda<Args...>> internalConnectionLambda;
+        method, function, lambda
     };
 
-    // -- Implementation --
-    template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionMethod<Args...>> internalConnection)
-        : signal(signal)
-        , internalConnectionMethod(std::move(internalConnection))
-    {
-    }
+    // Declaration
+    template <typename... Args> class Signal;
+    template <typename... Args> using Function = void (*)(Args...);
 
-    template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionFunction<Args...>> internalConnection)
-        : signal(signal)
-        , internalConnectionFunction(std::move(internalConnection))
+    /**
+     * @brief The Connection class
+     */
+    template <typename... Args> class Connection
     {
-    }
+    public:
+        // Function constructor
+        Connection(const Signal<Args...>& signal, Function<Args...> function) : signal(signal), type(ConnectionType::function), function(reinterpret_cast<void*>(function)) { }
 
-    template <typename... Args>
-    Connection<Args...>::Connection(const Signal<Args...>& signal, std::unique_Handle<InternalConnectionLambda<Args...>> internalConnection)
-        : signal(signal)
-        , internalConnectionLambda(std::move(internalConnection))
-    {
-    }
+        // Methods constructor
+        template <typename Method, typename Object>
+        Connection(const Signal<Args...>& signal, Method method, Object* object) : signal(signal), type(ConnectionType::method), object(reinterpret_cast<void*>(object)), function(*reinterpret_cast<void**>(&method)) { }
 
-    template <typename... Args>
-    void Connection<Args...>::operator()(Args... args) const
-    {
-        if (internalConnectionMethod)
+        // Lambda constructor
+        template <typename Lambda, typename std::enable_if<std::is_convertible<Lambda, std::function<void(Args...)>>::value, bool>::type = true>
+        Connection(const Signal<Args...>& signal, Lambda&& lambda) : signal(signal), type(ConnectionType::lambda), function(reinterpret_cast<void*>(new LambdaContainer<Args...>{ lambda })) { }
+
+        // Lambda with no argument constructor for simlpification
+        template <typename Lambda, typename std::enable_if<std::is_convertible<Lambda, std::function<void()>>::value && !std::is_same<std::function<void()>, std::function<void(Args...)>>::value, bool>::type = true>
+        Connection(const Signal<Args...>& signal, Lambda&& lambda) : signal(signal), type(ConnectionType::lambda), function(reinterpret_cast<void*>(new LambdaContainer<Args...>{[lambda](Args...){ lambda(); }})) { }
+
+        // Destructor
+        ~Connection()
         {
-            (*internalConnectionMethod)(std::forward<Args>(args)...);
+            if (type == ConnectionType::lambda)
+            {
+                delete reinterpret_cast<LambdaContainer<Args...>*>(function);
+            }
         }
-        else if (internalConnectionFunction)
-        {
-            (*internalConnectionFunction)(std::forward<Args>(args)...);
-        }
-        else if (internalConnectionLambda)
-        {
-            (*internalConnectionLambda)(std::forward<Args>(args)...);
-        }
-    }
 
-    template <typename... Args>
-    void Connection<Args...>::disconnect()
-    {
-        signal.disconnect(this);
-    }
+        void disconnect() { signal.disconnect(this); }
+
+        // Call the connection
+        void operator()(Args... args) const
+        {
+            switch (type)
+            {
+            case ConnectionType::method:
+                reinterpret_cast<void (*)(void*, Args...)>(function)(object, std::forward<Args>(args)...);
+                break;
+            case ConnectionType::function:
+                reinterpret_cast<Function<Args...>>(function)(std::forward<Args>(args)...);
+                break;
+            case ConnectionType::lambda:
+                std::cout << "lambda" << std::endl;
+                (*reinterpret_cast<LambdaContainer<Args...>*>(function))(std::forward<Args>(args)...);
+                break;
+            }
+        }
+
+    private:
+        const Signal<Args...>& signal;
+        ConnectionType type;
+        mutable void* object;
+        mutable void* function;
+    };
 }

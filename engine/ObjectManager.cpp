@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
 #include "Object.h"
+#include "ObjectInterface.h"
 #include "utils/Logs.h"
 #include <algorithm>
 
@@ -13,7 +14,7 @@ ObjectManager::ObjectManager()
 
 ObjectManager::~ObjectManager()
 {
-    std::vector<Handle<Object>> toRelease;
+    std::vector<Object<ObjectInterface>> toRelease;
     toRelease.reserve(objects.size());
     for (auto& object : objects)
     {
@@ -28,32 +29,34 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::update()
 {
-    Handle<Object> object;
+    Object<ObjectInterface> object;
 
     // Object to reset
     while (resetList.try_dequeue(object))
     {
-        if (object->state != Object::InitState::initialized)
+        if (object->state != InitState::initialized)
         {
-            Logs(error) << "Wrong reset call";
+            Logs(error) << "Reset call on not inialized object";
+            continue;
         }
 
         object->release();
         object->init();
-        object->state = Object::InitState::initialized;
-        object = nullptr;
+        object->state = InitState::initialized;
     }
+    object = nullptr;
 
     // Objects to init
     while (initializeList.try_dequeue(object))
     {
-        if (object->state != Object::InitState::notInitialized)
+        if (object->state == InitState::initialized)
         {
-            Logs(error) << "multiple initialization";
+            Logs(error) << "Multiple initialization";
+            continue;
         }
 
         object->init();
-        object->state = Object::InitState::initialized;
+        object->state = InitState::initialized;
 
         // Insert the object
         if (!freePositions.empty())
@@ -65,34 +68,35 @@ void ObjectManager::update()
         {
             objects.push_back(object);
         }
-        object = nullptr;
     }
+    object = nullptr;
 
     // Objects to release
     while (releaseList.try_dequeue(object))
     {
-        if (object->state != Object::InitState::initialized)
+        if (object->state != InitState::initialized)
         {
             Logs(error) << "Multiple deletion";
+            continue;
         }
 
         object->release();
-        object->state = Object::InitState::released;
-        object = nullptr;
+        object->state = InitState::released;
     }
+    object = nullptr;
 }
 
-void ObjectManager::add(const Handle<Object>& object)
+void ObjectManager::add(const Object<ObjectInterface>& object)
 {
     initializeList.enqueue(object);
 }
 
-void ObjectManager::remove(const Handle<Object>& object)
+void ObjectManager::remove(const Object<ObjectInterface>& object)
 {
     releaseList.enqueue(object);
 }
 
-void ObjectManager::reset(const Handle<Object>& object)
+void ObjectManager::reset(const Object<ObjectInterface>& object)
 {
     resetList.enqueue(object);
 }

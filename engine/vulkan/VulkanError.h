@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Logs.h"
+#include "utils/Logs.h"
 
 #ifndef USE_VALIDATION_LAYERS
-#define	VERIFY(R) R == VK_SUCCESS
+#define	VERIFY(R) (R == VK_SUCCESS)
 #else
 #define VERIFY(R)                                                                                                  \
     [](VkResult result) {                                                                                          \

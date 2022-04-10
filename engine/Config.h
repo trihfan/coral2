@@ -1,5 +1,4 @@
 #pragma once
-
 #include <thread>
 
 namespace coral
@@ -10,6 +9,11 @@ namespace coral
      */
     struct Config
     {
-        int threadCount = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
+        int threadCount;
+
+        //-----------
+        Config() :
+            threadCount(std::max(1, static_cast<int>(std::thread::hardware_concurrency())))
+        {}
     };
 }

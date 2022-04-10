@@ -1,7 +1,10 @@
 #pragma once
 #include "Object.h"
+#include "ObjectInterface.h"
 #include "Resource.h"
-#include "Handle.h"
+#include "Property.h"
+#include "PropertyArray.h"
+#include "vulkan/VulkanBackendStructures.h"
 #include <memory>
 #include <vector>
 
@@ -9,31 +12,42 @@ namespace coral
 {
     class RenderPass;
 
-    struct FramebufferResource
+    enum class FramebufferResourceRole
     {
-        //backend::BackendFramebufferResourceRole role;
-        Handle<Resource> resource;
+        color,
+        depth,
+        stencil
     };
 
-    class Framebuffer : public Object
+    struct FramebufferResource
+    {
+        FramebufferResourceRole role;
+        Object<Resource> resource;
+    };
+
+    inline static std::string backbufferName = "backbuffer";
+
+    class Framebuffer : public ObjectInterface
     {
     public:
-        // Constructor with the renderpass to make it compatible with
-        Framebuffer(const Handle<RenderPass>& renderpass);
+        // Construction
+        Framebuffer();
 
-        // Framebuffer resources
-        void addResource(const FramebufferResource& resource);
-        const std::vector<FramebufferResource>& getResources() const;
+        // Properties
+        Property<glm::ivec2> extend;
+        Property<Object<RenderPass>> renderPass;
+        PropertyArray<FramebufferResource> resources;
 
         // Initialize
         virtual void init() override;
         virtual void release() override;
 
-        //backend::BackendFramebuffer* getBackendFramebuffer() const;
-
     private:
-        Handle<RenderPass> renderpass;
-        //std::unique_Handle<backend::BackendFramebuffer> backendFramebuffer;
-        std::vector<FramebufferResource> resources;
+        // Vulkan data
+        VulkanDevice device;
+        VkFramebuffer framebuffer;
+
+        // If true this framebuffer is a ref to the backbuffer
+        bool linkWithBackbuffer;
     };
 }

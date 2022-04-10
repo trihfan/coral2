@@ -1,5 +1,5 @@
 #pragma once
-#include "Handle.h"
+#include "Object.h"
 #include "resources/Framebuffer.h"
 #include <memory>
 #include <vector>
@@ -15,11 +15,11 @@ namespace coral
     {
     public:
         void clear();
-        Handle<Framebuffer> getFramebufferFor(const Handle<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources);
+        Object<Framebuffer> getFramebufferFor(const Object<RenderPass>& renderpass, const std::vector<FramebufferResource>& resources);
 
     private:
         RenderPassFramebufferManager();
-        std::vector<Handle<Framebuffer>> framebuffers;
-        Handle<Framebuffer> defaultFramebuffer;
+        std::vector<Object<Framebuffer>> framebuffers;
+        Object<Framebuffer> defaultFramebuffer;
     };
 }

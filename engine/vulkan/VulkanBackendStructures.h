@@ -3,10 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 #include <vulkan/vulkan.h>
+#include "VulkanError.h"
 
 namespace coral
 {
-    const std::vector<const char*> deviceExtensions { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    inline static const std::vector<const char*> deviceExtensions { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     struct VulkanDevice
     {

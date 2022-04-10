@@ -1,13 +1,12 @@
 #pragma once
 #include "utils/ConcurrentQueue.h"
-#include "Handle.h"
+#include <Object.h>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace coral
 {
-    template <typename Type> class Object;
     class ObjectInterface;
 
     /**

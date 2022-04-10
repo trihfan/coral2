@@ -6,55 +6,37 @@
 
 namespace coral
 {
-    class ObjectManager;
-    template <typename Type> class Object;
+    class ObjectInterface;
 
     /**
-     * @brief An object is an engine object providing an init() and release() method to manage gpu data
+     * @brief The Object class is a handle for engine object
+     * an engine object must extend ObjectInterface fo initialization and release the resources are
+     * handledby the engine
      */
-    class ObjectInterface : private std::enable_shared_from_this<ObjectInterface>
-    {
-        friend class ObjectManager;
-    public:
-        // Creation
-        virtual ~ObjectInterface();
-
-        // meta
-        template <typename Type> Object<Type> to() { return std::dynamic_pointer_cast<Type>(shared_from_this()); }
-        template <typename Type> bool isA() const { return dynamic_cast<const Type*>(this) != nullptr; }
-
-        // Properties
-        Property<std::string> name;
-
-        // The ObjectInterface can't be copied
-        ObjectInterface(const ObjectInterface&) = delete;
-        ObjectInterface(ObjectInterface&&) = delete;
-        ObjectInterface& operator=(const ObjectInterface&) = delete;
-    protected:
-        // Initialization methods
-        virtual void init() {}
-        virtual void release() {}
-
-        // Discard current initialized data, this will cause a call to release() followed by a call to init()
-        void reset();
-
-        // Construction
-        ObjectInterface();
-
-    private:
-        // Meta
-        enum class InitState { notInitialized, initialized, released };
-        InitState state;
-    };
-
     template <typename Type> class Object
     {
     public:
         static_assert(std::is_base_of<ObjectInterface, Type>::value);
 
-        // Copy and null handle
+        // Creation
+        template <class... Args> static Object<Type> create(Args&&... args)
+        {
+            Object<Type> object = std::make_shared<Type>(std::forward<Args>(args)...);
+            engine->objectManager->add(object);
+            return object;
+        }
+        template <class... Args> static Object<Type> createWithName(const std::string& name, Args&&... args)
+        {
+            auto object = create(std::forward<Args>(args)...);
+            object->name = name;
+            return object;
+        }
+
+        // Null handle
         Object() = default;
         Object(std::nullptr_t) : Object() {}
+
+        // Copy
         template <typename OtherType> Object(const Object<OtherType>& other) : ptr(other.ptr) {}
         template <typename OtherType> Object(Object<OtherType>&& other) : ptr(std::move(other.ptr)) {}
 
@@ -84,13 +66,19 @@ namespace coral
         bool expired() const { return useCount() == 0; }
 
         // Reset the handle -> ask for re-init
-        void reset() { engine->objectManager->reset(*this); }
+        void reset()
+        {
+            engine->objectManager->reset(*this);
+        }
 
     private:
         std::shared_ptr<Type> ptr;
 
         // Constructor from shared_ptr
         Object(const std::shared_ptr<Type>& ptr) : ptr(ptr) {}
+
+        // Add friend class to construct Object from shared_ptr of ObjectInterface
+        friend class ObjectInterface;
     };
 
     // Comparison
@@ -108,9 +96,11 @@ namespace coral
     template <class T> bool operator>(std::nullptr_t, const Object<T>& rhs) noexcept { return nullptr > rhs.ptr; }
     template <class T> bool operator>=(const Object<T>& lhs, std::nullptr_t) noexcept { return lhs.ptr >= nullptr; }
     template <class T> bool operator>=(std::nullptr_t, const Object<T>& rhs) noexcept { return nullptr >= rhs.ptr; }
+    template <class T> bool operator!(const Object<T>& o) noexcept { return o == nullptr; }
 
     /**
-     * @brief The ObjectRef class
+     * @brief The ObjectRef class provide a ref to an object, it acts as a weak ptr and so must
+     * be locked before use
      */
     template <typename Type>
     class ObjectRef
@@ -134,24 +124,10 @@ namespace coral
         bool unique() const { return useCount() == 1;}
         bool expired() const { return useCount() == 0; }
 
-        // Object the object
+        // Lock and return an Object from the ref, if the ref is already deleted the Object will be null
         Object<Type> lock() const { return Object<Type>(ptr.lock()); }
 
     private:
         std::weak_ptr<Type> ptr;
     };
-
-    template <typename Type, class... Args> static Object<Type> createWithName(const std::string& name, Args&&... args)
-    {
-        auto object = create(std::forward<Args>(args)...);
-        object->name = name;
-        return object;
-    }
-
-    template <typename Type, class... Args> static Object<Type> create(Args&&... args)
-    {
-        Object<Type> object = std::make_shared<Type>(std::forward<Args>(args)...);
-        engine->objectManager->add(object);
-        return object;
-    }
 }

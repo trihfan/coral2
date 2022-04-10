@@ -15,7 +15,7 @@ namespace coral
         virtual ~DrawableNode() override = default;
 
         // Properties
-        Property<Handle<Material>> material;
+        Property<Object<Material>> material;
 
         // Update and draw
         virtual void update() override;

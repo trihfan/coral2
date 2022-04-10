@@ -21,6 +21,9 @@ namespace coral
     {
         std::string name;
 
+        // Misc
+        glm::ivec2 extend;
+
         // Renderpass
         std::string renderpass;
 
@@ -43,7 +46,7 @@ namespace coral
     /**
      * @brief The Pipeline class describe a pipeline configuration for rendering
      */
-    class Pipeline : public Object
+    class Pipeline : public ObjectInterface
     {
     public:
         // Construction
@@ -51,7 +54,6 @@ namespace coral
 
         // Properties
         Property<PipelineParams> params;
-        Property<bool> dirty;
 
         // Set uniform value
         void setUniform(const std::string& name, bool value) const;

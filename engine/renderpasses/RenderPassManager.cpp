@@ -6,71 +6,53 @@
 
 using namespace coral;
 
-DEFINE_SINGLETON(RenderPassManager)
-
-void RenderPassManager::release()
+RenderPassManager::RenderPassManager()
 {
-    for (auto renderpass : instance->renderPasses)
-    {
-        renderpass->invalidate();
-    }
+    connect<&RenderPassManager::invalidate>(renderPasses.itemAdded, this);
+    connect<&RenderPassManager::invalidate>(renderPasses.itemRemoved, this);
 }
 
-void RenderPassManager::addRenderPass(Handle<RenderPass> renderPass)
+Object<RenderPass> RenderPassManager::getRenderPassByName(const std::string& name)
 {
-    instance->renderPasses.push_back(renderPass);
-    instance->orderedRenderPasses.clear();
-}
-
-void RenderPassManager::removeRenderPass(const std::string& name)
-{
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const Handle<RenderPass> renderpass) { return renderpass->getName() == name; });
-    if (it != instance->renderPasses.end())
+    for (auto& renderPass : renderPasses)
     {
-        instance->renderPasses.erase(it);
-        instance->orderedRenderPasses.clear();
-    }
-}
-
-Handle<RenderPass> RenderPassManager::getRenderPassByName(const std::string& name)
-{
-    auto it = std::find_if(instance->renderPasses.begin(), instance->renderPasses.end(), [name](const Handle<RenderPass> renderpass) { return renderpass->getName() == name; });
-    if (it != instance->renderPasses.end())
-    {
-        return *it;
+        if (renderPass->name == name)
+        {
+            return renderPass;
+        }
     }
     return nullptr;
 }
 
-void RenderPassManager::update(const RenderParameters& parameters)
+void RenderPassManager::update()
 {
     // bake the graph
-    if (instance->orderedRenderPasses.empty())
+    if (orderedRenderPasses.empty())
     {
-        instance->bake(parameters);
+        bake();
     }
 }
 
-void RenderPassManager::bake(const RenderParameters& parameters)
+void RenderPassManager::bake()
 {
     // clear resources
     RenderPassFramebufferManager::clear();
     RenderPassResourceManager::clear();
 
-    // sort render passes
+    // sort render passes, todo
     for (auto renderpass : renderPasses)
     {
         orderedRenderPasses.push_back(renderpass);
-        renderpass->prepare(parameters);
+        renderpass->prepare();
     }
 }
 
 void RenderPassManager::invalidate()
 {
-    instance->orderedRenderPasses.clear();
+    orderedRenderPasses.clear();
 }
 
-const std::vector<Handle<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
+const std::vector<Object<RenderPass>>& RenderPassManager::getOrderedRenderPasses()
 {
-    return instance->orderedRenderPasses;
+    return orderedRenderPasses;
 }

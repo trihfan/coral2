@@ -29,6 +29,13 @@ namespace coral
         Type value;
     };
 
+    // Comparison
+    template <typename Type> bool operator==(const Property<Type>& p, const Type& o) { return *p == o; }
+    template <typename Type> bool operator==( const Type& o, const Property<Type>& p) { return o == *p; }
+    template <typename Type> bool operator!=(const Property<Type>& p, const Type& o) { return *p != o; }
+    template <typename Type> bool operator!=( const Type& o, const Property<Type>& p) { return o != *p; }
+
+    // Implementation
     template <typename Type>
     Property<Type>::Property(const Type& defaultValue)
         : value(defaultValue)

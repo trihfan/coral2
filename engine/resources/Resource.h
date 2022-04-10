@@ -6,19 +6,12 @@
 
 namespace coral
 {
-    class Engine;
-
-    /**
-     * @brief Texture type
-     */
     enum class ResourceType
     {
         texture2d
     };
 
-    /**
-     * @brief Texture internal format
-     */
+    // Texture internal format
     enum class ResourceFormat
     {
         r8,
@@ -43,31 +36,37 @@ namespace coral
      * @brief The Resource class represent a gpu resource
      * It encapsulate the BackendResource
      */
-    class Resource : public Object
+    class Resource : public ObjectInterface
     {
     public:
-        Resource(const ResourceParams& params);
+        //
+        Resource();
 
-        // Create resource from file
-        Resource(const std::string& file);
+        // Properties
+        Property<ResourceParams> params;
 
-        // Create resource from memory
-        Resource(const unsigned char* buffer, int length);
+        // Load resource data from file
+        bool load(const std::string& file);
 
-        const VulkanImage& getImage() const;
-        void bind(int index);
+        // Load resource data from memory
+        bool load(const unsigned char* buffer, int length);
 
+        // Init
         virtual void init() override;
         virtual void release() override;
 
+        //
+        const VulkanImage& vkHandle() const;
     private:
-        ResourceParams params;
-        unsigned char* fileData;
-        
+        // Vulkan data
         VulkanDevice device;
         VulkanImage image;
         bool ownImage;
 
-        void setFromMemory();
+        // Temporary ptr to resource data
+        unsigned char* fileData;
+
+        // Fill params from loaded data
+        bool updateParams(int width, int height, int nbComponents);
     };
 }

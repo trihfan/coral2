@@ -1,15 +1,12 @@
 #pragma once
-#include "VulkanBackendStructures.h"
-
-#define CURRENT_COMMAND_BUFFER VulkanCommandBufferManager::get()->getCommandBuffer()
 
 namespace coral
 {
-    class VulkanCommandBufferManager
+    class CommandBufferManager
     {
     public:
-        VulkanCommandBufferManager(const VulkanDevice& device, size_t count);
-        ~VulkanCommandBufferManager();
+        CommandBufferManager(const VulkanDevice& device, size_t count);
+        ~CommandBufferManager();
 
         VkCommandBuffer& getCommandBuffer();
         VkCommandPool& getCommandPool();

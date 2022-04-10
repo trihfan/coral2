@@ -1,6 +1,6 @@
 #pragma once
 #include "Property.h"
-#include "Handle.h"
+#include "Object.h"
 
 namespace coral
 {
@@ -13,10 +13,10 @@ namespace coral
         Scene();
 
         // Objects
-        void add(Handle<Node> node);
-        void remove(Handle<Node> node);
+        void add(Object<Node> node);
+        void remove(Object<Node> node);
 
         // Properties
-        Property<Handle<Node>> topNode;
+        Property<Object<Node>> topNode;
     };
 }

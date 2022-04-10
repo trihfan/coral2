@@ -1,127 +1,80 @@
 #include "Resource.h"
+#include "Framebuffer.h"
 #include "stb_image.h"
 
 using namespace coral;
 
-Resource::Resource(const ResourceParams& params)
-    : params(params)
-    , fileData(nullptr)
+Resource::Resource() : ownImage(false)
 {
+    connect(params.modified, *this, &Resource::reset);
 }
 
-Resource::Resource(const std::string& file)
+bool Resource::load(const std::string& file)
 {
-    // Load file
     int width, height;
     int nbComponents;
     fileData = stbi_load(file.c_str(), &width, &height, &nbComponents, 0);
-
-    if (!fileData)
-    {
-        Logs(error) << "Texture failed to load (null) at path: " << file;
-        return;
-    }
-
-    switch (nbComponents)
-    {
-    case 1:
-        params.format = backend::BackendResourceFormat::r8;
-        break;
-
-    case 2:
-        params.format = backend::BackendResourceFormat::rg88;
-        break;
-
-    case 3:
-        params.format = backend::BackendResourceFormat::rgb888;
-        break;
-
-    case 4:
-        params.format = backend::BackendResourceFormat::rgba8888;
-        break;
-
-    default:
-        Logs(error) << "Texture failed to load (wrong component size) at path: " << file;
-        return;
-    }
-
-    params.type = backend::BackendResourceType::texture2d;
-    params.width = width;
-    params.height = height;
+    return updateParams(width, height, nbComponents);
 }
 
-Resource::Resource(const unsigned char* buffer, int length)
+bool Resource::load(const unsigned char* buffer, int length)
 {
-    // Load file
     int width, height;
     int nbComponents;
     fileData = stbi_load_from_memory(buffer, length, &width, &height, &nbComponents, 0);
+    return updateParams(width, height, nbComponents);
+}
 
+bool Resource::updateParams(int width, int height, int nbComponents)
+{
     if (!fileData)
     {
         Logs(error) << "Texture failed to load from memory";
-        return;
+        return false;
     }
 
+    auto newParams = *params;
     switch (nbComponents)
     {
     case 1:
-        params.format = backend::BackendResourceFormat::r8;
+        newParams.format = ResourceFormat::r8;
         break;
 
     case 2:
-        params.format = backend::BackendResourceFormat::rg88;
+        newParams.format = ResourceFormat::rg88;
         break;
 
     case 3:
-        params.format = backend::BackendResourceFormat::rgb888;
+        newParams.format = ResourceFormat::rgb888;
         break;
 
     case 4:
-        params.format = backend::BackendResourceFormat::rgba8888;
+        newParams.format = ResourceFormat::rgba8888;
         break;
 
     default:
         Logs(error) << "Texture failed to load from memory";
-        return;
+        return false;
     }
 
-    params.type = backend::BackendResourceType::texture2d;
-    params.width = width;
-    params.height = height;
-}
+    newParams.type = ResourceType::texture2d;
+    newParams.width = width;
+    newParams.height = height;
+    params = newParams;
 
-void Resource::bind(int index)
-{
-    backendResource->bind(index);
+    reset();
+    return true;
 }
 
 void Resource::init()
 {
-    Object::init();
-
     // When referencing the backbuffer, the resource become a mock for referencing the backbuffer resource
-    if (getName() == backend::BackendFramebuffer::backbufferName)
+    if (name == backbufferName)
     {
         return;
     }
 
-    backend::BackendResourceParams params;
-    params.type = this->params.type;
-    params.format = this->params.format;
-    params.width = this->params.width;
-    params.height = this->params.height;
-    params.samples = this->params.samples;
-    params.data = this->params.data.empty() ? fileData : this->params.data.data();
-
-        /*: BackendResource(BackendResourceParams())
-    , image(image)
-    , device(device)
-    , ownImage(false)
-    backendResource = backend::BackendObjectFactory<backend::BackendResource>::create(params);*/
-
-    // Release memory
-    this->params.data.clear();
+    // Todo
 
     if (fileData)
     {
@@ -137,5 +90,4 @@ void Resource::release()
     {
         vkDestroyImage(device.logicalDevice, image.image, nullptr);
     }
-    Object::release();
 }

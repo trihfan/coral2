@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Object.h"
 #include "Property.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -42,7 +42,7 @@ namespace coral
         Signal<const glm::mat4&> matrixChanged;
 
     protected:
-        void update(const Handle<Node>& parent);
+        void update(const Object<Node>& parent);
 
     private:
         // Computed transform
