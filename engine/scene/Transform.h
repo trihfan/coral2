@@ -42,7 +42,7 @@ namespace coral
         Signal<const glm::mat4&> matrixChanged;
 
     protected:
-        void update(const Object<Node>& parent);
+        void update(const std::shared_ptr<Node>& parent);
 
     private:
         // Computed transform

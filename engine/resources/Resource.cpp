@@ -85,9 +85,9 @@ void Resource::init()
 
 void Resource::release()
 {
-    vkDestroyImageView(device.logicalDevice, image.imageView, nullptr);
+    vkDestroyImageView(device, image.imageView, nullptr);
     if (ownImage)
     {
-        vkDestroyImage(device.logicalDevice, image.image, nullptr);
+        vkDestroyImage(device, image.image, nullptr);
     }
 }

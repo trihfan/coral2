@@ -21,9 +21,9 @@ namespace coral
      */
     struct RenderQueue
     {
-        std::vector<Handle<DrawableNode>> nodes;
-        std::map<Handle<Pipeline>, std::set<Handle<Material>>> pipelineMap;
-        std::map<Handle<Material>, std::vector<Handle<DrawableNode>>> materialMap;
+        std::vector<std::shared_ptr<DrawableNode>> nodes;
+        std::map<std::shared_ptr<Pipeline>, std::set<std::shared_ptr<Material>>> pipelineMap;
+        std::map<std::shared_ptr<Material>, std::vector<std::shared_ptr<DrawableNode>>> materialMap;
     };
 
     /**
@@ -35,12 +35,12 @@ namespace coral
         /**
          * @brief Set the current scene
          */
-        void setCurrentScene(Handle<Scene> scene);
+        void setCurrentScene(const std::shared_ptr<Scene>& scene);
 
         /**
          * @brief Return the cameras
          */
-        const std::vector<Handle<Camera>>& getCameras();
+        const std::vector<std::shared_ptr<Camera>>& getCameras();
 
         /**
          * @brief Build the render queues for the given parameters
@@ -57,16 +57,16 @@ namespace coral
         /**
          * @brief The current scene
          */
-        Handle<Scene> currentScene;
+        std::shared_ptr<Scene> currentScene;
 
         /**
          * @brief List of camera in the currrent scene
          */
-        std::vector<Handle<Camera>> cameras;
+        std::vector<std::shared_ptr<Camera>> cameras;
 
         /**
          * @brief List of lights in the currrent scene
          */
-        std::vector<Handle<Light>> lights;
+        std::vector<std::shared_ptr<Light>> lights;
     };
 }

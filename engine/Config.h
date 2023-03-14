@@ -12,8 +12,6 @@ namespace coral
         int threadCount;
 
         //-----------
-        Config() :
-            threadCount(std::max(1, static_cast<int>(std::thread::hardware_concurrency())))
-        {}
+        Config() : threadCount(std::max(1, static_cast<int>(std::thread::hardware_concurrency()))) {}
     };
 }

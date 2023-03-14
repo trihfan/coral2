@@ -1,10 +1,10 @@
 #pragma once
 #include "Object.h"
-#include "ObjectInterface.h"
 #include "Resource.h"
 #include "Property.h"
 #include "PropertyArray.h"
-#include "vulkan/VulkanBackendStructures.h"
+#include <vulkan/vulkan.h>
+#include <glm/glm.hpp>
 #include <memory>
 #include <vector>
 
@@ -22,12 +22,12 @@ namespace coral
     struct FramebufferResource
     {
         FramebufferResourceRole role;
-        Object<Resource> resource;
+        std::shared_ptr<Resource> resource;
     };
 
     inline static std::string backbufferName = "backbuffer";
 
-    class Framebuffer : public ObjectInterface
+    class Framebuffer : public Object
     {
     public:
         // Construction
@@ -35,7 +35,7 @@ namespace coral
 
         // Properties
         Property<glm::ivec2> extend;
-        Property<Object<RenderPass>> renderPass;
+        Property<std::shared_ptr<RenderPass>> renderPass;
         PropertyArray<FramebufferResource> resources;
 
         // Initialize
@@ -44,7 +44,7 @@ namespace coral
 
     private:
         // Vulkan data
-        VulkanDevice device;
+        VkDevice device;
         VkFramebuffer framebuffer;
 
         // If true this framebuffer is a ref to the backbuffer

@@ -1,6 +1,6 @@
 #pragma once
-#include "vulkan/VulkanBackendStructures.h"
 #include "Object.h"
+#include <vulkan/vulkan.h>
 #include <memory>
 #include <vector>
 
@@ -36,7 +36,7 @@ namespace coral
      * @brief The Resource class represent a gpu resource
      * It encapsulate the BackendResource
      */
-    class Resource : public ObjectInterface
+    class Resource : public Object
     {
     public:
         //
@@ -56,11 +56,14 @@ namespace coral
         virtual void release() override;
 
         //
-        const VulkanImage& vkHandle() const;
+        const VkImage& vkImage() const;
+        const VkImageView& vkImageView() const;
+
     private:
         // Vulkan data
-        VulkanDevice device;
-        VulkanImage image;
+        VkDevice device;
+        VkImage image;
+        VkImageView imageView;
         bool ownImage;
 
         // Temporary ptr to resource data

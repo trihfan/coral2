@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
+#include <vector>
 #include <vulkan/vulkan.h>
-#include "RenderParameters.h"
 #include "Config.h"
 
 class GLFWwindow;
@@ -19,13 +19,9 @@ namespace coral
     class Engine;
 
     using Clock = std::chrono::high_resolution_clock;
-    template<typename Type> using Module = std::unique_ptr<Type>;
 
-    struct VulkanDevice
-    {
-        VkPhysicalDevice physicalDevice;
-        VkDevice logicalDevice;
-    };
+    /********************************************************/
+    inline static const std::vector<const char*> deviceExtensions { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
     struct QueueFamilyIndices
     {
@@ -45,6 +41,8 @@ namespace coral
         std::vector<VkSurfaceFormatKHR> formats; // List of supported surface image formats
         std::vector<VkPresentModeKHR> presentationModes; // List of supported presentation modes
     };
+
+    /********************************************************/
 
     /**
      * @brief Static container for the currently running engine
@@ -70,7 +68,7 @@ namespace coral
     class Engine
     {
     public:
-        // COnstruction
+        // Construction
         Engine(int width, int height);
         ~Engine();
 
@@ -82,15 +80,15 @@ namespace coral
 
         // Properties
         Config config;
-        RenderParameters renderParameters;
+        std::unique_ptr<RenderParameters> renderParameters;
 
         // Modules
-        Module<SceneManager> sceneManager;
-        Module<ObjectManager> objectManager;
-        Module<RenderPassManager> renderPassManager;
-        Module<PipelineManager> pipelineManager;
-        Module<CommandBufferManager> commandBufferManager;
-        Module<Freetype> freetype;
+        std::unique_ptr<SceneManager> sceneManager;
+        std::unique_ptr<ObjectManager> objectManager;
+        std::unique_ptr<RenderPassManager> renderPassManager;
+        std::unique_ptr<PipelineManager> pipelineManager;
+        std::unique_ptr<CommandBufferManager> commandBufferManager;
+        std::unique_ptr<Freetype> freetype;
 
     private:
         // Time point of engine start
@@ -101,7 +99,8 @@ namespace coral
 
         // Main vulkan Components
         VkInstance instance;
-        VulkanDevice mainDevice;
+        VkPhysicalDevice physicalDevice;
+        VkDevice logicalDevice;
         VkQueue graphicsQueue;
         VkQueue presentationQueue;
         VkSurfaceKHR surface;
@@ -140,7 +139,7 @@ namespace coral
 
         // -- Vulkan support functions
         // Get
-        void getPhysicalDevice();
+        void selectPhysicalDevice();
         QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
         SwapchainDetails getSwapChainDetails(VkPhysicalDevice device);
 

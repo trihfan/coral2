@@ -1,15 +1,16 @@
-#include "ObjectInterface.h"
+#include "Object.h"
 #include "ObjectManager.h"
+#include "Engine.h"
 #include "utils/Logs.h"
 
 using namespace coral;
 
-ObjectInterface::ObjectInterface() :
+Object::Object() :
     state(InitState::notInitialized), willReset(false)
 {
 }
 
-ObjectInterface::~ObjectInterface()
+Object::~Object()
 {
     if (state == InitState::initialized)
     {
@@ -17,11 +18,11 @@ ObjectInterface::~ObjectInterface()
     }
 }
 
-void ObjectInterface::reset()
+void Object::reset()
 {
     if (!willReset)
     {
-        getHandle<ObjectInterface>().reset();
+        engine->objectManager->reset(shared_from_this());
         willReset = true;
     }
 }

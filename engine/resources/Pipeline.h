@@ -1,8 +1,8 @@
 #pragma once
 #include "Object.h"
-#include "vulkan/VulkanBackendStructures.h"
 #include <memory>
 #include <glm/glm.hpp>
+#include <vulkan/vulkan.h>
 
 namespace coral
 {
@@ -46,7 +46,7 @@ namespace coral
     /**
      * @brief The Pipeline class describe a pipeline configuration for rendering
      */
-    class Pipeline : public ObjectInterface
+    class Pipeline : public Object
     {
     public:
         // Construction
@@ -76,7 +76,7 @@ namespace coral
 
     private:
         // Vulkan data
-        VulkanDevice device;
+        VkDevice device;
         VkPipeline pipeline;
         VkPipelineLayout layout;
     };
