@@ -1,11 +1,13 @@
 #pragma once
-#include "utils/concurrentqueue.h"
+#include "utils/ConcurrentQueue.h"
+#include <Object.h>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace coral
 {
-    class Object;
+    class ObjectInterface;
 
     /**
      * @brief Mange the object, calling init and release
@@ -21,18 +23,18 @@ namespace coral
         void update();
 
         // Handle objects
-        void add(const std::shared_ptr<Object>& object);
-        void remove(const std::shared_ptr<Object>& object);
-        void reset(const std::shared_ptr<Object>& object);
+        void add(const Object<ObjectInterface>& object);
+        void remove(const Object<ObjectInterface>& object);
+        void reset(const Object<ObjectInterface>& object);
 
     private:
         // Init/release queues, thread safes
-        moodycamel::ConcurrentQueue<std::shared_ptr<Object>> initializeList;
-        moodycamel::ConcurrentQueue<std::shared_ptr<Object>> releaseList;
-        moodycamel::ConcurrentQueue<std::shared_ptr<Object>> resetList;
+        moodycamel::ConcurrentQueue<Object<ObjectInterface>> initializeList;
+        moodycamel::ConcurrentQueue<Object<ObjectInterface>> releaseList;
+        moodycamel::ConcurrentQueue<Object<ObjectInterface>> resetList;
 
         // Array with all the objects
-        std::vector<std::shared_ptr<Object>> objects;
+        std::vector<Object<ObjectInterface>> objects;
         std::vector<size_t> freePositions;
     };
 }

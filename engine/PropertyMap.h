@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "signals/Signal.h"
+#include "Signal.h"
 
 namespace coral
 {
@@ -22,7 +22,7 @@ namespace coral
         void clear();
 
         // Search
-        auto find(const Key& key) const { return items.find(key); }
+        int find(const Key& key) const { return items.find(key); }
         bool contains(const Key& key) const { return find(key) != items.end(); }
 
         // Item access
@@ -67,7 +67,7 @@ namespace coral
         auto it = find(key);
         if (it != end())
         {
-            auto value = it->second;
+            auto value = *it;
             items.erase(it);
             itemRemoved(key, value);
         }
@@ -76,9 +76,9 @@ namespace coral
     template <typename Key, typename Value, typename Map>
     void PropertyMap<Key, Value, Map>::clear()
     {
-        while (size() > 0)
+        while(size() > 0)
         {
-            remove(begin()->first);
+            remove(size() - 1);
         }
     }
 }

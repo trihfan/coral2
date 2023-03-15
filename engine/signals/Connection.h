@@ -1,6 +1,5 @@
 #pragma once
 #include "ConnectionHelpers.h"
-#include <iostream>
 
 namespace coral
 {

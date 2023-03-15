@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include "signals/Signal.h"
+#include "Signal.h"
 
 namespace coral
 {

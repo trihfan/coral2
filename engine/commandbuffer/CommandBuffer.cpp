@@ -1,12 +1,19 @@
-#include "CommandBufferManager.h"
-#include "utils/Logs.h"
+#include "VulkanCommandBuffer.h"
+#include "Logs.h"
 #include "VulkanBackbuffer.h"
 #include "VulkanBackend.h"
 #include "VulkanError.h"
 
 using namespace coral;
+using namespace coral;
 
-CommandBufferManager::CommandBufferManager(const VulkanDevice& device, size_t count)
+DEFINE_SINGLETON(VulkanCommandBufferManager)
+
+void VulkanCommandBufferManager::release()
+{
+}
+
+VulkanCommandBufferManager::VulkanCommandBufferManager(const VulkanDevice& device, size_t count)
     : device(device)
     , count(count)
 {
@@ -41,7 +48,7 @@ CommandBufferManager::CommandBufferManager(const VulkanDevice& device, size_t co
     }
 }
 
-CommandBufferManager::~VulkanCommandBufferManager()
+VulkanCommandBufferManager::~VulkanCommandBufferManager()
 {
     vkDestroyCommandPool(device.logicalDevice, graphicsCommandPool, nullptr);
 }

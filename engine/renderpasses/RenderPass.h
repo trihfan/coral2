@@ -1,5 +1,5 @@
 #pragma once
-#include "Object.h"
+#include "ObjectInterface.h"
 #include "resources/Framebuffer.h"
 #include <memory>
 
@@ -13,12 +13,12 @@ namespace coral
     struct RenderPassResource
     {
         std::string name;
-        /*backend::BackendFramebufferResourceRole role;
-        backend::BackendResourceFormat format;*/
+        backend::BackendFramebufferResourceRole role;
+        backend::BackendResourceFormat format;
         int sampleCount;
     };
 
-    class RenderPass : public Object
+    class RenderPass : public ObjectInterface
     {
     public:
         void invalidate();
@@ -41,8 +41,8 @@ namespace coral
         virtual void internalRender(RenderQueue& queue, const RenderParameters& parameters) = 0;
 
         // Loaded resouces
-        std::vector<std::shared_ptr<Resource>> inputResources;
-        std::vector<std::shared_ptr<Resource>> outputResources;
+        std::vector<Object<Resource>> inputResources;
+        std::vector<Object<Resource>> outputResources;
 
     private:
         // Render pass resources
@@ -50,9 +50,10 @@ namespace coral
         std::vector<RenderPassResource> outputs;
 
         // The output framebuffer
-        std::shared_ptr<Framebuffer> framebuffer;
+        Object<Framebuffer> framebuffer;
         VkRenderPass renderPass;
+        //std::unique_Handle<backend::BackendRenderPass> backendRenderPass;
 
-        std::shared_ptr<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
+        Object<Resource> getResource(const RenderPassResource& resource, const RenderParameters& parameters) const;
     };
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Pipeline.h"
-#include "PropertyArray.h"
+#include "Object.h"
+#include "PropertyMap.h"
 
 namespace coral
 {
@@ -8,12 +9,12 @@ namespace coral
     {
     public:
         // Properties
-        PropertyArray<std::shared_ptr<Pipeline>> pipelines;
+        PropertyMap<PipelineParams, Object<Pipeline>> pipelines;
 
         // Get a pipeline by its name
-        std::shared_ptr<Pipeline> getPipelineByName(const std::string& name);
+        Object<Pipeline> getPipelineByName(const std::string& name);
 
         // Create a new pipeline
-        std::shared_ptr<Pipeline> createPipeline(PipelineParams params);
+        Object<Pipeline> createPipeline(PipelineParams params);
     };
 }

@@ -1,5 +1,6 @@
 #include "ObjectManager.h"
 #include "Object.h"
+#include "ObjectInterface.h"
 #include "utils/Logs.h"
 #include <algorithm>
 
@@ -13,7 +14,7 @@ ObjectManager::ObjectManager()
 
 ObjectManager::~ObjectManager()
 {
-    std::vector<std::shared_ptr<Object>> toRelease;
+    std::vector<Object<ObjectInterface>> toRelease;
     toRelease.reserve(objects.size());
     for (auto& object : objects)
     {
@@ -28,7 +29,7 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::update()
 {
-    std::shared_ptr<Object> object;
+    Object<ObjectInterface> object;
 
     // Object to reset
     while (resetList.try_dequeue(object))
@@ -85,17 +86,17 @@ void ObjectManager::update()
     object = nullptr;
 }
 
-void ObjectManager::add(const std::shared_ptr<Object>& object)
+void ObjectManager::add(const Object<ObjectInterface>& object)
 {
     initializeList.enqueue(object);
 }
 
-void ObjectManager::remove(const std::shared_ptr<Object>& object)
+void ObjectManager::remove(const Object<ObjectInterface>& object)
 {
     releaseList.enqueue(object);
 }
 
-void ObjectManager::reset(const std::shared_ptr<Object>& object)
+void ObjectManager::reset(const Object<ObjectInterface>& object)
 {
     resetList.enqueue(object);
 }

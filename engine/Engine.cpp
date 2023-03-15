@@ -1,23 +1,17 @@
 #include "Engine.h"
 #include "ObjectManager.h"
-#include "RenderParameters.h"
 #include "scene/SceneManager.h"
 #include "renderpasses/RenderPassManager.h"
 #include "renderpasses/RenderPass.h"
 #include "resources/stb_image.h"
 #include "resources/PipelineManager.h"
-#include "commandbuffer/CommandBufferManager.h"
 #include "utils/Freetype.h"
 #include "utils/Logs.h"
-#include "utils/CoralException.h"
-#include <GLFW/glfw3.h>
-
-#include "vulkan/VulkanError.h"
 
 using namespace coral;
 using namespace std::chrono;
 
-Engine::Engine(int width, int height) : renderParameters(std::make_unique<RenderParameters>())
+Engine::Engine(int width, int height)
 {
     // Initialize vulkan
     initVulkan();
@@ -39,7 +33,7 @@ Engine::Engine(int width, int height) : renderParameters(std::make_unique<Render
     resize(width, height);
 }
 
-Engine::~Engine()
+ Engine::~Engine()
 {
     // Delete modules
     freetype = nullptr;
@@ -54,8 +48,8 @@ Engine::~Engine()
 void Engine::resize(int width, int height)
 {
     Logs(info) << "update size: " << width << ", " << height;
-    renderParameters->width = width;
-    renderParameters->height = height;
+    renderParameters.width = width;
+    renderParameters.height = height;
     renderPassManager->invalidate();
     pipelineManager->pipelines.clear();
 }
@@ -63,9 +57,9 @@ void Engine::resize(int width, int height)
 void Engine::frame()
 {
     // Update time
-    double lastTime = renderParameters->time;
-    renderParameters->time = static_cast<double>(duration_cast<microseconds>(Clock::now() - startTime).count()) / 1e6;
-    renderParameters->deltaTime = renderParameters->time - lastTime;
+    double lastTime = renderParameters.time;
+    renderParameters.time = static_cast<double>(duration_cast<microseconds>(Clock::now() - startTime).count()) / 1e6;
+    renderParameters.deltaTime = renderParameters.time - lastTime;
 
     // Start the frame
     beginFrame();
@@ -82,20 +76,20 @@ void Engine::frame()
     // Render for each active camera
     for (size_t i = 0; i < sceneManager->getCameras().size(); i++)
     {
-        renderParameters->camera = sceneManager->getCameras()[i];
+        renderParameters.camera = sceneManager->getCameras()[i];
 
         // Cull for current camera
-        auto queues = sceneManager->buildRenderQueuesFor(*renderParameters);
+        auto queues = sceneManager->buildRenderQueuesFor(renderParameters);
 
         // Render each renderpasses
         for (auto& renderPass : renderPassManager->getOrderedRenderPasses())
         {
             auto it = queues.find(renderPass->name);
-            renderPass->render(it->second, *renderParameters);
+            renderPass->render(it->second, renderParameters);
         }
 
-        renderParameters->camera = nullptr;
-        renderParameters->lights = LightArray();
+        renderParameters.camera = nullptr;
+        renderParameters.lights = LightArray();
     }
 
     // End the frame
@@ -106,20 +100,20 @@ void Engine::beginFrame()
 {
     // -- GET NEXT IMAGE --
     // Wait for given fence to signal (open) from last draw before continuing
-    vkWaitForFences(logicalDevice, 1, &drawFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    vkWaitForFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
     // Manually reset (close) fences
-    vkResetFences(logicalDevice, 1, &drawFences[currentFrame]);
+    vkResetFences(mainDevice.logicalDevice, 1, &drawFences[currentFrame]);
 
     // Get index of next image to be drawn to, and signal semaphore when ready to be drawn to
-    vkAcquireNextImageKHR(logicalDevice, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable[currentFrame], VK_NULL_HANDLE, &imageIndex);
+    vkAcquireNextImageKHR(mainDevice.logicalDevice, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-    commandBufferManager->begin();
+    VulkanCommandBufferManager::get()->begin();
 }
 
 void Engine::endFrame()
 {
-    commandBufferManager->end();
+    VulkanCommandBufferManager::get()->end();
 
     // -- SUBMIT COMMAND BUFFER TO RENDER --
     // Queue submission information
@@ -132,7 +126,7 @@ void Engine::endFrame()
     };
     submitInfo.pWaitDstStageMask = waitStages; // Stages to check semaphores at
     submitInfo.commandBufferCount = 1; // Number of command buffers to submit
-    submitInfo.pCommandBuffers = &commandBufferManager->getCommandBuffer(); // Command buffer to submit
+    submitInfo.pCommandBuffers = &VulkanCommandBufferManager::get()->getCommandBuffer(); // Command buffer to submit
     submitInfo.signalSemaphoreCount = 1; // Number of semaphores to signal
     submitInfo.pSignalSemaphores = &renderFinished[currentFrame]; // Semaphores to signal when command buffer finishes
 
@@ -166,7 +160,7 @@ void Engine::initVulkan()
 {
     createInstance();
     createSurface();
-    selectPhysicalDevice();
+    getPhysicalDevice();
     createLogicalDevice();
     createSwapchain();
     createFrameSynchronization();
@@ -175,13 +169,13 @@ void Engine::initVulkan()
 void Engine::releaseVulkan()
 {
     // Wait until no actions being run on device before destroying
-    vkDeviceWaitIdle(logicalDevice);
+    vkDeviceWaitIdle(mainDevice.logicalDevice);
 
     deleteFrameSynchronization();
     deleteSwapchain();
 
     vkDestroySurfaceKHR(instance, surface, nullptr);
-    vkDestroyDevice(logicalDevice, nullptr);
+    vkDestroyDevice(mainDevice.logicalDevice, nullptr);
     vkDestroyInstance(instance, nullptr);
 }
 
@@ -243,7 +237,7 @@ void Engine::createInstance()
 
 void Engine::createSwapchain()
 {
-    SwapchainDetails swapchainDetails = getSwapChainDetails(physicalDevice);
+    SwapchainDetails swapchainDetails = getSwapChainDetails(mainDevice.physicalDevice);
 
     // Choose optimal surface format
     VkSurfaceFormatKHR surfaceFormat = chooseBestSurfaceFormat(swapchainDetails.formats);
@@ -277,7 +271,7 @@ void Engine::createSwapchain()
     swapchainCreateInfo.clipped = VK_TRUE;
 
     // Get queue family indices
-    QueueFamilyIndices indices = getQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = getQueueFamilies(mainDevice.physicalDevice);
 
     // If graphics && presentation family are different, then swapchain image must be shared between queue families
     if (indices.graphicsFamily != indices.presentationFamily)
@@ -298,7 +292,7 @@ void Engine::createSwapchain()
     swapchainCreateInfo.oldSwapchain = nullptr; // todo swap chain when resizing
 
     // Create swap chain
-    if (!VERIFY(vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain)))
+    if (!VERIFY(vkCreateSwapchainKHR(mainDevice.logicalDevice, &swapchainCreateInfo, nullptr, &swapchain)))
     {
         throw std::runtime_error("Failed to create the swapchain!");
     }
@@ -309,25 +303,24 @@ void Engine::createSwapchain()
 
     // Get swap chain images
     uint32_t swapchainImageCount;
-    vkGetSwapchainImagesKHR(logicalDevice, swapchain, &swapchainImageCount, nullptr);
+    vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, nullptr);
     std::vector<VkImage> images(swapchainImageCount);
-    vkGetSwapchainImagesKHR(logicalDevice, swapchain, &swapchainImageCount, images.data());
+    vkGetSwapchainImagesKHR(mainDevice.logicalDevice, swapchain, &swapchainImageCount, images.data());
 
     // Create image views
-    /*std::vector<std::unique_ptr<VulkanResource>> swapchainImages(images.size());
+    std::vector<std::unique_Handle<VulkanResource>> swapchainImages(images.size());
     for (size_t i = 0; i < images.size(); i++)
     {
         VulkanImage image { images[i], createImageView(images[i], swapchainFormat, VK_IMAGE_ASPECT_COLOR_BIT) };
-        swapchainImages[i] = std::make_unique<VulkanResource>(image, logicalDevice);
+        swapchainImages[i] = std::make_unique<VulkanResource>(image, mainDevice);
     }
 
     swapChainImageCount = swapchainImages.size();
-    VulkanBackbuffer::setSwapChainImages(std::move(swapchainImages));*/
-
-    commandBufferManager = std::make_unique<CommandBufferManager>(logicalDevice, swapChainImageCount);
+    VulkanBackbuffer::setSwapChainImages(std::move(swapchainImages));
+    VulkanCommandBufferManager::create(mainDevice, swapChainImageCount);
 }
 
-void Engine::selectPhysicalDevice()
+void Engine::getPhysicalDevice()
 {
     // Enumerate Physical devices the vkInstance can access
     uint32_t deviceCount = 0;
@@ -347,12 +340,12 @@ void Engine::selectPhysicalDevice()
     {
         if (checkDeviceSuitable(device))
         {
-            physicalDevice = device;
+            mainDevice.physicalDevice = device;
             break;
         }
     }
 
-    /*if (!physicalDevice)
+    /*if (!mainDevice.physicalDevice)
     {
         throw
     }*/
@@ -361,7 +354,7 @@ void Engine::selectPhysicalDevice()
 void Engine::createLogicalDevice()
 {
     // Get the queue family indices for the chosen Physical Device
-    QueueFamilyIndices indices = getQueueFamilies(physicalDevice);
+    QueueFamilyIndices indices = getQueueFamilies(mainDevice.physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<int> queueFamilyIndices { indices.graphicsFamily, indices.presentationFamily };
@@ -391,7 +384,7 @@ void Engine::createLogicalDevice()
     deviceCreateInfo.pEnabledFeatures = &deviceFeatures; // Physical Device features Logical Device will use
 
     // Create the logical device for the given physical device
-    if (!VERIFY(vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice)))
+    if (!VERIFY(vkCreateDevice(mainDevice.physicalDevice, &deviceCreateInfo, nullptr, &mainDevice.logicalDevice)))
     {
         throw CoralException("Failed to create a Logical Device!");
     }
@@ -399,8 +392,8 @@ void Engine::createLogicalDevice()
     // Queues are created at the same time as the device...
     // So we want h&&le to queues
     // From given logical device, of given Queue Family, of given Queue Index (0 since only one queue), place reference in given VkQueue
-    vkGetDeviceQueue(logicalDevice, static_cast<uint32_t>(indices.graphicsFamily), 0, &graphicsQueue);
-    vkGetDeviceQueue(logicalDevice, static_cast<uint32_t>(indices.presentationFamily), 0, &presentationQueue);
+    vkGetDeviceQueue(mainDevice.logicalDevice, static_cast<uint32_t>(indices.graphicsFamily), 0, &graphicsQueue);
+    vkGetDeviceQueue(mainDevice.logicalDevice, static_cast<uint32_t>(indices.presentationFamily), 0, &presentationQueue);
 }
 
 void Engine::createSurface()
@@ -663,7 +656,7 @@ VkImageView Engine::createImageView(VkImage image, VkFormat format, VkImageAspec
 
     // Create the image view
     VkImageView imageView;
-    if (!VERIFY(vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView)))
+    if (!VERIFY(vkCreateImageView(mainDevice.logicalDevice, &imageViewCreateInfo, nullptr, &imageView)))
     {
         throw CoralException("Failed to create the image view!");
     }
@@ -671,6 +664,53 @@ VkImageView Engine::createImageView(VkImage image, VkFormat format, VkImageAspec
     return imageView;
 }
 
+std::string Engine::getName() const
+{
+    return "vulkan";
+}
+
+QueueFamilyIndices Engine::getQueueFamilies()
+{
+    QueueFamilyIndices indices;
+
+    // Get all Queue Family Property info for the given device
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(mainDevice.physicalDevice, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilyList(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(mainDevice.physicalDevice, &queueFamilyCount, queueFamilyList.data());
+
+    // Go through each queue family and check if it has at least 1 of the required types of queue
+    int i = 0;
+    for (const auto& queueFamily : queueFamilyList)
+    {
+        // First check if queue family has at least 1 queue in that family (could have no queues)
+        // Queue can be multiple types defined through bitfield. Need to bitwise AND with VK_QUEUE_*_BIT to check if has required type
+        if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        {
+            indices.graphicsFamily = i; // If queue family is valid, then get index
+        }
+
+        // Check if Queue Family supports presentation
+        VkBool32 presentationSupport = false;
+        vkGetPhysicalDeviceSurfaceSupportKHR(mainDevice.physicalDevice, i, surface, &presentationSupport);
+        // Check if queue is presentation type (can be both graphics and presentation)
+        if (queueFamily.queueCount > 0 && presentationSupport)
+        {
+            indices.presentationFamily = i;
+        }
+
+        // Check if queue family indices are in a valid state, stop searching if so
+        if (indices.isValid())
+        {
+            break;
+        }
+
+        i++;
+    }
+
+    return indices;
+}
 
 void Engine::createFrameSynchronization()
 {
@@ -690,17 +730,17 @@ void Engine::createFrameSynchronization()
 
     for (size_t i = 0; i < swapChainImageCount; i++)
     {
-        if (!VERIFY(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable[i])))
+        if (!VERIFY(vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &imageAvailable[i])))
         {
             Logs(error) << "Failed to create image available semaphores";
         }
 
-        if (!VERIFY(vkCreateSemaphore(logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished[i])))
+        if (!VERIFY(vkCreateSemaphore(mainDevice.logicalDevice, &semaphoreCreateInfo, nullptr, &renderFinished[i])))
         {
             Logs(error) << "Failed to create render finished semaphores";
         }
 
-        if (!VERIFY(vkCreateFence(logicalDevice, &fenceCreateInfo, nullptr, &drawFences[i])))
+        if (!VERIFY(vkCreateFence(mainDevice.logicalDevice, &fenceCreateInfo, nullptr, &drawFences[i])))
         {
             Logs(error) << "Failed to create a draw fences";
         }
@@ -710,11 +750,11 @@ void Engine::createFrameSynchronization()
 void Engine::deleteSwapchain()
 {
     // Clean
-    commandBufferManager = nullptr;
-    //VulkanBackbuffer::release();
+    VulkanCommandBufferManager::destroy();
+    VulkanBackbuffer::release();
     if (swapchain)
     {
-        vkDestroySwapchainKHR(logicalDevice, swapchain, nullptr);
+        vkDestroySwapchainKHR(mainDevice.logicalDevice, swapchain, nullptr);
     }
 }
 
@@ -722,9 +762,9 @@ void Engine::deleteFrameSynchronization()
 {
     for (size_t i = 0; i < swapChainImageCount; i++)
     {
-        vkDestroySemaphore(logicalDevice, renderFinished[i], nullptr);
-        vkDestroySemaphore(logicalDevice, imageAvailable[i], nullptr);
-        vkDestroyFence(logicalDevice, drawFences[i], nullptr);
+        vkDestroySemaphore(mainDevice.logicalDevice, renderFinished[i], nullptr);
+        vkDestroySemaphore(mainDevice.logicalDevice, imageAvailable[i], nullptr);
+        vkDestroyFence(mainDevice.logicalDevice, drawFences[i], nullptr);
     }
 
     renderFinished.clear();

@@ -1,13 +1,11 @@
 #pragma once
-#include <vulkan/vulkan.h>
-#include <vector>
 
 namespace coral
 {
     class CommandBufferManager
     {
     public:
-        CommandBufferManager(const VkDevice& device, size_t count);
+        CommandBufferManager(const VulkanDevice& device, size_t count);
         ~CommandBufferManager();
 
         VkCommandBuffer& getCommandBuffer();
@@ -17,7 +15,7 @@ namespace coral
         void end();
 
     private:
-        VkDevice device;
+        VulkanDevice device;
         size_t count;
         VkCommandPool graphicsCommandPool;
         std::vector<VkCommandBuffer> commandBuffers;

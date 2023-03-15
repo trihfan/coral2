@@ -25,10 +25,10 @@ namespace coral
         RenderPassManager();
 
         // Properties
-        PropertyArray<std::shared_ptr<RenderPass>> renderPasses;
+        PropertyArray<Object<RenderPass>> renderPasses;
 
         // Helpers
-        std::shared_ptr<RenderPass> getRenderPassByName(const std::string& name);
+        Object<RenderPass> getRenderPassByName(const std::string& name);
 
         // Invalidate the render graph
         void invalidate();
@@ -37,11 +37,11 @@ namespace coral
         void update();
 
         // Return the renderpasses ordered by render order
-        const std::vector<std::shared_ptr<RenderPass>>& getOrderedRenderPasses();
+        const std::vector<Object<RenderPass>>& getOrderedRenderPasses();
 
     private:
         // Ordered renderpasses by render priority
-        std::vector<std::shared_ptr<RenderPass>> orderedRenderPasses;
+        std::vector<Object<RenderPass>> orderedRenderPasses;
 
         // Bake the render graph
         void bake();
